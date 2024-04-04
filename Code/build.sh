@@ -2,8 +2,8 @@
 
 # Check if arguments are provided, if not, set default values
 if [ "$#" -eq 0 ]; then
-    flex_file=$(find ./Code/ -maxdepth 1 -type f -name "*.l" | head -n 1)
-    bison_file=$(find ./Code/ -maxdepth 1 -type f -name "*.y" | head -n 1)
+    flex_file=$(find . -maxdepth 1 -type f -name "*.l" | head -n 1)
+    bison_file=$(find . -maxdepth 1 -type f -name "*.y" | head -n 1)
 elif [ "$#" -eq 2 ]; then
     flex_file="$1"
     bison_file="$2"

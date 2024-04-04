@@ -3,7 +3,7 @@
 
 // "y.tab.h" is automatically generated from the .y file.  
 // definitions for tokens are in y.tab.h
-#include "y.tab.h"
+#include "spider.tab.h"
 
 // called by the parser in case of a syntax error. 
 void yyerror (char *s);
