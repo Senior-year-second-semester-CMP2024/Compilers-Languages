@@ -1,4 +1,4 @@
-    /* calculator #1 */
+/* calculator #1 */
 %{
     #include "calc2.tab.h"
     #include <stdlib.h>
