@@ -1,6 +1,6 @@
 %{
 
-#include "spid  er.tab.h"
+#include "y.tab.h"
 #include <stdio.h>
 #include <string.h> // For strdup
 

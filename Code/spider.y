@@ -2,9 +2,9 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include <ctype.h>
-    void yyerror(char *);
-    int yylex();
+    #include <string.h>
     void yyerror (char *s); 
+    int yylex();
 %}
 
 // -----Tokens-----
@@ -28,7 +28,7 @@
 %right '=' 
 %right NOT
 
-%nonassoc LESS_THAN GREATER_THAN LESS_THAN_OR_EQUAL GREATER_THAN_OR_EQUAL EQUAL NOT_EQUAL
+//%nonassoc LESS_THAN GREATER_THAN LESS_THAN_OR_EQUAL GREATER_THAN_OR_EQUAL EQUAL NOT_EQUAL
 
 %%
 
@@ -133,8 +133,8 @@ function_parameters : literal                                          {;}
                     | literal ',' function_parameters                  {;}
                     ;
 
-function_definition : data_type IDENTIFIER '(' function_arguments ')' code_block        {;}
-                    | data_type IDENTIFIER '(' ')' code_block                           {printf("function_definition\n");}
+function_definition : data_type IDENTIFIER '(' function_arguments ')' statement_list        {;}
+                    | data_type IDENTIFIER '(' ')' statement_list                           {printf("function_definition\n");}
                     ;
 
 function_call : IDENTIFIER '(' function_parameters ')'        {;}
