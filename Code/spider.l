@@ -1,6 +1,6 @@
 %{
 
-#include "spider.tab.h"
+#include "spid  er.tab.h"
 #include <stdio.h>
 #include <string.h> // For strdup
 
@@ -67,7 +67,7 @@ False				{ yylval=0; return FALSE_VALUE; }
 
 -?[0-9]+			{ yylval = atoi(yytext); return INTEGER; }
 
--?[0-9]*[.][0-9]+		{ yylval = atof(yytext); return FLOAT; }
+-?[0-9]*"."[0-9]+		{ yylval = atof(yytext); return FLOAT; }
 
 [_a-zA-Z][_a-zA-Z0-9]*		{ yylval = strdup(yytext); return IDENTIFIER; } 
 
