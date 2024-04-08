@@ -9,10 +9,12 @@ void yyerror (char *s);
 
 // called by the parser whenever it needs a token. 
 // This is where the lexical analyzer is called. 
-int yylex();
+//int yylex();
 
 
-int line=1;
+int nword=0;
+int nline=1;
+
 %}
 
 %%
@@ -41,7 +43,6 @@ int line=1;
 "break"				{ return BREAK; }
 "return"			{ return RETURN; }
 
-"enum"				{ return ENUM; }
 
 "<<"				{ return SHIFT_LEFT; }
 ">>"				{ return SHIFT_RIGHT; }
@@ -73,9 +74,9 @@ False				{ yylval=0; return FALSE_VALUE; }
 
 \"(\\.|[^\\"])*\"		{ yylval = strdup(yytext); return STRING; }
 
-\n				{ line++; }
+(\n)+				{ nline+=yyleng ; nword++; return yytext[0];}
 
-[ \r\t]+			{ /* Ignore whitespace */ }
+[ \r\t]+			{ nword++; /* Ignore whitespace */ }
 
 \/\/[^\n]*			{ /* Ignore inline comments "//comment" */ }
 
@@ -87,7 +88,7 @@ False				{ yylval=0; return FALSE_VALUE; }
 
 //SubRoutines
 // called by lex when input is exhausted. Return 1 if you are done
-
 int yywrap (void) {
+    printf("#words = %d\t #lines= %d\n", nword, nline-1);
     return 1;
 }

@@ -5,7 +5,7 @@
 
 %}
 
-%token PRINT CONSTANT BOOL_DATA_TYPE STRING_DATA_TYPE INT_DATA_TYPE FLOAT_DATA_TYPE VOID_DATA_TYPE IF ELSE ELSE_IF FOR WHILE REPEAT UNTIL SWITCH CASE DEFAULT CONTINUE BREAK RETURN SHIFT_LEFT SHIFT_RIGHT AND OR NOT TRUE_VALUE FALSE_VALUE IDENTIFIER INTEGER FLOAT STRING ENUM
+%token PRINT CONSTANT BOOL_DATA_TYPE STRING_DATA_TYPE INT_DATA_TYPE FLOAT_DATA_TYPE VOID_DATA_TYPE IF ELSE ELSE_IF FOR WHILE REPEAT UNTIL SWITCH CASE DEFAULT CONTINUE BREAK RETURN SHIFT_LEFT SHIFT_RIGHT AND OR NOT TRUE_VALUE FALSE_VALUE IDENTIFIER INTEGER FLOAT STRING
 %left '+' '-'
 %left '*' '/' '%'
 %left AND OR
@@ -14,27 +14,30 @@
 %nonassoc LESS_THAN GREATER_THAN LESS_THAN_OR_EQUAL GREATER_THAN_OR_EQUAL EQUAL NOT_EQUAL
 
 %%
-
+/*rules*/
 program : statement_list
-        | /* empty */
+        | '\n'
+        | /*empty*/
         ;
 
-statement_list : statement
-               | statement_list statement
+statement_list : statement';'
+               | statement_list statement';'
                ;
 
-statement : PRINT expression ';'
-          | declaration ';'
+statement : PRINT expression
+          | declaration
           | selection_statement
           | iteration_statement
-          | jump_statement ';'
+          | jump_statement
+          | assignment
           ;
 
-declaration : CONSTANT data_type IDENTIFIER '=' expression
-            | data_type IDENTIFIER '=' expression
+declaration : CONSTANT data_type assignment
+            | data_type assignment
             | data_type IDENTIFIER
             ;
-
+assignment : IDENTIFIER '=' expression
+            ;
 data_type : BOOL_DATA_TYPE
           | STRING_DATA_TYPE
           | INT_DATA_TYPE
@@ -45,7 +48,7 @@ data_type : BOOL_DATA_TYPE
 selection_statement : IF '(' expression ')' statement
                     | IF '(' expression ')' statement ELSE statement
                     | IF '(' expression ')' statement ELSE_IF '(' expression ')' statement
-                    | SWITCH '(' expression ')' '{' case_list '}'
+                    | SWITCH '(' expression ')' case_list
                     ;
 
 case_list : case_list case
