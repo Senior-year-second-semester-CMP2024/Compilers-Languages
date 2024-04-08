@@ -1,6 +1,6 @@
 /* calculator #1 */
 %{
-    #include "calc2.tab.h"
+    #include "y.tab.h"
     #include <stdlib.h>
     void yyerror(char *);
 %}
