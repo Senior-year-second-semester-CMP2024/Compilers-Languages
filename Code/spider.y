@@ -3,8 +3,13 @@
     #include <stdlib.h>
     #include <ctype.h>
     #include <string.h>
+
     void yyerror (char *s); 
+    int yyparse();
+    int yywrap();
     int yylex();
+    extern FILE *yyin;
+
 %}
 
 // -----Tokens-----
@@ -32,7 +37,7 @@
 
 %%
 
-program : statement_list
+program : statement_list 
         | /* empty */
         ;
 
@@ -164,7 +169,15 @@ void yyerror(char *s) {
     fprintf(stderr, "%s\n", s);
 }
 
-
-int main(void) {
+int main(int argc, char *argv[]) {
+    yyin = fopen(argv[1], "r");
     yyparse();
+
+    if (yywrap()) {
+        // printf("Winner Winner Chicken Dinner (kaak🐔)\n");
+    }
+
+    fclose(yyin);
+
+    return 0;
 }

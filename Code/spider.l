@@ -1,6 +1,6 @@
 %{
 
-#include "y.tab.h"
+#include "spider.tab.h"
 #include <stdio.h>
 #include <string.h> // For strdup
 
