@@ -1,1 +1,17 @@
-print("ad");
+x = 0;
+x = 9;
+asd = 0;
+if (z > x) x = 0;
+else x = 1;
+
+if (z > x) x = 0;
+else x = 1;
+x = 0;
+
+//comment ignored
+
+// switch(z){ case 1 : x = 1; }
+
+sd = 0;
+
+

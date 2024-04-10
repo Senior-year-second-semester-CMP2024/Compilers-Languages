@@ -4,11 +4,15 @@
     #include <ctype.h>
     #include <string.h>
 
+    #define YY_USER_ACTION yylineno += yyleng;
+    #define YYSTYPE int
+
     void yyerror (char *s); 
     int yyparse();
     int yywrap();
     int yylex();
     extern FILE *yyin;
+    extern int nline;
 
 %}
 
@@ -32,34 +36,35 @@
 
 %right '=' 
 %right NOT
-
 //%nonassoc LESS_THAN GREATER_THAN LESS_THAN_OR_EQUAL GREATER_THAN_OR_EQUAL EQUAL NOT_EQUAL
 
 %%
 
-program : statement_list 
-        | /* empty */
+program : statement_list
+        | '\n'
+        | /*empty*/
         ;
 
-statement_list : statement
-               | statement_list statement
+statement_list : statement ';'
+               | statement ';' '\n'
+               | statement ';' statement_list
+               | statement ';' '\n' statement_list
                ;
 
-statement : PRINT expression ';'
-          | PRINT '(' STRING ')' 	                {printf("%s\n", $3);}
-          | declaration ';'
+statement : PRINT expression
+          | declaration
           | selection_statement
           | iteration_statement
-          | jump_statement ';'
+          | jump_statement
+          | assignment
           ;
 
-declaration : CONSTANT data_type IDENTIFIER '=' expression
-            | data_type IDENTIFIER '=' expression
-            | data_type IDENTIFIER '=' STRING
+declaration : CONSTANT data_type assignment
+            | data_type assignment
             | data_type IDENTIFIER
-            | enum_declaration
-            | enum_def
             ;
+
+assignment : IDENTIFIER '=' expression
 
 data_type : BOOL_DATA_TYPE          {$$ = $1;}
           | STRING_DATA_TYPE        {$$ = $1;}
@@ -68,9 +73,10 @@ data_type : BOOL_DATA_TYPE          {$$ = $1;}
           | VOID_DATA_TYPE          {$$ = $1;}
           ;
 
-selection_statement : IF '(' expression ')' statement
-                    | IF '(' expression ')' statement ELSE statement
-                    | IF '(' expression ')' statement ELSE_IF '(' expression ')' statement
+selection_statement : IF '(' expression ')' statement_list
+                    | IF '(' expression ')' statement_list ELSE statement_list
+                    | IF '(' expression ')' statement_list ELSE_IF '(' expression ')' statement_list
+                    | IF '(' expression ')' statement_list ELSE statement_list ELSE_IF '(' expression ')' statement_list
                     | SWITCH '(' expression ')' '{' case_list '}'
                     ;
 
@@ -166,18 +172,21 @@ enum_declaration : IDENTIFIER IDENTIFIER                         {;}
 %%
 
 void yyerror(char *s) {
-    fprintf(stderr, "%s\n", s);
+     fprintf(stderr, "Error: %s at line %d\n", s, nline);
 }
 
 int main(int argc, char *argv[]) {
     yyin = fopen(argv[1], "r");
-    yyparse();
-
-    if (yywrap()) {
-        // printf("Winner Winner Chicken Dinner (kaak🐔)\n");
+    if (yyin == NULL) {
+        printf("File not found, Interpreter mode..\n");
+        
+        yyparse();
     }
+    else{
+        yyparse();
 
-    fclose(yyin);
+        fclose(yyin);
 
-    return 0;
+        return 0;
+    }
 }
