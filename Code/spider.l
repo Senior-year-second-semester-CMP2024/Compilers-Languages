@@ -3,17 +3,41 @@
 #include "spider.tab.h"
 #include <stdio.h>
 #include <string.h> // For strdup
+#include <stdarg.h>
 
 // called by the parser in case of a syntax error. 
 void yyerror (char *s);
 
 // called by the parser whenever it needs a token. 
 // This is where the lexical analyzer is called. 
-//int yylex();
+int yylex();
 
 
 int nword=0;
-int nline=1;
+extern int nline=1;
+#define SHOW_LOGS 1
+void Log(const char* type, const char* value)
+{
+    if(SHOW_LOGS)
+    {
+        if (type == "int value")
+        {
+            printf("Lex(%d) %s: %d\n", nline, type, atoi(value));
+            // printf("\033[1;30mLex(%d) %s: %d\033[0m\n", nline, type, atoi(value));
+        }
+        else if (type == "float value")
+        {
+            printf("Lex(%d) %s: %f\n", nline, type, atof(value));
+            // printf("\033[1;30mLex(%d) %s: %f\033[0m\n", nline, type, atof(value));
+        }
+        else{
+            printf("Lex(%d) %s: %s\n", nline, type, value);
+            // printf("\033[1;30mLex(%d) %s: %s\033[0m\n", nline, type, value);
+
+        }
+
+    }
+}
 
 %}
 
@@ -57,34 +81,36 @@ int nline=1;
 "!"				{ return NOT; }
 
 
-[-+*/%&^|~]			{ return yytext[0]; }
+[;]                 {return yytext[0];} /*Return the character*/
 
-[()={}:,;]			{ return yytext[0]; }
+[-+*/%&^|~]			{ return yytext[0]; } 
 
-True				{ yylval=1; return TRUE_VALUE; }
+[()={}:,]			{ return yytext[0]; }
 
-False				{ yylval=0; return FALSE_VALUE; }
+"true"				{ yylval=1; return TRUE_VALUE; }
 
+"false"				{ yylval=0; return FALSE_VALUE; }
+
+[_a-zA-Z][_a-zA-Z0-9]*		{ yylval = strdup(yytext); return IDENTIFIER; } 
 
 -?[0-9]+			{ yylval = atoi(yytext); return INTEGER; }
 
 -?[0-9]*[.][0-9]+		{ yylval = atof(yytext); return FLOAT; }
 
-[_a-zA-Z][_a-zA-Z0-9]*		{ yylval = strdup(yytext); return IDENTIFIER; } 
-
 \"(\\.|[^\\"])*\"		{ yylval = strdup(yytext); return STRING; }
 
-(\n)+				{ nline += yyleng ; nword++; return yytext[0];}
+
+(\n)+				{nline += yyleng ; nword++; }
 
 [ \r\t]+			{ nword++; /* Ignore whitespace */ }
 
-\/\/[^\n]*			{ /* Ignore inline comments "//comment" */ }
+\/\/.*			{ /* Ignore inline comments "//comment" */ }
 
 \/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*\/	{ /* Ignore multiline comments */ }
 
 .				{ yyerror("unexpected character"); }
 
-%%
+%%  
 
 //SubRoutines
 // called by lex when input is exhausted. Return 1 if you are done

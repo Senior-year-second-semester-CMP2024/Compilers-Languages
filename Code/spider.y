@@ -40,23 +40,33 @@
 
 %%
 
-program : statement_list
-        | '\n'
-        | /*empty*/
+program : statement_list                            {;}
+        | function_definition                       {;} 
+        | statement_list program                    {;}  
+        | function_definition program               {;}
         ;
 
-statement_list : statement ';'
-               | statement ';' '\n'
-               | statement ';' statement_list
-               | statement ';' '\n' statement_list
+statement_list : statement ';'                           {;}
+                | statement_list statement ';'           {;} 
+                | control_statement                      {;}
+                | statement_list control_statement       {;}
+                | '{' statement_list '}'
+                | statement_list '{' statement_list '}'  {;}        
                ;
 
-statement : PRINT expression
-          | declaration
-          | selection_statement
-          | iteration_statement
-          | jump_statement
-          | assignment
+control_statement   :  if_condition 
+                    |  while_loop 
+                    |  for_loop 
+                    |  repeat_until_loop 
+                    |  switch_Case 
+                    ;   
+
+statement : assignment                   {;}
+          | declaration                  {;}
+          | jump_statement               {;}
+          | expression                   {;}
+          | PRINT '(' IDENTIFIER ')'     {;}
+          | PRINT '(' expression ')'     {;}
           ;
 
 declaration : CONSTANT data_type assignment
@@ -65,39 +75,7 @@ declaration : CONSTANT data_type assignment
             ;
 
 assignment : IDENTIFIER '=' expression
-
-data_type : BOOL_DATA_TYPE          {$$ = $1;}
-          | STRING_DATA_TYPE        {$$ = $1;}
-          | INT_DATA_TYPE           {$$ = $1;}
-          | FLOAT_DATA_TYPE         {$$ = $1;}
-          | VOID_DATA_TYPE          {$$ = $1;}
-          ;
-
-selection_statement : IF '(' expression ')' statement_list
-                    | IF '(' expression ')' statement_list ELSE statement_list
-                    | IF '(' expression ')' statement_list ELSE_IF '(' expression ')' statement_list
-                    | IF '(' expression ')' statement_list ELSE statement_list ELSE_IF '(' expression ')' statement_list
-                    | SWITCH '(' expression ')' '{' case_list '}'
-                    ;
-
-case_list : case_list case
-          | case
-          ;
-
-case : CASE INTEGER ':' statement_list
-     | DEFAULT ':' statement_list
-     ;
-
-iteration_statement : WHILE '(' expression ')' statement                                {;}
-                    | FOR '(' declaration ';' expression ';' expression ')' statement   {;}
-                    | REPEAT statement UNTIL '(' expression ')' ';'                     {;}
-                    ;
-
-jump_statement : CONTINUE                       {;}
-               | BREAK                          {;}
-               | RETURN expression              {;}
-               | RETURN                         {;}
-               ;
+           ;
 
 expression : function_call                                      {;}
            | '-' literal                                        {$$ = -$2;}
@@ -127,14 +105,54 @@ expression : function_call                                      {;}
            ;
 
 
+// ------------ Conditions ------------------
+if_condition             : IF '(' expression  ')' '{' statement_list '}' else_condition {;}
+                        ;
+else_condition           : {;}
+                        | ELSE {;} if_condition          {;}
+                        | ELSE {;}'{' statement_list '}'     {;}
+                        ;
+case                    : CASE expression ':' statement_list                {;}
+                        | DEFAULT ':' statement_list                        {;}
+                        ;
+caseList                : caseList case
+                        | case 
+                        ;
+switch_Case          : SWITCH '(' IDENTIFIER ')' '{' caseList '}'        {;}
+                        ;
+
+case_list : case_list case
+          | case
+          ;
+
+// ------------ Loops ------------------
+while_loop               : WHILE '(' expression ')'  '{' statement_list '}'                              {;}
+                        ;
+for_loop                 : FOR '(' assignment ';'  expression ';'  assignment ')' '{' statement_list '}' {;}
+                        ;
+repeat_until_loop         : REPEAT '{' statement_list '}' UNTIL '(' expression ')' ';'                    {;}
+                        ;
+
+jump_statement : CONTINUE                       {;}
+               | BREAK                          {;}
+               | RETURN expression              {;}
+               | RETURN                         {;}
+               ;
+
+// ------------ Data Types ------------------
+data_type : BOOL_DATA_TYPE          {$$ = $1;}
+          | STRING_DATA_TYPE        {$$ = $1;}
+          | INT_DATA_TYPE           {$$ = $1;}
+          | FLOAT_DATA_TYPE         {$$ = $1;}
+          | VOID_DATA_TYPE          {$$ = $1;}
+          ;
+
 literal : INTEGER               {$$ = $1;}
         | FLOAT                 {$$ = $1;}
         | STRING                {$$ = $1;}
         | TRUE_VALUE            {$$ = 1;}
         | FALSE_VALUE           {$$ = 0;}
         ;
-
-
 // ------------ Function ------------------
 function_arguments : data_type IDENTIFIER                                 {;}
                    | data_type IDENTIFIER ',' function_arguments          {;}
@@ -145,7 +163,8 @@ function_parameters : literal                                          {;}
                     ;
 
 function_definition : data_type IDENTIFIER '(' function_arguments ')' statement_list        {;}
-                    | data_type IDENTIFIER '(' ')' statement_list                           {printf("function_definition\n");}
+                    | data_type IDENTIFIER '(' function_arguments ')' statement_list '\n'   {;}
+                    | data_type IDENTIFIER '(' ')' statement_list                           {;}
                     ;
 
 function_call : IDENTIFIER '(' function_parameters ')'        {;}
