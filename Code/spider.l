@@ -83,13 +83,13 @@ void Log(const char* type, const char* value)
 
 [;]                 {return yytext[0];} /*Return the character*/
 
-[-+*/%&^|~]			{ return yytext[0]; } 
+[-+*%&^|~/]			{ return yytext[0]; }  /*mod and division  not working*/
 
 [()={}:,]			{ return yytext[0]; }
 
-"true"				{ yylval=1; return TRUE_VALUE; }
+true				{ yylval=1; return TRUE_VALUE; }
 
-"false"				{ yylval=0; return FALSE_VALUE; }
+false		{ yylval=0; return FALSE_VALUE; }
 
 [_a-zA-Z][_a-zA-Z0-9]*		{ yylval = strdup(yytext); return IDENTIFIER; } 
 

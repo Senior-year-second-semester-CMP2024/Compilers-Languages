@@ -1,0 +1,50 @@
+int sum(int a, int b)
+{
+    sum_val = a + b;
+    return sum_val;
+}
+
+
+
+void main()
+{
+    const int x = 5;
+    float y = 10.2;
+    float z = x + y;
+    string str = "Hello World!";
+    if(x > y){
+        str = "x is greater than y";
+    }
+    elif (x == y)
+    {
+        str = "x is equal to y";
+    }
+    else{
+        str = "x is less than y";
+    }
+    print(str);
+    while (z > 0)
+    {
+        print(z);
+        z = z - 1;
+        switch (z)
+        {
+        case 1:
+            x = 0;
+            break;
+        
+        default:
+            break;
+        }
+    }
+    int count = 10;
+    for (i = 0; i < count; i = i + 1)
+    {
+        if(i * 2 == 0)
+        {
+            continue;
+        }
+        print("Odd number");
+    }
+    sum_val = sum(5, 10);
+}

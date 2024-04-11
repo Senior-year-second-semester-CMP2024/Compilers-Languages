@@ -65,7 +65,6 @@ statement : assignment                   {;}
           | declaration                  {;}
           | jump_statement               {;}
           | expression                   {;}
-          | PRINT '(' IDENTIFIER ')'     {;}
           | PRINT '(' expression ')'     {;}
           ;
 
@@ -109,7 +108,7 @@ expression : function_call                                      {;}
 if_condition             : IF '(' expression  ')' '{' statement_list '}' else_condition {;}
                         ;
 else_condition           : {;}
-                        | ELSE {;} if_condition          {;}
+                        | ELSE_IF '(' expression  ')' '{' statement_list '}' else_condition {;}
                         | ELSE {;}'{' statement_list '}'     {;}
                         ;
 case                    : CASE expression ':' statement_list                {;}
@@ -162,9 +161,8 @@ function_parameters : literal                                          {;}
                     | literal ',' function_parameters                  {;}
                     ;
 
-function_definition : data_type IDENTIFIER '(' function_arguments ')' statement_list        {;}
-                    | data_type IDENTIFIER '(' function_arguments ')' statement_list '\n'   {;}
-                    | data_type IDENTIFIER '(' ')' statement_list                           {;}
+function_definition : data_type IDENTIFIER '(' function_arguments ')' '{' statement_list '}'         {;}
+                    | data_type IDENTIFIER '(' ')' '{' statement_list '}'                            {;}
                     ;
 
 function_call : IDENTIFIER '(' function_parameters ')'        {;}
