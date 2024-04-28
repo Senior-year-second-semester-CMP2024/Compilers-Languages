@@ -35,7 +35,12 @@
     // ----- Symbol Table Functions ------
     struct symbol symbol_table [100]; // 26 for lower case, 26 for upper case
     struct nodeType* symbolValue(char symbol); // returns the value of a given symbol
-    
+    void insert(char name, char* type, int isConstant, int isInitialized, int isUsed, int scope);
+    struct nodeType* symbolValue(char symbol);
+    void updateSymbolName(char symbol, char new_name);
+    void updateSymbolValue(char symbol, struct nodeType* value);
+    void updateSymbolParameter(char symbol, int parameter);
+
     int getSymbolIndex(char name);
 
 %}
@@ -299,10 +304,6 @@ int getSymbolIndex(char name) {
 }
 
 /* ------------------------------------------------------------------------*/
-
-/* ----------------------------
-
----------------------------- */
 
 void updateSymbolName(char symbol, char new_name){
     int bucket = computeSymbolIndex(symbol);
