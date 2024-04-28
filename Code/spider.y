@@ -273,13 +273,13 @@ struct nodeType* symbolValue(char symbol){
     ptr->type = symbol_table[bucket].type;
 
     if( strcmp(symbol_table[bucket].type, "int") == 0 )
-        ptr->value.intVal = symbol_table[bucket].value.integer_value;
+        ptr->value.integer_value = symbol_table[bucket].value.integer_value;
     else if( strcmp(symbol_table[bucket].type, "float") == 0)
-        ptr->value.floatVal = symbol_table[bucket].value.float_value;
+        ptr->value.float_value = symbol_table[bucket].value.float_value;
     else if( strcmp(symbol_table[bucket].type, "bool") == 0)
-        ptr->value.boolVal = symbol_table[bucket].value.bool_value;
+        ptr->value.bool_value = symbol_table[bucket].value.bool_value;
     else if( strcmp(symbol_table[bucket].type, "string") == 0)
-        ptr->value.stringVal = symbol_table[bucket].value.string_value;
+        ptr->value.string_value = symbol_table[bucket].value.string_value;
 
     return ptr;
 }
@@ -300,6 +300,99 @@ int getSymbolIndex(char name) {
 
 /* ------------------------------------------------------------------------*/
 
+/* ----------------------------
+
+---------------------------- */
+
+void updateSymbolName(char symbol, char new_name){
+    int bucket = computeSymbolIndex(symbol);
+    symbol_table [bucket].name = new_name;
+}
+
+/* ------------------------------------------------------------------------*/
+
+/* ----------------------------
+Parameters:
+- symbol: the symbol whose value is to be updated.
+- value: the new value to be assigned to the symbol.
+---------------------------- */
+
+void updateSymbolValue(char symbol, struct nodeType* value){
+	int bucket = computeSymbolIndex(symbol);
+    
+    if( strcmp(symbol_table[bucket].type, "int") == 0)
+        symbol_table [bucket].value.integer_value = val->value.integer_value;
+    else if( strcmp(symbol_table[bucket].type, "float") == 0)
+        symbol_table[bucket].value.float_value = val->value.float_value;
+    else if( strcmp(symbol_table[bucket].type, "bool") == 0)
+        symbol_table[bucket].value.bool_value = val->value.bool_value;
+    else if( strcmp(symbol_table[bucket].type, "string") == 0)
+        symbol_table[bucket].value.string_value = val->value.string_value;
+}
+
+/* ------------------------------------------------------------------------*/
+
+/* ----------------------------
+Parameters:
+- symbol: the symbol whose value is to be updated
+- param: the new parameter value to be assigned to the symbol
+
+Usage: in function definition (later)
+---------------------------- */
+
+void updateSymbolParameter(char symbol, int parameter){
+    int bucket = computeSymbolIndex(symbol);
+    symbol_table [bucket].value.integer_value = parameter;
+}
+
+
+/* ------------------------------------------------------------------------*/
+
+void printNode(struct nodeType* node)
+{
+    if( strcmp(node->type, "int") == 0 )
+        printf("%d\n", node->value.integer_value);
+    else if( strcmp(node->type, "float") == 0 )
+        printf("%f\n", node->value.float_value);
+    else if( strcmp(node->type, "bool") == 0 )
+        printf("%d\n", node->value.bool_value);
+    else if(strcmp( node->type, "string" ) == 0)
+        printf("%s\n", node->value.string_value);
+}
+
+/* ------------------------------------------------------------------------*/
+
+void printSymbolTable(){
+
+    FILE *f = fopen("symbol_table.txt", "w");
+    if (f == NULL)
+    {
+        printf("Error opening file!\n");
+        exit(EXIT_FAILURE);
+    }
+
+    fprintf(f, "Symbol Table:\n");
+    for( int i=0 ; i < symbol_table_index ; i++ ){
+        if( strcmp(symbol_table[i].type, "int") == 0 ){
+            fprintf(f, "Name:%c, Type:%s, Value:%d, Declared:%d, Initialized:%d, Used:%d, Const:%d, Scope:%d\n", 
+                        symbol_table[i].name, symbol_table[i].type, symbol_table[i].value.integer_value, symbol_table[i].isDeclared, symbol_table[i].isInitialized, symbol_table[i].isUsed, symbol_table[i].isConstant, symbol_table[i].scope);
+        }
+        else if( strcmp(symbol_table[i].type, "float" ) == 0){
+            fprintf(f, "Name:%c,Type:%s,Value:%f,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
+                        symbol_table[i].name, symbol_table[i].type, symbol_table[i].value.float_value, symbol_table[i].isDeclared, symbol_table[i].isInitialized, symbol_table[i].isUsed, symbol_table[i].isConstant, symbol_table[i].scope);
+        }
+        else if( strcmp(symbol_table[i].type, "bool" ) == 0){
+            fprintf(f, "Name:%c,Type:%s,Value:%d,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
+                        symbol_table[i].name, symbol_table[i].type, symbol_table[i].value.bool_value, symbol_table[i].isDeclared, symbol_table[i].isInitialized, symbol_table[i].isUsed, symbol_table[i].isConstant, symbol_table[i].scope);
+        }
+        else if( strcmp(symbol_table[i].type, "string" ) == 0){
+            fprintf(f, "Name:%c,Type:%s,Value:%s,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
+                        symbol_table[i].name, symbol_table[i].type, symbol_table[i].value.string_value, symbol_table[i].isDeclared, symbol_table[i].isInitialized, symbol_table[i].isUsed, symbol_table[i].isConstant, symbol_table[i].scope);
+        }
+    }
+}
+
+/* ------------------------------------------------------------------------*/
 
 void yyerror(char *s) {
      fprintf(stderr, "Error: %s at line %d\n", s, nline);
