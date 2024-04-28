@@ -42,73 +42,73 @@ void Log(const char* type, const char* value)
 %}
 
 %%
-"print"				{ return PRINT; }
-"const"				{ return CONSTANT; }
+"print"				{ Log("Command", yytext); return PRINT; }            /* yytext => matched string */ 
+"const"				{ Log("Data Modifier", yytext); return CONSTANT; }
 
-"bool"				{ return BOOL_DATA_TYPE; }
-"string"			{ return STRING_DATA_TYPE; }
-"int"				{ return INT_DATA_TYPE; }
-"float"				{ return FLOAT_DATA_TYPE; }
-"void"				{ return VOID_DATA_TYPE; }
+"bool"				{ Log("Data Type", yytext); return BOOL_DATA_TYPE; }
+"string"			{ Log("Data Type", yytext); return STRING_DATA_TYPE; }
+"int"				{ Log("Data Type", yytext); return INT_DATA_TYPE; }
+"float"				{ Log("Data Type", yytext); return FLOAT_DATA_TYPE; }
+"void"				{ Log("Data Type", yytext); return VOID_DATA_TYPE; }
 
-"if"				{ return IF; }
-"else"				{ return ELSE; }
-"elif"				{ return ELSE_IF; }
+"if"				{ Log("Control Flow", yytext); return IF; }
+"else"				{ Log("Control Flow", yytext); return ELSE; }
+"elif"				{ Log("Control Flow", yytext); return ELSE_IF; }
 
-"for"				{ return FOR; }
-"while"				{ return WHILE; }
-"repeat"			{ return REPEAT; }
-"until"				{ return UNTIL; }
+"for"				{ Log("Control Flow", yytext); return FOR; }
+"while"				{ Log("Control Flow", yytext); return WHILE; }
+"repeat"			{ Log("Control Flow", yytext); return REPEAT; }
+"until"				{ Log("Control Flow", yytext); return UNTIL; }
 
-"switch"			{ return SWITCH; }
-"case"				{ return CASE; }
-"default"			{ return DEFAULT; }
-"continue"			{ return CONTINUE; }
-"break"				{ return BREAK; }
-"return"			{ return RETURN; }
-
-
-"<<"				{ return SHIFT_LEFT; }
-">>"				{ return SHIFT_RIGHT; }
-"<"				{ return LESS_THAN; }
-">"				{ return GREATER_THAN; }
-"<="				{ return LESS_THAN_OR_EQUAL; }
-">="				{ return GREATER_THAN_OR_EQUAL; }
-"=="				{ return EQUAL; }
-"!="				{ return NOT_EQUAL; }
-"&&"				{ return AND; }
-"||"				{ return OR; }
-"!"				{ return NOT; }
+"switch"			{ Log("Control Flow", yytext); return SWITCH; }
+"case"				{ Log("Control Flow", yytext); return CASE; }
+"default"			{ Log("Control Flow", yytext); return DEFAULT; }
+"continue"			{ Log("Control Flow", yytext); return CONTINUE; }
+"break"				{ Log("Control Flow", yytext); return BREAK; }
+"return"			{ Log("Control Flow", yytext); return RETURN; }
 
 
-[;]                 {return yytext[0];} /*Return the character*/
+"<<"				{ Log("BitWise Operator", yytext); return SHIFT_LEFT; }
+">>"				{ Log("BitWise Operator", yytext); return SHIFT_RIGHT; }
 
-[-+*%&^|~/]			{ return yytext[0]; }  /*mod and division  not working*/
+"<"				    { Log("Comparison Operator", yytext); return LESS_THAN; }
+">"				    { Log("Comparison Operator", yytext); return GREATER_THAN; }
+"<="				{ Log("Comparison Operator", yytext); return LESS_THAN_OR_EQUAL; }
+">="				{ Log("Comparison Operator", yytext); return GREATER_THAN_OR_EQUAL; }
+"=="				{ Log("Comparison Operator", yytext); return EQUAL; }
+"!="				{ Log("Comparison Operator", yytext); return NOT_EQUAL; }
 
-[()={}:,]			{ return yytext[0]; }
+"&&"				{ Log("Logical Operator", yytext); return AND; }
+"||"				{ Log("Logical Operator", yytext); return OR; }
+"!"				    { Log("Logical Operator", yytext); return NOT; }
 
-true				{ yylval=1; return TRUE_VALUE; }
+[&^~|]              {Log("Bitwise Operator", yytext);return yytext[0];}
+           
+[;]                 {Log("End Of Statement", "; \n"); return yytext[0];}
 
-false		{ yylval=0; return FALSE_VALUE; }
+[-+*%/]			    { Log("Arithmetic Operator", yytext); return yytext[0]; }
 
-[_a-zA-Z][_a-zA-Z0-9]*		{ yylval = strdup(yytext); return IDENTIFIER; } 
+[()={}:,]			{ Log("Punctuators", yytext); return yytext[0]; }
 
--?[0-9]+			{ yylval = atoi(yytext); return INTEGER; }
-
--?[0-9]*[.][0-9]+		{ yylval = atof(yytext); return FLOAT; }
-
-\"(\\.|[^\\"])*\"		{ yylval = strdup(yytext); return STRING; }
+true				{ Log("Value", "true"); yylval.TYPE_BOOL=1; return TRUE_VALUE; }
+false		        { Log("value", "false"); yylval.TYPE_BOOL=0; return FALSE_VALUE; }
 
 
-(\n)+				{nline += yyleng ; nword++; }
+[_a-zA-Z][_a-zA-Z0-9]*		                    { Log("Identifier", yytext); yylval = strdup(yytext); return IDENTIFIER; } 
 
-[ \r\t]+			{ nword++; /* Ignore whitespace */ }
+-?[0-9]+			                            { Log("Integer Value", yytext); yylval.TYPE_INT = atoi(yytext); return INTEGER; }
+-?[0-9]*[.][0-9]+		                        { Log("Float Value", yytext); yylval.TYPE_FLOAT = atof(yytext); return FLOAT; }
+\"(\\.|[^\\"])*\"		                        { Log("String Value", yytext); yylval.TYPE_STR = strdup(yytext); return STRING;}
 
-\/\/.*			{ /* Ignore inline comments "//comment" */ }
+(\n)+				                            {nline += yyleng ; nword++; }               /* Ignore the new line */
 
-\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*\/	{ /* Ignore multiline comments */ }
+[ \r\t]+			                            { nword++; }                                /* Ignore White Spaces */
 
-.				{ yyerror("unexpected character"); }
+\/\/.*			                                { Log("InLine Comment", yytext); }          /* Ignore Inline Comment */
+
+\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*\/	    { Log("MultiLine Comment", yytext); }       /* Ignore MultiLine Comment */
+
+.                                               {Log("UnExpected Token", yytext); yyerror ("UnExpected Token");} /* Otherwise, Error Message */
 
 %%  
 
