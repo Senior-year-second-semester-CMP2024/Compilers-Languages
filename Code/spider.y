@@ -13,8 +13,33 @@
     int yylex();
     extern FILE *yyin;
     extern int nline;
+    extern int yyleng;
+
+    // ----- Symbol Table Variables ------
+    int symbol_table_index = 0;
+
+
+    // ----- Symbol Table Data Structure ------
+    struct symbol {
+        char name;
+        char *type;
+        union {
+                int integer_value;
+                float float_value;
+                char* string_value;
+                int bool_value;
+        }value;
+        int isDeclared, isConstant, isInitialized, isUsed, scope;
+    };
+
+    // ----- Symbol Table Functions ------
+    struct symbol symbol_table [100]; // 26 for lower case, 26 for upper case
+    struct nodeType* symbolValue(char symbol); // returns the value of a given symbol
+    
+    int getSymbolIndex(char name);
 
 %}
+
 
 // -----Tokens-----
 %token PRINT CONSTANT 
@@ -46,13 +71,13 @@ program : statement_list                            {;}
         | function_definition program               {;}
         ;
 
-statement_list : statement ';'                           {;}
+statement_list  : statement ';'                          {;}
                 | statement_list statement ';'           {;} 
                 | control_statement                      {;}
                 | statement_list control_statement       {;}
                 | '{' statement_list '}'
                 | statement_list '{' statement_list '}'  {;}        
-               ;
+                ;
 
 control_statement   :  if_condition 
                     |  while_loop 
@@ -187,6 +212,94 @@ enum_declaration : IDENTIFIER IDENTIFIER                         {;}
 // --------------------------------------------------------------------
 
 %%
+
+// -------------------- Symbol Table Functions --------------------
+
+/* ----------------------------
+- `level` ==> store the scope level of the symbol found in the symbol table.
+- iterates backward through the symbol tables starting from the current table (bottom up).
+- check if name of it == input `token` 
+- Then, iterates backward through the table to find the token
+- it returns the index `i`, which represents the index of the symbol in the symbol table.
+---------------------------- */
+
+int computeSymbolIndex(char token){
+    int level = -1;
+    for(int i=symbol_table_index - 1 ; i >= 0 ; i--) {
+        if(symbol_table[i].name == token) {
+            level = symbol_table[i].scope;
+            for(int j = scope_index - 1 ; j >= 0 ; j--) {
+                if(level == scopes[j]) {
+                    return i;
+                }
+            }
+        }
+    }
+    return -1;
+} 
+
+/* ------------------------------------------------------------------------*/
+
+/* ----------------------------
+Parameters:
+- name: the name of the symbol to be inserted.
+- type: the type of the symbol
+- scope:the scope level of the symbol
+---------------------------- */
+void insert(char name, char* type, int isConstant, int isInitialized, int isUsed, int scope){
+
+    symbol_table [symbol_table_index].name = name;
+    symbol_table [symbol_table_index].type = type;
+    symbol_table [symbol_table_index].isDeclared = 1;
+    symbol_table [symbol_table_index].isConstant = isConstant;
+
+    symbol_table [symbol_table_index].isInitialized = isInitialized;
+    symbol_table [symbol_table_index].isUsed = isUsed;
+    symbol_table [symbol_table_index].scope = scope;
+    ++symbol_table_index;
+}
+
+/* ------------------------------------------------------------------------*/
+
+/* ----------------------------
+retrieves the value of a given symbol from a symbol table
+computes index of `symbol` in the symbol table by calling the `computeSymbolIndex` 
+The result is stored in the variable `bucket`
+---------------------------- */
+struct nodeType* symbolValue(char symbol){
+
+    int bucket = computeSymbolIndex(symbol);
+    struct nodeType* ptr = malloc(sizeof(struct nodeType));;
+    ptr->type = symbol_table[bucket].type;
+
+    if( strcmp(symbol_table[bucket].type, "int") == 0 )
+        ptr->value.intVal = symbol_table[bucket].value.integer_value;
+    else if( strcmp(symbol_table[bucket].type, "float") == 0)
+        ptr->value.floatVal = symbol_table[bucket].value.float_value;
+    else if( strcmp(symbol_table[bucket].type, "bool") == 0)
+        ptr->value.boolVal = symbol_table[bucket].value.bool_value;
+    else if( strcmp(symbol_table[bucket].type, "string") == 0)
+        ptr->value.stringVal = symbol_table[bucket].value.string_value;
+
+    return ptr;
+}
+
+/* ------------------------------------------------------------------------*/
+
+/* ----------------------------
+1. Parameters:
+- name: Represents the name of the symbol whose index is to be retrieved.
+---------------------------- */
+
+int getSymbolIndex(char name) {
+    int bucket = computeSymbolIndex(name);
+    struct nodeType* ptr = malloc(sizeof(struct nodeType));;
+    ptr->type = bucket;
+    return bucket;
+}
+
+/* ------------------------------------------------------------------------*/
+
 
 void yyerror(char *s) {
      fprintf(stderr, "Error: %s at line %d\n", s, nline);

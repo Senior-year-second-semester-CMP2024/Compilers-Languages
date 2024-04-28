@@ -1,0 +1,7 @@
+flex spider.l
+
+bison -dy spider.y
+
+gcc lex.yy.c spider.tab.c – out.exe
+
+out.exe
