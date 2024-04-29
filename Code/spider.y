@@ -52,11 +52,11 @@
     struct symbol symbol_table [100]; // 26 for lower case, 26 for upper case
     struct NodeType* get_symbol_value(char symbol); // returns the value of a given symbol
     void add_symbol(char name, char* type, int constant_flag, int initialized_flag, int used_flag, int scope);
-    void updateSymbolName(char symbol, char new_name);
-    void updateSymbolValue(char symbol, struct NodeType* value);
-    void updateSymbolParameter(char symbol, int parameter);
+    void change_symbol_name(char symbol, char new_name);
+    void modify_symbol_value(char symbol, struct NodeType* new_value);
+    void modify_symbol_parameter(char symbol, int new_parameter);
 
-    int getSymbolIndex(char name);
+    int retrieve_symbol_index(char symbol_name);
 
 %}
 
@@ -319,10 +319,13 @@ struct NodeType* get_symbol_value(char symbol) {
     // Check the type of the symbol and assign its value to the node
     if (strcmp(symbol_table[bucket].type, "int") == 0)
         ptr->value.integer_value = symbol_table[bucket].value.integer_value;
+    
     else if (strcmp(symbol_table[bucket].type, "float") == 0)
         ptr->value.float_value = symbol_table[bucket].value.float_value;
+    
     else if (strcmp(symbol_table[bucket].type, "bool") == 0)
         ptr->value.bool_value = symbol_table[bucket].value.bool_value;
+    
     else if (strcmp(symbol_table[bucket].type, "string") == 0)
         ptr->value.string_value = symbol_table[bucket].value.string_value;
     
@@ -337,18 +340,18 @@ struct NodeType* get_symbol_value(char symbol) {
 - name: Represents the name of the symbol whose index is to be retrieved.
 ---------------------------- */
 
-int getSymbolIndex(char name) {
-    int bucket = find_symbol_index(name);
-    struct NodeType* ptr = malloc(sizeof(struct NodeType));;
+int retrieve_symbol_index(char symbol_name) {
+    int bucket = find_symbol_index(symbol_name);
+    struct NodeType* ptr = malloc(sizeof(struct NodeType));
     ptr->type = bucket;
     return bucket;
 }
 
 /* ------------------------------------------------------------------------*/
 
-void updateSymbolName(char symbol, char new_name){
-    int bucket = find_symbol_index(symbol);
-    symbol_table [bucket].name = new_name;
+void change_symbol_name(char old_symbol, char new_symbol_name){
+    int bucket = find_symbol_index(old_symbol);
+    symbol_table [bucket].name = new_symbol_name;
 }
 
 /* ------------------------------------------------------------------------*/
@@ -359,17 +362,21 @@ Parameters:
 - value: the new value to be assigned to the symbol.
 ---------------------------- */
 
-void updateSymbolValue(char symbol, struct NodeType* value){
-	int bucket = find_symbol_index(symbol);
+void modify_symbol_value(char symbol, struct NodeType* new_value){
+	// Find the index of the symbol
+    int bucket = find_symbol_index(symbol);
     
     if( strcmp(symbol_table[bucket].type, "int") == 0)
-        symbol_table [bucket].value.integer_value = value->value.integer_value;
+        symbol_table [bucket].value.integer_value = new_value->value.integer_value;
+    
     else if( strcmp(symbol_table[bucket].type, "float") == 0)
-        symbol_table[bucket].value.float_value = value->value.float_value;
+        symbol_table[bucket].value.float_value = new_value->value.float_value;
+    
     else if( strcmp(symbol_table[bucket].type, "bool") == 0)
-        symbol_table[bucket].value.bool_value = value->value.bool_value;
+        symbol_table[bucket].value.bool_value = new_value->value.bool_value;
+    
     else if( strcmp(symbol_table[bucket].type, "string") == 0)
-        symbol_table[bucket].value.string_value = value->value.string_value;
+        symbol_table[bucket].value.string_value = new_value->value.string_value;
 }
 
 /* ------------------------------------------------------------------------*/
@@ -382,15 +389,15 @@ Parameters:
 Usage: in function definition (later)
 ---------------------------- */
 
-void updateSymbolParameter(char symbol, int parameter){
+void modify_symbol_parameter(char symbol, int new_parameter){
     int bucket = find_symbol_index(symbol);
-    symbol_table [bucket].value.integer_value = parameter;
+    symbol_table [bucket].value.integer_value = new_parameter;
 }
 
 
 /* ------------------------------------------------------------------------*/
 
-void printNode(struct NodeType* node)
+void display_node_value(struct NodeType* node)
 {
     if( strcmp(node->type, "int") == 0 )
         printf("%d\n", node->value.integer_value);
@@ -404,40 +411,49 @@ void printNode(struct NodeType* node)
 
 /* ------------------------------------------------------------------------*/
 
-void printSymbolTable(){
+void write_symbol_table_to_file(){
 
-    FILE *f = fopen("symbol_table.txt", "w");
-    if (f == NULL)
+    FILE *filePointer = fopen("symbol_table.txt", "w");
+    if (filePointer == NULL)
     {
         printf("Error opening file!\n");
         exit(EXIT_FAILURE);
     }
 
-    fprintf(f, "Symbol Table:\n");
+    fprintf(filePointer, "Symbol Table:\n");
+
+    // Iterate through the symbol table and write each entry to the file
     for( int i=0 ; i < symbol_table_index ; i++ ){
+        
         if( strcmp(symbol_table[i].type, "int") == 0 ){
-            fprintf(f, "Name:%c, Type:%s, Value:%d, Declared:%d, Initialized:%d, Used:%d, Const:%d, Scope:%d\n", 
+            fprintf(filePointer, "Name:%c, Type:%s, Value:%d, Declared:%d, Initialized:%d, Used:%d, Constant:%d, Scope:%d\n", 
                         symbol_table[i].name, symbol_table[i].type, symbol_table[i].value.integer_value, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
         }
+        
         else if( strcmp(symbol_table[i].type, "float" ) == 0){
-            fprintf(f, "Name:%c,Type:%s,Value:%f,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
+            fprintf(filePointer, "Name:%c,Type:%s,Value:%f,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
                         symbol_table[i].name, symbol_table[i].type, symbol_table[i].value.float_value, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
         }
+        
         else if( strcmp(symbol_table[i].type, "bool" ) == 0){
-            fprintf(f, "Name:%c,Type:%s,Value:%d,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
+            fprintf(filePointer, "Name:%c,Type:%s,Value:%d,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
                         symbol_table[i].name, symbol_table[i].type, symbol_table[i].value.bool_value, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
         }
+        
         else if( strcmp(symbol_table[i].type, "string" ) == 0){
-            fprintf(f, "Name:%c,Type:%s,Value:%s,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
+            fprintf(filePointer, "Name:%c,Type:%s,Value:%s,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
                         symbol_table[i].name, symbol_table[i].type, symbol_table[i].value.string_value, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
         }
     }
+
+    fclose(filePointer); 
 }
 
 /* ------------------------------------------------------------------------*/
 
 void yyerror(char *s) {
      fprintf(stderr, "Error: %s at line %d\n", s, nline);
+     write_symbol_table_to_file();
 }
 
 int main(int argc, char *argv[]) {
@@ -451,7 +467,7 @@ int main(int argc, char *argv[]) {
         yyparse();
 
         fclose(yyin);
-
+        write_symbol_table_to_file();
         return 0;
     }
 }
