@@ -2,6 +2,7 @@
 
 #include "spider.tab.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h> // For strdup
 #include <stdarg.h>
 
@@ -40,6 +41,7 @@ void Log(const char* type, const char* value)
 }
 
 %}
+
 
 %%
 "print"				{ Log("Command", yytext); return PRINT; }            /* yytext => matched string */ 
@@ -90,15 +92,15 @@ void Log(const char* type, const char* value)
 
 [()={}:,]			{ Log("Punctuators", yytext); return yytext[0]; }
 
-true				{ Log("Value", "true"); yylval.TYPE_BOOL=1; return TRUE_VALUE; }
-false		        { Log("value", "false"); yylval.TYPE_BOOL=0; return FALSE_VALUE; }
+true				{ Log("Value", "true"); yylval = 1; return TRUE_VALUE; }
+false		        { Log("value", "false"); yylval = 0; return FALSE_VALUE; }
 
 
 [_a-zA-Z][_a-zA-Z0-9]*		                    { Log("Identifier", yytext); yylval = strdup(yytext); return IDENTIFIER; } 
 
--?[0-9]+			                            { Log("Integer Value", yytext); yylval.TYPE_INT = atoi(yytext); return INTEGER; }
--?[0-9]*[.][0-9]+		                        { Log("Float Value", yytext); yylval.TYPE_FLOAT = atof(yytext); return FLOAT; }
-\"(\\.|[^\\"])*\"		                        { Log("String Value", yytext); yylval.TYPE_STR = strdup(yytext); return STRING;}
+-?[0-9]+			                            { Log("Integer Value", yytext); yylval = atoi(yytext); return INTEGER; }
+-?[0-9]*[.][0-9]+		                        { Log("Float Value", yytext); yylval = atof(yytext); return FLOAT; }
+\"(\\.|[^\\"])*\"		                        { Log("String Value", yytext); yylval = strdup(yytext); return STRING;}
 
 (\n)+				                            {nline += yyleng ; nword++; }               /* Ignore the new line */
 

@@ -45,6 +45,13 @@
 
 %}
 
+/*
+%union {
+    char *str;  // Assuming yylval holds a pointer to a string
+}
+
+%token <str> IDENTIFIER
+*/
 
 // -----Tokens-----
 %token PRINT CONSTANT 
@@ -53,7 +60,7 @@
 %token FOR WHILE REPEAT UNTIL 
 %token SWITCH CASE DEFAULT CONTINUE BREAK RETURN 
 %token SHIFT_LEFT SHIFT_RIGHT AND OR NOT 
-%token TRUE_VALUE FALSE_VALUE IDENTIFIER INTEGER FLOAT STRING ENUM
+%token TRUE_VALUE FALSE_VALUE INTEGER FLOAT STRING ENUM IDENTIFIER
 
 // -----Operators-----
 %left '+' '-'
