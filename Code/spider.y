@@ -138,7 +138,7 @@ declaration : CONSTANT data_type assignment {;}
             | data_type IDENTIFIER       {;}
             ;
 
-assignment : IDENTIFIER '=' expression {modify_symbol_value($1, $3); $$ = $3;}
+assignment : IDENTIFIER '=' expression {;}
            ;
 
 expression : function_call                                      {;}
@@ -165,7 +165,7 @@ expression : function_call                                      {;}
            | expression NOT_EQUAL expression                    {$$ = $1 != $3;}
            | '(' expression ')'                                 {$$ = $2;}
            | literal                                            {$$ = $1;}
-           | IDENTIFIER                                         {$$ = get_symbol_value($1);}
+           | IDENTIFIER                                         {;}
            ;
 
 
