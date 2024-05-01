@@ -14,10 +14,22 @@
     extern FILE *yyin;
     extern int nline;
     extern int yyleng;
+    
+
+    // ----- Operations -----
+    struct NodeType* arithmatic(struct NodeType* op1, struct NodeType*op2, char op);
+    struct NodeType* comparison(struct NodeType* op1, struct NodeType*op2, char op);
+    struct NodeType* logical(struct NodeType* op1, struct NodeType*op2, char op);
+    struct NodeType* bitwise(struct NodeType* op1, struct NodeType*op2, char op);
+    // ----- Scope -----
+    int scope_id = 1;
+    int scopes_count = 1;
+    int scopes[100];
+    void enter_scope();
+    void exit_scope();
 
     // ----- Symbol Table Variables ------
     int symbol_table_index = 0;
-
     int scope_index = 1;
     int scopes[100];
 
@@ -34,6 +46,15 @@
         // check if the expression is a constant ==> helps in if statements with constant expressions
         int isConstant; 
     };
+    // type functions
+    struct NodeType* int_node();
+    struct NodeType* float_node();
+    struct NodeType* bool_node();
+    struct NodeType* string_node();
+    struct NodeType* enum_node();
+
+    // used to fill enum values
+    struct NodeType* enumValue;
 
     // ----- Symbol Table Data Structure ------
     struct symbol {
@@ -59,14 +80,6 @@
     int retrieve_symbol_index(char symbol_name);
 
 %}
-
-/*
-%union {
-    char *str;  // Assuming yylval holds a pointer to a string
-}
-
-%token <str> IDENTIFIER
-*/
 
 // -----Tokens-----
 %token PRINT CONSTANT 
@@ -102,8 +115,8 @@ statement_list  : statement ';'                          {;}
                 | statement_list statement ';'           {;} 
                 | control_statement                      {;}
                 | statement_list control_statement       {;}
-                | '{' statement_list '}'
-                | statement_list '{' statement_list '}'  {;}        
+                | '{' statement_list '}'     
+                | statement_list '{'  statement_list '}'  {;}        
                 ;
 
 control_statement   :  if_condition 
@@ -120,12 +133,12 @@ statement : assignment                   {;}
           | PRINT '(' expression ')'     {;}
           ;
 
-declaration : CONSTANT data_type assignment
-            | data_type assignment
-            | data_type IDENTIFIER
+declaration : CONSTANT data_type assignment {;}
+            | data_type assignment       {;}
+            | data_type IDENTIFIER       {;}
             ;
 
-assignment : IDENTIFIER '=' expression
+assignment : IDENTIFIER '=' expression {modify_symbol_value($1, $3); $$ = $3;}
            ;
 
 expression : function_call                                      {;}
@@ -152,16 +165,16 @@ expression : function_call                                      {;}
            | expression NOT_EQUAL expression                    {$$ = $1 != $3;}
            | '(' expression ')'                                 {$$ = $2;}
            | literal                                            {$$ = $1;}
-           | IDENTIFIER                                         /* Need to put into thy Symbol Table*/
+           | IDENTIFIER                                         {$$ = get_symbol_value($1);}
            ;
 
 
 // ------------ Conditions ------------------
-if_condition             : IF '(' expression  ')' '{' statement_list '}' else_condition {;}
+if_condition             : IF '(' expression  ')' '{'  statement_list '}' else_condition {;}
                         ;
 else_condition           : {;}
-                        | ELSE_IF '(' expression  ')' '{' statement_list '}' else_condition {;}
-                        | ELSE {;}'{' statement_list '}'     {;}
+                        | ELSE_IF '(' expression  ')' '{'  statement_list '}' else_condition {;}
+                        | ELSE {;}'{'  statement_list '}'     {;}
                         ;
 case                    : CASE expression ':' statement_list                {;}
                         | DEFAULT ':' statement_list                        {;}
@@ -169,7 +182,7 @@ case                    : CASE expression ':' statement_list                {;}
 caseList                : caseList case
                         | case 
                         ;
-switch_Case          : SWITCH '(' IDENTIFIER ')' '{' caseList '}'        {;}
+switch_Case          : SWITCH '(' IDENTIFIER ')' '{'  caseList '}'        {;}
                         ;
 
 case_list : case_list case
@@ -177,7 +190,7 @@ case_list : case_list case
           ;
 
 // ------------ Loops ------------------
-while_loop               : WHILE '(' expression ')'  '{' statement_list '}'                              {;}
+while_loop               : WHILE '(' expression ')'  '{'  statement_list '}'                 {;}
                         ;
 for_loop                 : FOR '(' assignment ';'  expression ';'  assignment ')' '{' statement_list '}' {;}
                         ;
@@ -191,18 +204,18 @@ jump_statement : CONTINUE                       {;}
                ;
 
 // ------------ Data Types ------------------
-data_type : BOOL_DATA_TYPE          {$$ = $1;}
-          | STRING_DATA_TYPE        {$$ = $1;}
-          | INT_DATA_TYPE           {$$ = $1;}
-          | FLOAT_DATA_TYPE         {$$ = $1;}
-          | VOID_DATA_TYPE          {$$ = $1;}
+data_type : BOOL_DATA_TYPE          {;}
+          | STRING_DATA_TYPE        {;}
+          | INT_DATA_TYPE           {;}
+          | FLOAT_DATA_TYPE         {;}
+          | VOID_DATA_TYPE          {;}
           ;
 
-literal : INTEGER               {$$ = $1;}
-        | FLOAT                 {$$ = $1;}
-        | STRING                {$$ = $1;}
-        | TRUE_VALUE            {$$ = 1;}
-        | FALSE_VALUE           {$$ = 0;}
+literal : INTEGER               {;}
+        | FLOAT                 {;}
+        | STRING                {;}
+        | TRUE_VALUE            {;}
+        | FALSE_VALUE           {;}
         ;
 // ------------ Function ------------------
 function_arguments : data_type IDENTIFIER                                 {;}
@@ -213,8 +226,8 @@ function_parameters : literal                                          {;}
                     | literal ',' function_parameters                  {;}
                     ;
 
-function_definition : data_type IDENTIFIER '(' function_arguments ')' '{' statement_list '}'         {;}
-                    | data_type IDENTIFIER '(' ')' '{' statement_list '}'                            {;}
+function_definition : data_type IDENTIFIER '(' function_arguments ')' '{'  statement_list '}'          {;}
+                    | data_type IDENTIFIER '(' ')' '{'  statement_list '}'                             {;}
                     ;
 
 function_call : IDENTIFIER '(' function_parameters ')'        {;}
@@ -450,6 +463,235 @@ void write_symbol_table_to_file(){
 }
 
 /* ------------------------------------------------------------------------*/
+
+// -------------------------------------------------------------
+// -------------------- Operation Functions --------------------
+// -------------------------------------------------------------
+struct NodeType* arithmatic(struct NodeType* op1, struct NodeType*op2, char op){
+    struct NodeType* p = malloc(sizeof(struct NodeType));
+    if(strcmp(op1->type, "int") == 0 && strcmp(op2->type, "int") == 0){
+        p->type = "int";
+        switch(op){
+            case '+':
+                p->value.integer_value = op1->value.integer_value + op2->value.integer_value;
+                break;
+            case '-':
+                p->value.integer_value = op1->value.integer_value - op2->value.integer_value;
+                break;
+            case '*':
+                p->value.integer_value = op1->value.integer_value * op2->value.integer_value;
+                break;
+            case '/':
+                p->value.integer_value = op1->value.integer_value / op2->value.integer_value;
+                break;
+            case '%':
+                p->value.integer_value = op1->value.integer_value % op2->value.integer_value;
+                break;
+            default:
+                /* printf("Invalid operator\n"); */
+        }
+    }
+    else if(strcmp(op1->type, "float") == 0 && strcmp(op2->type, "float") == 0){
+        p->type = "float";
+        switch(op){
+            case '+':
+                p->value.float_value = op1->value.float_value + op2->value.float_value;
+                break;
+            case '-':
+                p->value.float_value = op1->value.float_value - op2->value.float_value;
+                break;
+            case '*':
+                p->value.float_value = op1->value.float_value * op2->value.float_value;
+                break;
+            case '/':
+                p->value.float_value = op1->value.float_value / op2->value.float_value;
+                break;
+            default:
+                /* printf("Invalid operator\n"); */
+        }
+    }
+    else if (strcmp(op1->type, "int") == 0 && strcmp(op2->type, "float") == 0){
+        p->type = "float";
+        switch(op){
+            case '+':
+                p->value.float_value = op1->value.integer_value + op2->value.float_value;
+                break;
+            case '-':
+                p->value.float_value = op1->value.integer_value - op2->value.float_value;
+                break;
+            case '*':
+                p->value.float_value = op1->value.integer_value * op2->value.float_value;
+                break;
+            case '/':
+                p->value.float_value = op1->value.integer_value / op2->value.float_value;
+                break;
+            default:
+                /* printf("Invalid operator\n"); */
+        }
+    }
+    else if (strcmp(op1->type, "float") == 0 && strcmp(op2->type, "int") == 0){
+        p->type = "float";
+        switch(op){
+            case '+':
+                p->value.float_value = op1->value.float_value + op2->value.integer_value;
+                break;
+            case '-':
+                p->value.float_value = op1->value.float_value - op2->value.integer_value;
+                break;
+            case '*':
+                p->value.float_value = op1->value.float_value * op2->value.integer_value;
+                break;
+            case '/':
+                p->value.float_value = op1->value.float_value / op2->value.integer_value;
+                break;
+            default:
+                /* printf("Invalid operator\n"); */
+        }
+    }
+    else{
+        /* printf("Type Error\n"); */ 
+    }
+    return p;
+} 
+struct NodeType* comparison(struct NodeType* op1, struct NodeType*op2, char op){
+    struct NodeType* p = malloc(sizeof(struct NodeType)); 
+    if(strcmp(op1->type, "int") == 0 && strcmp(op2->type, "int") == 0){
+        p->type = "bool";
+        switch(op){
+            case '<':
+                p->value.bool_value = op1->value.integer_value < op2->value.integer_value;
+                break;
+            case '>':
+                p->value.bool_value = op1->value.integer_value > op2->value.integer_value;
+                break;
+            case '<=':
+                p->value.bool_value = op1->value.integer_value <= op2->value.integer_value;
+                break;
+            case '>=':
+                p->value.bool_value = op1->value.integer_value >= op2->value.integer_value;
+                break;
+            case '==':
+                p->value.bool_value = op1->value.integer_value == op2->value.integer_value;
+                break;
+            case '!=':
+                p->value.bool_value = op1->value.integer_value != op2->value.integer_value;
+                break;
+            default:
+                /* printf("Invalid operator\n"); */
+        }
+    }
+    else if(strcmp(op1->type, "float") == 0 && strcmp(op2->type, "float") == 0){
+        p->type = "bool";
+        switch(op){
+            case '<':
+                p->value.bool_value = op1->value.float_value < op2->value.float_value;
+                break;
+            case '>':
+                p->value.bool_value = op1->value.float_value > op2->value.float_value;
+                break;
+            case '<=':
+                p->value.bool_value = op1->value.float_value <= op2->value.float_value;
+                break;
+            case '>=':
+                p->value.bool_value = op1->value.float_value >= op2->value.float_value;
+                break;
+            case '==':
+                p->value.bool_value = op1->value.float_value == op2->value.float_value;
+                break;
+            case '!=':
+                p->value.bool_value = op1->value.float_value != op2->value.float_value;
+                break;
+            default:
+                /* printf("Invalid operator\n"); */
+        }
+    }
+    else{
+        /* printf("Type Error\n"); */
+    }
+    return p;
+}
+
+
+
+
+struct NodeType* logical(struct NodeType* op1, struct NodeType*op2, char op){
+    struct NodeType* p = malloc(sizeof(struct NodeType));
+    if(strcmp(op1->type, "bool") == 0 && strcmp(op2->type, "bool") == 0){
+        p->type = "bool";
+        switch(op){
+            case '|':
+                p->value.bool_value = op1->value.bool_value || op2->value.bool_value;
+                break;
+            case '&':
+                p->value.bool_value = op1->value.bool_value && op2->value.bool_value;
+                break;
+            default:
+                /* printf("Invalid operator\n"); */
+        }
+    }
+    else{
+        /* printf("Type Error\n"); */
+    }
+    return p;
+}
+
+struct NodeType* bitwise(struct NodeType* op1, struct NodeType*op2, char op){
+    struct NodeType* p = malloc(sizeof(struct NodeType));
+    if(strcmp(op1->type, "int") == 0 && strcmp(op2->type, "int") == 0){
+        p->type = "int";
+        switch(op){
+            case '|':
+                p->value.integer_value = op1->value.integer_value | op2->value.integer_value;
+                break;
+            case '&':
+                p->value.integer_value = op1->value.integer_value & op2->value.integer_value;
+                break;
+            case '^':
+                p->value.integer_value = op1->value.integer_value ^ op2->value.integer_value;
+                break;
+            default:
+                /* printf("Invalid operator\n"); */
+        }
+    }
+    else{
+        /* printf("Type Error\n"); */
+    }
+    return p;
+}
+ 
+// Scope functions
+void enter_scope(){
+    scopes[scope_index] = scope_id;
+    scope_id++;
+    scope_index++;
+}
+void exit_scope(){
+    scope_index--;
+}
+// Type functions
+struct NodeType* int_node(){
+    struct NodeType* p = malloc(sizeof(struct NodeType));
+    p->type = "int";
+    return p;
+}
+
+struct NodeType* float_node(){
+    struct NodeType* p = malloc(sizeof(struct NodeType));
+    p->type = "float";
+    return p;
+}
+
+struct NodeType* bool_node(){
+    struct NodeType* p = malloc(sizeof(struct NodeType));
+    p->type = "bool";
+    return p;
+}
+
+struct NodeType* string_node(){
+    struct NodeType* p = malloc(sizeof(struct NodeType));
+    p->type = "string";
+    return p;
+}
 
 void yyerror(char *s) {
      fprintf(stderr, "Error: %s at line %d\n", s, nline);
