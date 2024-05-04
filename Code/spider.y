@@ -109,6 +109,15 @@
     void check_Type_2(char symbol, struct NodeType* second_type);
     void check_type_3(char* first_type, char* second_type);
 
+    int check_variable_declaration(char variable_name);
+    void check_same_scope_redeclaration(char variable_name);
+    void check_out_of_scope_declaration(char variable_name);
+    void check_initialization(char variable_name);
+    void check_using_variables();
+    void check_reassignment_constant_variable(char variable_name);
+    void check_constant_expression_if_statement(struct NodeType* expression);
+    int check_variable_declaration_as_constant_same_scope(char variable_name);
+
     /* ------------------------------------------------------------------------*/
 
     // ----- Symbol Table Data Structure ------
@@ -943,6 +952,155 @@ void check_type_3(char* first_type, char* second_type){
     }
     return;
 }
+
+/* ------------------------------------------------------------------------*/
+
+/* ------------------------- General Checking Functions -----------------------------*/
+/* -------------------------
+Checks if a variable is declared in the symbol table.
+------------------------- */
+int check_variable_declaration(char variable_name) {
+    int found = 0;
+    for( int i = 0; i < symbol_table_index; ++i ) {
+        if( symbol_table[i].name == variable_name) {
+            found = 1;
+            break;
+        }
+    }    
+    return found;
+}
+
+/* -------------------------
+Checks if a variable is already declared in the current scope.
+------------------------- */
+void check_same_scope_redeclaration(char variable_name) {
+    int level;
+    for(int i = 0; i < symbol_table_index; ++i) 
+    {
+        if( symbol_table[i].name == variable_name ) 
+        {
+            level = symbol_table[i].scope;
+            if( level == scopes[scope_index - 1] ) {
+                log_semantic_error(SEMANTIC_ERROR_REDECLARED, variable_name);
+            }
+        }
+    }
+}
+
+/* -------------------------
+Checks if a variable is out of scope (undeclared or removed).
+------------------------- */
+void check_out_of_scope_declaration(char variable_name) {
+    int level;
+    for( int i = symbol_table_index - 1; i >= 0; --i ) 
+    {
+        if(symbol_table[i].name == variable_name) 
+        {
+            level = symbol_table[i].scope;
+            for( int j = scope_index - 1; j >= 0; --j) {
+                if(level == scopes[j]) {
+                    return;
+                }
+            }
+        }
+    }
+    log_semantic_error(SEMANTIC_ERROR_OUT_OF_SCOPE, variable_name);
+}
+
+/* -------------------------
+Checks if a variable is initialized before use
+------------------------- */
+void check_initialization(char variable_name) {
+    for(int i = symbol_table_index - 1; i >= 0; --i) 
+    {
+        if(symbol_table[i].name == variable_name) 
+        {
+            if(symbol_table[i].initialized_flag == 0) 
+            {
+                log_semantic_error(SEMANTIC_ERROR_UNINITIALIZED, variable_name);
+                return;
+            }
+        }
+    }
+}
+
+/* -------------------------
+Checks that all variables are used
+------------------------- */
+void check_using_variables() {
+    for(int i = 0; i < symbol_table_index; ++i) 
+    {
+        if(symbol_table[i].used_flag == 0) 
+        {
+            log_semantic_error(SEMANTIC_ERROR_UNUSED, symbol_table[i].name);
+        }
+    }
+}
+
+/* -------------------------
+Checks if a constant variable is re-assigned a value
+------------------------- */
+void check_reassignment_constant_variable(char variable_name) {
+    for(int i = symbol_table_index - 1 ; i >= 0; --i) 
+    {
+        if(symbol_table[i].name == variable_name) 
+        {
+            for(int j = scope_index - 1; j >= 0; --j) 
+            {
+                if(symbol_table[i].scope == scopes[j]) 
+                {
+                    if(symbol_table[i].constant_flag == 1) 
+                    {
+                        log_semantic_error(SEMANTIC_ERROR_CONSTANT, variable_name);
+                        return;
+                    } else {
+                        return;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* -------------------------
+Checks if a conditional expression in an if statement is constant
+------------------------- */
+void check_constant_expression_if_statement(struct NodeType* expression) {
+    if(expression->isConstant == 1) {
+        log_semantic_error(SEMANTIC_WARNING_CONSTANT_IF, expression->value.bool_value != 0);
+    }
+}
+
+/* -------------------------
+Checks if a variable is declared as a constant within the current scope
+------------------------- */
+int check_variable_declaration_as_constant_same_scope(char variable_name) {
+    for(int i = symbol_table_index - 1; i >= 0; --i) 
+    {
+        if(symbol_table[i].name == variable_name) 
+        {
+            for(int j = scope_index - 1; j >= 0; --j) 
+            {
+                if(symbol_table[i].scope == scopes[j]) 
+                {
+                    if(symbol_table[i].constant_flag == 1) 
+                    {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+/* ------------------------------------------------------------------------*/
+
+/* --------------------------------- Setter functions ---------------------------------------*/
+
+
 
 
 
