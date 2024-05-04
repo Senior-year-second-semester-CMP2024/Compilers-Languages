@@ -6,6 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
+# ignore symbole table
+symbole_table.txt
 # Distribution / packaging
 .Python
 build/
