@@ -98,6 +98,19 @@
         int isConstant; 
     };
 
+    // --------- Types Functions -------------
+    struct NodeType* create_int_node();
+    struct NodeType* create_float_node();
+    struct NodeType* create_bool_node();
+    struct NodeType* create_string_node();
+    struct NodeType* create_enum_node();
+
+    void check_type(struct NodeType* first_type, struct NodeType* second_type);
+    void check_Type_2(char symbol, struct NodeType* second_type);
+    void check_type_3(char* first_type, char* second_type);
+
+    /* ------------------------------------------------------------------------*/
+
     // ----- Symbol Table Data Structure ------
     struct symbol {
         char name;
@@ -848,6 +861,88 @@ struct NodeType* perform_conversion(struct NodeType* term, char *target_type) {
 }
 
 
+/* ------------------------------------------------------------------------*/
+
+/* ------------------------- Type Checking -----------------------------*/
+
+/* -------------------------
+a new node of 'int' &&  initial value = 0 && Returns: A pointer to the node
+------------------------- */
+struct NodeType* create_int_node() {
+    struct NodeType* new_node = malloc(sizeof(struct NodeType));
+    new_node->type = "int";
+    new_node->value.integer_value = 0;
+    return new_node;
+}
+
+struct NodeType* create_float_node() {
+    struct NodeType* ptr = malloc(sizeof(struct NodeType));
+    ptr->type = "float";
+    ptr->value.integer_value = 0;
+    return ptr;
+}
+
+struct NodeType* create_bool_node() {
+    struct NodeType* ptr = malloc(sizeof(struct NodeType));
+    ptr->type = "bool";
+    ptr->value.integer_value = 0;
+    return ptr;
+}
+
+struct NodeType* create_string_node() {
+    struct NodeType* ptr = malloc(sizeof(struct NodeType));
+    ptr->type = "string";
+    ptr->value.integer_value = 0;
+    return ptr;
+}
+
+struct NodeType* create_enum_node() {
+    struct NodeType* ptr = malloc(sizeof(struct NodeType));
+    ptr->type = "enum";
+    ptr->value.integer_value = 0;
+    return ptr;
+}
+
+
+/* ------------------------- Compares the types of two node -----------------------------*/
+void check_type(struct NodeType* first_type, struct NodeType* second_type) {
+    if( strcmp(first_type->type, second_type->type) != 0 ) {
+        log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, second_type->type); 
+    }
+    return;
+}
+
+/* ------------------------- Checks the type of a symbol against a given node type -----------------------------*/
+void check_Type_2(char symbol, struct NodeType* second_type) {
+    for( int i=symbol_table_index-1 ; i>=0 ; i-- ) 
+    {
+        if( symbol_table[i].name == symbol ) 
+        {
+            for( int j=scope_index-1 ; j>=0 ; j--) 
+            {
+                if(symbol_table[i].scope == scopes[j]) 
+                {
+                    if(strcmp(symbol_table[i].type, second_type->type) != 0) 
+                    {
+                        log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, symbol_table[i].name);
+                    }
+                    else{
+                        return;
+                    }
+                }
+            }
+        }
+    }
+    return;
+}
+
+/* ------------------------- Compares two types specified as strings -----------------------------*/
+void check_type_3(char* first_type, char* second_type){
+    if( strcmp(first_type, second_type) != 0 ) {
+        log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, second_type);
+    }
+    return;
+}
 
 
 
