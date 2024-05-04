@@ -15,10 +15,6 @@
     extern int nline;
     extern int yyleng;
 
-    // ----- Quadruples ------
-
-
-
     // ----- Semantic Erros ------
     #define SHOW_SEMANTIC_ERROR_MESSAGES 1
     #define SEMANTIC_ERROR_TYPE_MISMATCH 1
@@ -155,6 +151,53 @@
     // -------------- Scope Functions --------------------
     void enter_scope();
     void exit_scope();
+
+    // -------------- Quadruples --------------------
+    #define show_quadruples 1
+    #define MAX_STACK_SIZE 100
+    void print_function_start(const char* function_name);
+
+
+    int end_label_stack[MAX_STACK_SIZE];
+    int end_label_stack_ptr = -1;
+    int end_label_number = 0;
+
+    int label_stack[MAX_STACK_SIZE];
+    int label_stack_ptr = -1;
+    int label_number = 0;
+
+    char last_identifier_stack[MAX_STACK_SIZE];
+    int last_identifier_stack_ptr = -1;
+
+    int start_label_stack[MAX_STACK_SIZE];
+    int start_label_stack_ptr = -1;
+    int start_label_number = 0;
+
+    // ---------Functions --------------
+    void print_function_start(const char* function_name);
+    void print_function_end(const char* function_name);
+    void print_function_call(const char* function_name);
+    void print_function_return();
+    void print_instruction(const char* instruction);
+    void print_push_integer(int value);
+    void print_push_float(float value);
+    void print_push_identifier(char symbol);
+    void print_push_string(char* str);
+    void print_pop_identifier(char symbol);
+    void print_push_end_label(int end_label_number);
+    void print_jump_end_label();
+    void print_pop_end_label();
+    void print_jump_false_label(int label_number);
+    void print_pop_label();
+    void print_push_last_identifier_stack(char identifier);
+    void print_peak_last_identifier_stack();
+    void print_pop_last_identifier_stack();
+    void print_push_start_label(int start_label_number);
+    void print_jump_start_label();
+    void print_pop_start_label();
+    void print_start_enum(char enum_name);
+    void print_end_enum(char enum_name);
+
 
 %}
 
@@ -1187,6 +1230,220 @@ Exits the current scope by decrementing the scope index
 void exit_scope() {
     scope_index--;
 }
+/* ------------------------------------------------------------------------*/
+
+/* --------------------------------- Quadruples functions ---------------------------------------*/
+
+/* -------------------------
+Prints the start of a function with its name if the show_quadruples flag is enabled
+------------------------- */
+void print_function_start(const char* function_name)
+{
+    if (show_quadruples) {
+        printf("Quadruple(%d) \tPROC %s\n", nline, function_name); 
+    }
+}
+
+
+/* -------------------------
+Prints the end of a function along with its name if the show_quadruples flag is enabled.
+------------------------- */
+void print_function_end(const char* function_name)
+{
+    if (show_quadruples) {
+        printf("Quadruple(%d) \tENDPROC %s\n", nline, function_name); 
+    }
+}
+
+/* -------------------------
+Prints the call of a function with its name if the show_quadruples flag is enabled.
+------------------------- */
+void print_function_call(const char* function_name)
+{
+    if (show_quadruples) {
+        printf("Quadruple(%d) \tCALL %s\n", nline, function_name);
+    }
+}
+
+/* -------------------------
+Prints the return from a function if the show_quadruples flag is enabled.
+------------------------- */
+void print_function_return()
+{
+    if (show_quadruples) {
+        printf("Quadruple(%d) \tRET\n", nline);
+    }
+}
+
+/* -------------------------
+Prints a quadruple instruction if the show_quadruples flag is enabled.
+------------------------- */
+void print_instruction(const char* instruction)
+{
+    if (show_quadruples) {
+        printf("Quadruple(%d) \t%s\n", nline, instruction);
+    }
+}
+
+void print_push_integer(int value)
+{
+    if (show_quadruples) {
+        printf("Quadruple(%d) \tPUSH %d\n", nline, value);
+    }
+}
+
+void print_push_float(float value)
+{
+    if (show_quadruples) {
+        printf("Quadruple(%d) \tPUSH %f\n", nline, value);
+    }
+}
+
+void print_push_identifier(char symbol)
+{
+    if (show_quadruples) {
+        printf("Quadruple(%d) \tPUSH %c\n", nline, symbol);
+    }
+}
+
+void print_push_string(char* str)
+{
+    if (show_quadruples) {
+        printf("Quadruple(%d) \tPUSH %s\n", nline, str);
+    }
+}
+
+void print_pop_identifier(char symbol)
+{
+    if (show_quadruples) {
+        printf("Quadruple(%d) \tPOP %c\n", nline, symbol);
+    }
+}
+
+void print_push_end_label(int end_label_number)
+{
+    if (show_quadruples) {
+        /* Push the end label number to the stack */
+        end_label_stack[++end_label_stack_ptr] = end_label_number;
+    }
+}
+
+void print_jump_end_label()
+{
+    if (show_quadruples) {
+        /* Get the last end label number from the stack */
+        int end_label_number = end_label_stack[end_label_stack_ptr];
+        printf("Quadruple(%d) \tJMP EndLabel_%d\n", nline, end_label_number);
+    }
+}
+
+void print_pop_end_label()
+{
+    if (end_label_stack_ptr < 0) {
+        printf("Quadruple(%d) Error: No end label to add. Segmentation Fault\n", nline);
+        return;
+    }
+    /* Get the last end label number from the stack */
+    int end_label_number = end_label_stack[end_label_stack_ptr--];
+    if (show_quadruples) {
+        printf("Quadruple(%d) EndLabel_%d:\n", nline, end_label_number);
+    }
+}
+
+void print_jump_false_label(int label_number)
+{
+    if (show_quadruples) {
+        printf("Quadruple(%d) \tJF Label_%d\n", nline, label_number);
+        /* Push the label number to the stack */
+        label_stack[label_stack_ptr++] = label_number;
+    }
+}
+
+void print_pop_label()
+{
+    if (label_stack_ptr < 0) {
+        printf("Quadruple(%d) Error: No end label to add. Segmentation Fault\n", nline);
+        return;
+    }
+    /* Get the last label number from the stack */
+    int label_number = label_stack[--label_stack_ptr];
+    if (show_quadruples) {
+        printf("Quadruple(%d) Label_%d:\n", nline, label_number);
+    }
+}
+
+void print_push_last_identifier_stack(char identifier)
+{
+    if (show_quadruples) {
+        /* Add the identifier to the stack */
+        last_identifier_stack[++last_identifier_stack_ptr] = identifier;
+    }
+}
+
+void print_peak_last_identifier_stack()
+{
+    if (last_identifier_stack_ptr < 0) {
+        printf("Quadruple(%d) Error: No last identifier to peak. Segmentation Fault\n", nline);
+        return;
+    }
+    /* Get the last identifier from the stack */
+    char identifier = last_identifier_stack[last_identifier_stack_ptr];
+    if (show_quadruples) {
+        printf("Quadruple(%d) \tPUSH %c\n", nline, identifier);
+    }
+}
+
+void print_pop_last_identifier_stack()
+{
+    if (last_identifier_stack_ptr < 0) {
+        printf("Quadruple(%d) Error: No last identifier to pop. Segmentation Fault\n", nline);
+        return;
+    }
+    /* Get the last identifier from the stack */
+    char identifier = last_identifier_stack[last_identifier_stack_ptr--];
+}
+
+void print_push_start_label(int start_label_number)
+{
+    if (show_quadruples) {
+        /* Push the start label number to the stack */
+        start_label_stack[++start_label_stack_ptr] = start_label_number;
+        printf("Quadruple(%d) StartLabel_%d:\n", nline, start_label_number);
+    }
+}
+
+void print_jump_start_label()
+{
+    if (show_quadruples) {
+        /* Get the last start label number from the stack */
+        int start_label_number = start_label_stack[start_label_stack_ptr];
+        printf("Quadruple(%d) \tJMP StartLabel_%d\n", nline, start_label_number);
+    }
+}
+
+void print_pop_start_label()
+{
+    if (start_label_stack_ptr < 0) {
+        printf("Quadruple(%d) Error: No start label to pop. Segmentation Fault\n", nline);
+        return;
+    }
+    /* Get the last start label number from the stack */
+    int start_label_number = start_label_stack[start_label_stack_ptr--];
+}
+
+void print_start_enum(char enum_name)
+{
+    if (show_quadruples) {
+        printf("Quadruple(%d) \tENUM %c\n", nline, enum_name);
+    }
+}
+
+void print_end_enum(char enum_name)
+{
+    if (show_quadruples) {
+        printf("Quadruple(%d) \tENDENUM %c\n", nline, enum_name);
+    }
+}
 
 
 /* ------------------------------------------------------------------------*/
@@ -1205,6 +1462,7 @@ int main(int argc, char *argv[]) {
     }
     else{
         yyparse();
+        check_using_variables();
 
         fclose(yyin);
         write_symbol_table_to_file();
