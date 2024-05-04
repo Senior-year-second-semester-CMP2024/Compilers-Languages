@@ -82,6 +82,7 @@
     int symbol_table_index = 0;
 
     int scope_index = 1;
+    int scope_count = 1;
     int scopes[100];
 
     // --------- Types -------------
@@ -142,6 +143,18 @@
     void modify_symbol_parameter(char symbol, int new_parameter);
 
     int retrieve_symbol_index(char symbol_name);
+
+
+    // ----------------------------------
+    void set_variable_constant_in_symbol_table(char variable_name);
+    void set_variable_initialized_in_symbol_table(char variable_name);
+    void mark_variable_used_in_symbol_table(char variable_name);
+    void mark_variable_declared_in_symbol_table(char variable_name);
+    
+
+    // -------------- Scope Functions --------------------
+    void enter_scope();
+    void exit_scope();
 
 %}
 
@@ -1100,8 +1113,80 @@ int check_variable_declaration_as_constant_same_scope(char variable_name) {
 
 /* --------------------------------- Setter functions ---------------------------------------*/
 
+/* -------------------------
+Sets a variable as a constant within the symbol table
+------------------------- */
+void set_variable_constant_in_symbol_table(char variable_name) {
+    for(int i = symbol_table_index - 1; i >= 0; --i) 
+    {
+        if(symbol_table[i].name == variable_name) 
+        {
+            symbol_table[i].constant_flag = 1;
+            return;
+        }
+    }
+}
+
+/* -------------------------
+Sets a variable as initialized within the symbol table
+------------------------- */
+void set_variable_initialized_in_symbol_table(char variable_name) {
+    for(int i = symbol_table_index - 1; i >= 0; --i) 
+    {
+        if(symbol_table[i].name == variable_name) 
+        {
+            symbol_table[i].initialized_flag = 1;
+            return;
+        }
+    }
+}
+
+/* -------------------------
+Marks a variable as used within the symbol table
+------------------------- */
+void mark_variable_used_in_symbol_table(char variable_name) {
+    for(int i = symbol_table_index - 1; i >= 0; --i) 
+    {
+        if(symbol_table[i].name == variable_name) 
+        {
+            symbol_table[i].used_flag = 1;
+            return;
+        }
+    }
+}
 
 
+/* -------------------------
+Marks a variable as declared within the symbol table
+------------------------- */
+void mark_variable_declared_in_symbol_table(char variable_name) {
+    for(int i = symbol_table_index - 1; i >= 0; --i) {
+        if(symbol_table[i].name == variable_name) { 
+            symbol_table[i].declared_flag = 1;
+            return;
+        }
+    }
+}
+
+/* ------------------------------------------------------------------------*/
+
+
+/* --------------------------------- Setter functions ---------------------------------------*/
+/* -------------------------
+Enters a new scope by updating the scope array and index
+------------------------- */
+void enter_scope() {
+    scopes[scope_index] = scope_count;
+    scope_index++;
+    scope_count++;
+}
+
+/* -------------------------
+Exits the current scope by decrementing the scope index
+------------------------- */
+void exit_scope() {
+    scope_index--;
+}
 
 
 /* ------------------------------------------------------------------------*/
