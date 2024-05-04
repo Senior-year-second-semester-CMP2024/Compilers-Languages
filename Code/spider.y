@@ -15,6 +15,69 @@
     extern int nline;
     extern int yyleng;
 
+    // ----- Quadruples ------
+
+
+
+    // ----- Semantic Erros ------
+    #define SHOW_SEMANTIC_ERROR_MESSAGES 1
+    #define SEMANTIC_ERROR_TYPE_MISMATCH 1
+    #define SEMANTIC_ERROR_UNDECLARED 2
+    #define SEMANTIC_ERROR_UNINITIALIZED 3
+    #define SEMANTIC_ERROR_UNUSED 4
+    #define SEMANTIC_ERROR_REDECLARED 5
+    #define SEMANTIC_ERROR_CONSTANT 6
+    #define SEMANTIC_ERROR_OUT_OF_SCOPE 7
+    #define SEMANTIC_WARNING_CONSTANT_IF 8
+
+    void log_semantic_error( int error_code, char variable) {
+        int error_line = nline;
+
+        if ( SHOW_SEMANTIC_ERROR_MESSAGES ) {
+            
+            switch( error_code ) {
+                case SEMANTIC_ERROR_TYPE_MISMATCH:
+                    printf("Semantic error (%d): Type mismatch error\n", error_line);
+                    break;
+                case SEMANTIC_ERROR_UNDECLARED:
+                    printf("Semantic error (%d): Undeclared variable '%c'\n", error_line, variable);
+                    break;
+                case SEMANTIC_ERROR_UNINITIALIZED:
+                    printf("Semantic error (%d): Uninitialized variable '%c'\n", error_line, variable);
+                    break;
+                case SEMANTIC_ERROR_UNUSED:
+                    printf("Semantic error (%d): Unused variable '%c'\n", error_line, variable);
+                    break;
+                case SEMANTIC_ERROR_REDECLARED:
+                    printf("Semantic error (%d): Redeclared variable '%c'\n", error_line, variable);
+                    break;
+                case SEMANTIC_ERROR_CONSTANT:
+                    printf("Semantic error (%d): Constant variable '%c'\n", error_line, variable);
+                    break;
+                case SEMANTIC_ERROR_OUT_OF_SCOPE:
+                    printf("Semantic error (%d): Variable '%c' out of scope\n", error_line, variable);
+                    exit(EXIT_FAILURE);
+                    break;
+                case SEMANTIC_WARNING_CONSTANT_IF:
+                    printf("Semantic warning (%d): If statement is always %s\n", error_line, (variable ? "True" : "False"));
+                    break;
+                default:
+                    printf("Semantic error (%d): Unknown error\n", error_line);
+                    break;
+            }
+            write_symbol_table_to_file(); // Assuming you have a function named printSymbolTable to print the symbol table
+        }
+    }
+
+
+    // --------- Operators Functions ----------------
+    struct NodeType* perform_arithmetic(struct NodeType* first_operand, struct NodeType* second_operand, char operator);
+    struct NodeType* perform_bitwise_operation(struct NodeType* first_operand, struct NodeType* second_operand, char operator);
+    struct NodeType* perform_logical_operation(struct NodeType* first_operand, struct NodeType* second_operand, char operator);
+    struct NodeType* perform_comparison(struct NodeType* first_operand, struct NodeType* second_operand, char* operator);
+    struct NodeType* perform_conversion(struct NodeType* term, char *target_type);
+
+
     // ----- Symbol Table Variables ------
     int symbol_table_index = 0;
 
@@ -448,6 +511,345 @@ void write_symbol_table_to_file(){
 
     fclose(filePointer); 
 }
+
+/* ------------------------------------------------------------------------*/
+
+/* -------------------------Operators Functions-----------------------------*/
+
+
+/* ------------------------- 1-Arithmetic Operations -----------------------------*/
+
+struct NodeType* perform_arithmetic(struct NodeType* first_operand, struct NodeType* second_operand, char operator) {
+
+    struct NodeType* result_node = malloc(sizeof(struct NodeType));
+
+    if ( strcmp(first_operand->type, "int") == 0 && strcmp(second_operand->type, "int") == 0 ) {
+
+        result_node->type = "int";
+
+        switch (operator) {
+            case '+':
+                result_node->value.integer_value = first_operand->value.integer_value + second_operand->value.integer_value;
+                break;
+            case '-':
+                result_node->value.integer_value = first_operand->value.integer_value - second_operand->value.integer_value;
+                break;
+            case '*':
+                result_node->value.integer_value = first_operand->value.integer_value * second_operand->value.integer_value;
+                break;
+            case '/':
+                result_node->value.integer_value = first_operand->value.integer_value / second_operand->value.integer_value;
+                break;
+            case '%':
+                result_node->value.integer_value = first_operand->value.integer_value % second_operand->value.integer_value;
+                break;
+            default:
+                log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, second_operand->type);
+        }
+    } else if ( strcmp(first_operand->type, "float") == 0 && strcmp(second_operand->type, "float") == 0 ) {
+
+        result_node->type = "float";
+
+        switch (operator) {
+            case '+':
+                result_node->value.float_value = first_operand->value.float_value + second_operand->value.float_value;
+                break;
+            case '-':
+                result_node->value.float_value = first_operand->value.float_value - second_operand->value.float_value;
+                break;
+            case '*':
+                result_node->value.float_value = first_operand->value.float_value * second_operand->value.float_value;
+                break;
+            case '/':
+                result_node->value.float_value = first_operand->value.float_value / second_operand->value.float_value;
+                break;
+            default:
+                log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, second_operand->type);
+        }
+    } else if ( strcmp(first_operand->type, "int") == 0 && strcmp(second_operand->type, "float") == 0 ) {
+
+        result_node->type = "float";
+
+        switch (operator) {
+            case '+':
+                result_node->value.float_value = first_operand->value.integer_value + second_operand->value.float_value;
+                break;
+            case '-':
+                result_node->value.float_value = first_operand->value.integer_value - second_operand->value.float_value;
+                break;
+            case '*':
+                result_node->value.float_value = first_operand->value.integer_value * second_operand->value.float_value;
+                break;
+            case '/':
+                result_node->value.float_value = first_operand->value.integer_value / second_operand->value.float_value;
+                break;
+            default:
+                log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, second_operand->type);
+        }
+    } else if (strcmp(first_operand->type, "float") == 0 && strcmp(second_operand->type, "int") == 0) {
+        
+        result_node->type = "float";
+        
+        switch (operator) {
+            case '+':
+                result_node->value.float_value = first_operand->value.float_value + second_operand->value.integer_value;
+                break;
+            case '-':
+                result_node->value.float_value = first_operand->value.float_value - second_operand->value.integer_value;
+                break;
+            case '*':
+                result_node->value.float_value = first_operand->value.float_value * second_operand->value.integer_value;
+                break;
+            case '/':
+                result_node->value.float_value = first_operand->value.float_value / second_operand->value.integer_value;
+                break;
+            default:
+                log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, second_operand->type);
+        }
+    } else {
+        log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, second_operand->type);
+    }
+
+    return result_node;
+}
+
+/* ------------------------- 2- Bitwise Operations -----------------------------*/
+
+struct NodeType* perform_bitwise_operation(struct NodeType* first_operand, struct NodeType* second_operand, char operator) {
+    
+    struct NodeType* result_node = malloc(sizeof(struct NodeType));
+    
+    if ( strcmp(first_operand->type, "int") == 0 && strcmp(second_operand->type, "int") == 0 ) {
+
+        result_node->type = "int";
+
+        switch (operator) {
+            case '|':
+                result_node->value.integer_value = first_operand->value.integer_value | second_operand->value.integer_value;
+                break;
+            case '&':
+                result_node->value.integer_value = first_operand->value.integer_value & second_operand->value.integer_value;
+                break;
+            case '^':
+                result_node->value.integer_value = first_operand->value.integer_value ^ second_operand->value.integer_value;
+                break;
+            case '<':
+                result_node->value.integer_value = first_operand->value.integer_value << second_operand->value.integer_value;
+                break;
+            case '>':
+                result_node->value.integer_value = first_operand->value.integer_value >> second_operand->value.integer_value;
+                break;
+            default:
+                log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, operator);
+        }
+    } else {
+        log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, operator);
+    }
+    
+    return result_node;
+}
+
+/* ------------------------- 3- Logical Operations -----------------------------*/
+
+struct NodeType* perform_logical_operation(struct NodeType* first_operand, struct NodeType* second_operand, char operator) {
+
+    struct NodeType* result_node = malloc(sizeof(struct NodeType));
+    
+    if ( strcmp(first_operand->type, "bool") == 0 && strcmp(second_operand->type, "bool") == 0 ) {
+
+        result_node->type = "bool";
+
+        switch (operator) {
+            case '&':
+                result_node->value.bool_value = first_operand->value.bool_value && second_operand->value.bool_value;
+                break;
+            case '|':
+                result_node->value.bool_value = first_operand->value.bool_value || second_operand->value.bool_value;
+                break;
+            default:
+                log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, operator);
+        }
+    } else {
+        log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, operator);
+    }
+    
+    return result_node;
+}
+
+/* ------------------------- 4- Comparison Operations -----------------------------*/
+
+struct NodeType* perform_comparison(struct NodeType* first_operand, struct NodeType* second_operand, char* operator) {
+
+    struct NodeType* result_node = malloc(sizeof(struct NodeType));
+    result_node->type = "bool";
+    
+    if ( strcmp(first_operand->type, second_operand->type) != 0 ) {
+        log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, second_operand->type);
+    }
+
+    if (strcmp(first_operand->type, "float") == 0) {
+        
+        // ----------- float values -----------
+        if (strcmp(operator, "==") == 0) {
+            result_node->value.bool_value = first_operand->value.float_value == second_operand->value.float_value;
+        } 
+        else if (strcmp(operator, "!=") == 0) {
+            result_node->value.bool_value = first_operand->value.float_value != second_operand->value.float_value;
+        } 
+        else if (strcmp(operator, ">") == 0) {
+            result_node->value.bool_value = first_operand->value.float_value > second_operand->value.float_value;
+        } 
+        else if (strcmp(operator, ">=") == 0) {
+            result_node->value.bool_value = first_operand->value.float_value >= second_operand->value.float_value;
+        } 
+        else if (strcmp(operator, "<") == 0) {
+            result_node->value.bool_value = first_operand->value.float_value < second_operand->value.float_value;
+        } 
+        else if (strcmp(operator, "<=") == 0) {
+            result_node->value.bool_value = first_operand->value.float_value <= second_operand->value.float_value;
+        } 
+        else {
+            log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, second_operand->type);
+        }
+    } 
+    // ----------- integer values -----------
+    else {
+        if (strcmp(operator, "==") == 0) {
+            result_node->value.bool_value = first_operand->value.integer_value == second_operand->value.integer_value;
+        } 
+        else if (strcmp(operator, "!=") == 0) {
+            result_node->value.bool_value = first_operand->value.integer_value != second_operand->value.integer_value;
+        } 
+        else if (strcmp(operator, ">") == 0) {
+            result_node->value.bool_value = first_operand->value.integer_value > second_operand->value.integer_value;
+        } 
+        else if (strcmp(operator, ">=") == 0) {
+            result_node->value.bool_value = first_operand->value.integer_value >= second_operand->value.integer_value;
+        } 
+        else if (strcmp(operator, "<") == 0) {
+            result_node->value.bool_value = first_operand->value.integer_value < second_operand->value.integer_value;
+        } 
+        else if (strcmp(operator, "<=") == 0) {
+            result_node->value.bool_value = first_operand->value.integer_value <= second_operand->value.integer_value;
+        } 
+        else {
+            log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, second_operand->type);
+        }
+    }
+    
+    return result_node;
+}
+
+/* ------------------------- 5- Conversion Operations -----------------------------*/
+
+struct NodeType* perform_conversion(struct NodeType* term, char *target_type) {
+
+    struct NodeType* converted_node = malloc(sizeof(struct NodeType));
+
+    /* ------------------------- Convert to Integer -----------------------------*/
+    if(strcmp(target_type, "int") == 0) {
+
+        converted_node->type = "int";
+        /* ------------------------- Float to Integer -----------------------------*/        
+        if( strcmp(term->type, "float") == 0 ) {
+            converted_node->value.integer_value = (int)term->value.float_value;
+        } 
+        /* ------------------------- Bool to Integer -----------------------------*/        
+        else if(strcmp(term->type, "bool") == 0) {
+            converted_node->value.integer_value = (int)term->value.bool_value;
+        } 
+        /* ------------------------- String to Integer -----------------------------*/        
+        else if(strcmp(term->type, "string") == 0) {
+            char *str = strdup(term->value.string_value);
+            str++;
+            str[strlen(str)-1] = '\0';
+            converted_node->value.integer_value = atoi(str);
+        } 
+        else {
+            log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, term->type);
+        }
+    } 
+    /* ------------------------- Convert to Float -----------------------------*/
+    else if( strcmp(target_type, "float") == 0 ) {
+
+        converted_node->type = "float";
+
+        /* ------------------------- Integer to Float -----------------------------*/        
+        if( strcmp(term->type, "int") == 0 ) {
+            converted_node->value.float_value = (float)term->value.integer_value;
+        } 
+        /* ------------------------- Bool to Float -----------------------------*/        
+        else if(strcmp(term->type, "bool") == 0) {
+            converted_node->value.float_value = (float)term->value.bool_value;
+        }
+        /* ------------------------- String to Float -----------------------------*/         
+        else if(strcmp(term->type, "string") == 0) {
+            char *str = strdup(term->value.string_value);
+            str++;
+            str[strlen(str)-1] = '\0';
+            converted_node->value.float_value = atof(str);
+        } 
+        else {
+            log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, term->type);
+        }
+    }
+    /* ------------------------- Convert to Bool -----------------------------*/
+    else if(strcmp(target_type, "bool") == 0) {
+
+        converted_node->type = "bool";
+
+        /* ------------------------- Bool to Integer -----------------------------*/         
+        if(strcmp(term->type, "int") == 0) {
+            converted_node->value.bool_value = (int)term->value.integer_value!=0;
+        } 
+        /* ------------------------- Bool to Float -----------------------------*/         
+        else if(strcmp(term->type, "float") == 0) {
+            converted_node->value.bool_value = (int)term->value.float_value!=0;
+        } 
+        /* ------------------------- Bool to String -----------------------------*/         
+        else if(strcmp(term->type, "string") == 0) {
+            char *str = strdup(term->value.string_value);
+            str++;
+            str[strlen(str)-1] = '\0';
+            converted_node->value.bool_value = str[0] != '\0';
+        } 
+        else {
+            log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, term->type);
+        }
+    } 
+    /* ------------------------- Convert to String -----------------------------*/
+    else if( strcmp(target_type, "string") == 0 ) {
+        converted_node->type = "string";
+
+        /* ------------------------- String to Integer -----------------------------*/         
+        if(strcmp(term->type, "int") == 0) {
+            char temp[100];
+            sprintf(temp, "%d", term->value.integer_value);
+            converted_node->value.string_value = strdup(temp);
+        } 
+        /* ------------------------- String to Float -----------------------------*/         
+        else if(strcmp(term->type, "float") == 0) {
+            char temp[100];
+            sprintf(temp, "%f", term->value.float_value);
+            converted_node->value.string_value = strdup(temp);
+        } 
+        /* ------------------------- String to Bool -----------------------------*/         
+        else if(strcmp(term->type, "bool") == 0) {
+            char temp[100];
+            sprintf(temp, "%d", term->value.bool_value);
+            converted_node->value.string_value = strdup(temp);
+        } 
+        else {
+            log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, term->type);
+        }
+    } 
+
+    return converted_node;
+}
+
+
+
+
 
 /* ------------------------------------------------------------------------*/
 
