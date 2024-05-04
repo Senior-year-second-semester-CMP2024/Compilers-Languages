@@ -103,7 +103,7 @@
     struct NodeType* create_enum_node();
 
     void check_type(struct NodeType* first_type, struct NodeType* second_type);
-    void check_Type_2(char symbol, struct NodeType* second_type);
+    void check_type_2(char symbol, struct NodeType* second_type);
     void check_type_3(char* first_type, char* second_type);
 
     int check_variable_declaration(char variable_name);
@@ -201,101 +201,143 @@
 
 %}
 
-/*
+/* --------------- Yacc definitions ---------------*/
+
+/* --------------- Starting Symbol ---------------*/
+%start program
+
+// %union is used to define the types of the tokens that can be returned
+// Here, we define the types where the 2nd term is associated with the type of the 1st term.
 %union {
-    char *str;  // Assuming yylval holds a pointer to a string
+    int INTEGER_TYPE;
+    float FLOAT_TYPE;
+    int BOOL_TYPE;
+    char* STRING_TYPE;
+    void* VOID_TYPE;
+    char* DATA_TYPE;
+    char* DATA_MODIFIER;
+    struct NodeType* NODE_TYPE;
 }
 
-%token <str> IDENTIFIER
-*/
-
 // -----Tokens-----
-%token PRINT CONSTANT 
-%token BOOL_DATA_TYPE STRING_DATA_TYPE INT_DATA_TYPE FLOAT_DATA_TYPE VOID_DATA_TYPE 
+%token PRINT  
 %token IF ELSE ELSE_IF 
 %token FOR WHILE REPEAT UNTIL 
 %token SWITCH CASE DEFAULT CONTINUE BREAK RETURN 
 %token SHIFT_LEFT SHIFT_RIGHT AND OR NOT 
-%token TRUE_VALUE FALSE_VALUE INTEGER FLOAT STRING ENUM IDENTIFIER
+%token ENUM
 
 // -----Operators-----
-%left '+' '-'
-%left '*' '/' '%'
-%left  '|' '^' '&' 
+%right '=' 
 %left AND OR
-%left SHIFT_LEFT SHIFT_RIGHT
+%left  '|' '^' '&' 
 %left EQUAL NOT_EQUAL 
 %left GREATER_THAN GREATER_THAN_OR_EQUAL LESS_THAN LESS_THAN_OR_EQUAL 
-
-%right '=' 
+%left SHIFT_LEFT SHIFT_RIGHT
+%left '+' '-'
 %right NOT
-//%nonassoc LESS_THAN GREATER_THAN LESS_THAN_OR_EQUAL GREATER_THAN_OR_EQUAL EQUAL NOT_EQUAL
+%left '*' '/' '%'
+
+// ----- Declarations -----
+%token <DATA_MODIFIER> CONSTANT
+%token <DATA_TYPE> INTEGER_DATA_TYPE FLOAT_DATA_TYPE BOOL_DATA_TYPE STRING_DATA_TYPE VOID_DATA_TYPE
+%token <NODE_TYPE> IDENTIFIER // this is a token IDENTIFIER returned by the lexical analyzer with as NODE_TYPE
+
+
+// ----- Data Types -----
+%token <INTEGER_DATA_TYPE> INTEGER
+%token <FLOAT_DATA_TYPE> FLOAT
+%token <STRING_DATA_TYPE> STRING
+%token <BOOL_DATA_TYPE> TRUE_VALUE FALSE_VALUE
+
+// ----- Return Types (NON TERMINALS) -----
+%type <VOID_TYPE> program statement_list control_statement statement
+%type <VOID_TYPE> if_condition while_loop for_loop repeat_until_loop switch_Case case_list case
+%type <VOID_TYPE> function_arguments function_parameters
+
+%type <DATA_MODIFIER> data_modifier
+
+
+%type <NODE_TYPE> literal
+%type <NODE_TYPE> expression assignment data_type declaration function_call
 
 %%
 
+/* ----------------------------DONE---------------------------------*/
 program : statement_list                            {;}
         | function_definition                       {;} 
         | statement_list program                    {;}  
         | function_definition program               {;}
         ;
-
+/* ----------------------------DONE---------------------------------*/
 statement_list  : statement ';'                          {;}
-                | statement_list statement ';'           {;} 
+                | '{' {enter_scope();} statement_list '}' {exit_scope();}
                 | control_statement                      {;}
+                | statement_list '{' {enter_scope();} statement_list '}' {exit_scope();}  {;}        
+                | statement_list statement ';'           {;} 
                 | statement_list control_statement       {;}
-                | '{' statement_list '}'
-                | statement_list '{' statement_list '}'  {;}        
                 ;
-
-control_statement   :  if_condition 
-                    |  while_loop 
-                    |  for_loop 
-                    |  repeat_until_loop 
-                    |  switch_Case 
+/* -----------------------------DONE--------------------------------*/
+control_statement   :  {print_push_end_label(++end_label_number);} if_condition {print_pop_end_label();}
+                    |  {print_push_end_label(++end_label_number);} switch_Case {print_pop_end_label();}
+                    |  {print_push_start_label(++start_label_number);} while_loop {print_pop_start_label();}
+                    |  {print_push_start_label(++start_label_number);} repeat_until_loop {print_pop_start_label();}
+                    |  for_loop {print_pop_start_label();}
                     ;   
-
+/* ----------------------------DONE---------------------------------*/
 statement : assignment                   {;}
-          | declaration                  {;}
-          | jump_statement               {;}
           | expression                   {;}
-          | PRINT '(' expression ')'     {;}
+          | declaration                  {;}
+          | PRINT '(' expression ')'     {display_node_value($3);}
+          | PRINT '(' IDENTIFIER ')'     {display_node_value(get_symbol_value($3)); mark_variable_used_in_symbol_table($3);}
+          | jump_statement               {;}
           ;
-
-declaration : CONSTANT data_type assignment
-            | data_type assignment
-            | data_type IDENTIFIER
+/* ----------------------------DONE---------------------------------*/
+declaration : data_modifier data_type IDENTIFIER    {check_same_scope_redeclaration($3);} '=' expression { check_Type_3($2, $6); add_symbol($3, $2->type, 1, 0, 0, scopes[scope_index-1]); modify_symbol_value($3, $6); set_variable_initialized_in_symbol_table($3); print_pop_identifier($3);} 
+            | data_type IDENTIFIER                  { check_same_scope_redeclaration($2); add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); print_pop_identifier($2); }
+            | data_type IDENTIFIER                  { check_same_scope_redeclaration($2);} '=' expression {check_Type_3($1, $5); add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); modify_symbol_value($2,$5); set_variable_initialized_in_symbol_table($2); print_pop_identifier($2);}
             ;
-
-assignment : IDENTIFIER '=' expression
+/* --------------------------DONE-----------------------------------*/
+data_modifier : CONSTANT
+              ;
+/* ---------------------------DONE----------------------------------*/
+assignment : IDENTIFIER '=' expression              {check_out_of_scope_declaration($1); check_reassignment_constant_variable(); check_type_2($1,$3); mark_variable_used_in_symbol_table($1); modify_symbol_value($1, $3); $$ = $3; set_variable_initialized_in_symbol_table($3); print_pop_identifier($1);}
+           | enum_definition                        {;} 
+           | data_type enum_declaration             {/*check if redeclared*/;}
            ;
+/* ----------------------------DONE---------------------------------*/
+expression : function_call                                      {$$->isConstant=0;}
+           
+           | '-' literal                                        {print_instruction("Negative or Negation"); if($2->type == "int") {$$ = create_int_node(); $$->value.integer_value = -$2->value.integer_value;} else if ($2->type == "float") { $$ = create_float_node(); $$->value.float_value = -$2->value.float_value;} $$->isConstant = $2->isConstant;}
+           | NOT literal                                        {print_instruction("Negation or NOT"); if($2->type == "bool") {$$ = create_bool_node(); $$->value.bool_value = !$2->value.bool_value;} else if ($2->value.integer_value) {$$ = create_bool_node(); $$->value.bool_value = 0;} else {$$ = create_bool_node(); $$->value.bool_value = 1;} $$->isConstant = $2->isConstant;}
+           
+           | expression '|' expression                          {print_instruction("Bitwise OR"); $$ = perform_bitwise_operation($1, $3, '|'); $$->isConstant = $1->isConstant && $3->isConstant;}
+           | expression '&' expression                          {print_instruction("Bitwise AND"); $$ = perform_bitwise_operation($1, $3, '&'); $$->isConstant = $1->isConstant && $3->isConstant;}
+           | expression '^' expression                          {print_instruction("Bitwise XOR"); $$ = perform_bitwise_operation($1, $3, '^'); $$->isConstant = $1->isConstant && $3->isConstant;}
+           
+           | expression '+' expression                          {print_instruction("Addition"); $$ = perform_arithmetic($1, $3, '+'); $$->isConstant = $1->isConstant && $3->isConstant;}
+           | expression '-' expression                          {print_instruction("Subtraction"); $$ = perform_arithmetic($1, $3, '-'); $$->isConstant = $1->isConstant && $3->isConstant;}
+           | expression '*' expression                          {print_instruction("Multiplication"); $$ = perform_arithmetic($1, $3, '*'); $$->isConstant = $1->isConstant && $3->isConstant;}
+           | expression '/' expression                          {print_instruction("Division"); $$ = perform_arithmetic($1, $3, '/'); $$->isConstant = $1->isConstant && $3->isConstant;}
+           | expression '%' expression                          {print_instruction("Modulus"); $$ = perform_arithmetic($1, $3, '%'); $$->isConstant = $1->isConstant && $3->isConstant;}
+           
+           | expression AND expression                          {print_instruction("Logical AND"); $$ = perform_logical_operation($1, $3, '&'); $$->isConstant = $1->isConstant && $3->isConstant;}
+           | expression OR expression                           {print_instruction("Logical OR"); $$ = perform_logical_operation($1, $3, '|'); $$->isConstant = $1->isConstant && $3->isConstant;}
 
-expression : function_call                                      {;}
-           | '-' literal                                        {$$ = -$2;}
-           | NOT literal                                        {$$ = !$2;}
-           | expression '|' expression                          {$$ = $1 | $3;}
-           | expression '&' expression                          {$$ = $1 & $3;}
-           | expression '^' expression                          {$$ = $1 ^ $3;}
-           | expression '+' expression                          {$$ = $1 + $3;}
-           | expression '-' expression                          {$$ = $1 - $3;}
-           | expression '*' expression                          {$$ = $1 * $3;}
-           | expression '/' expression                          {$$ = $1 / $3;}
-           | expression '%' expression                          {$$ = $1 % $3;}
-           | expression AND expression                          {$$ = $1 && $3;}
-           | expression OR expression                           {$$ = $1 || $3;}
-           | NOT expression                                     {$$ = !$2;}
-           | expression SHIFT_LEFT expression                   {$$ = $1 << $3;}
-           | expression SHIFT_RIGHT expression                  {$$ = $1 >> $3;}
-           | expression LESS_THAN expression                    {$$ = $1 < $3;}
-           | expression GREATER_THAN expression                 {$$ = $1 > $3;}
-           | expression LESS_THAN_OR_EQUAL expression           {$$ = $1 <= $3;}
-           | expression GREATER_THAN_OR_EQUAL expression        {$$ = $1 >= $3;}
-           | expression EQUAL expression                        {$$ = $1 == $3;}
-           | expression NOT_EQUAL expression                    {$$ = $1 != $3;}
-           | '(' expression ')'                                 {$$ = $2;}
+           | expression SHIFT_LEFT expression                   {print_instruction("Shift Left"); perform_bitwise_operation($1, $3, '<'); $$->isConstant = $1->isConstant && $3->isConstant;}
+           | expression SHIFT_RIGHT expression                  {print_instruction("Shift Right"); perform_bitwise_operation($1, $3, '>'); $$->isConstant = $1->isConstant && $3->isConstant;}
+
+           | expression LESS_THAN expression                    {print_instruction("Less Than"); $$ = perform_comparison($1, $3, "<"); $$->isConstant = $1->isConstant && $3->isConstant;}
+           | expression GREATER_THAN expression                 {print_instruction("Greater Than"); $$ = perform_comparison($1, $3, ">"); $$->isConstant = $1->isConstant && $3->isConstant;}
+           | expression LESS_THAN_OR_EQUAL expression           {print_instruction("Less Than or Equal"); $$ = perform_comparison($1, $3, "<="); $$->isConstant = $1->isConstant && $3->isConstant;}
+           | expression GREATER_THAN_OR_EQUAL expression        {print_instruction("Greater Than or Equal"); $$ = perform_comparison($1, $3, ">="); $$->isConstant = $1->isConstant && $3->isConstant;}
+           | expression EQUAL expression                        {print_instruction("Equal"); $$ = perform_comparison($1, $3, "=="); $$->isConstant = $1->isConstant && $3->isConstant;}
+           | expression NOT_EQUAL expression                    {print_instruction("Not Equal"); $$ = perform_comparison($1, $3, "!="); $$->isConstant = $1->isConstant && $3->isConstant;}
+           
            | literal                                            {$$ = $1;}
-           | IDENTIFIER                                         /* Need to put into thy Symbol Table*/
+           | '(' data_type ')' literal                          {print_instruction("Casting or Conversion"); $$ = perform_conversion($4, $2->type); $$->isConstant = $4->isConstant;}
            ;
-
+/* -------------------------------------------------------------*/
 
 // ------------ Conditions ------------------
 if_condition             : IF '(' expression  ')' '{' statement_list '}' else_condition {;}
@@ -326,17 +368,17 @@ repeat_until_loop         : REPEAT '{' statement_list '}' UNTIL '(' expression '
                         ;
 
 jump_statement : CONTINUE                       {;}
-               | BREAK                          {;}
-               | RETURN expression              {;}
-               | RETURN                         {;}
+               | BREAK                          {print_jump_end_label();}
+               | RETURN                         {print_function_return();}
+               | RETURN expression              {print_function_return();}
                ;
 
-// ------------ Data Types ------------------
-data_type : BOOL_DATA_TYPE          {$$ = $1;}
-          | STRING_DATA_TYPE        {$$ = $1;}
-          | INT_DATA_TYPE           {$$ = $1;}
-          | FLOAT_DATA_TYPE         {$$ = $1;}
-          | VOID_DATA_TYPE          {$$ = $1;}
+// ------------ Data Types DONE------------------
+data_type : BOOL_DATA_TYPE              {$$ = create_bool_node();}
+          | STRING_DATA_TYPE            {$$ = create_string_node();}
+          | INTEGER_DATA_TYPE           {$$ = create_int_node();}
+          | FLOAT_DATA_TYPE             {$$ = create_float_node();}
+          | VOID_DATA_TYPE              {;}
           ;
 
 literal : INTEGER               {$$ = $1;}
@@ -364,7 +406,7 @@ function_call : IDENTIFIER '(' function_parameters ')'        {;}
 
 
 // ------------ Enum ------------------
-enum_def : ENUM IDENTIFIER '{' enum_body '}'         {;}
+enum_definition : ENUM IDENTIFIER '{' enum_body '}'         {;}
          ;
 
 enum_body : IDENTIFIER                                      {;}
@@ -978,7 +1020,7 @@ void check_type(struct NodeType* first_type, struct NodeType* second_type) {
 }
 
 /* ------------------------- Checks the type of a symbol against a given node type -----------------------------*/
-void check_Type_2(char symbol, struct NodeType* second_type) {
+void check_type_2(char symbol, struct NodeType* second_type) {
     for( int i=symbol_table_index-1 ; i>=0 ; i-- ) 
     {
         if( symbol_table[i].name == symbol ) 

@@ -49,7 +49,7 @@ void Log(const char* type, const char* value)
 
 "bool"				{ Log("Data Type", yytext); return BOOL_DATA_TYPE; }
 "string"			{ Log("Data Type", yytext); return STRING_DATA_TYPE; }
-"int"				{ Log("Data Type", yytext); return INT_DATA_TYPE; }
+"int"				{ Log("Data Type", yytext); return INTEGER_DATA_TYPE; }
 "float"				{ Log("Data Type", yytext); return FLOAT_DATA_TYPE; }
 "void"				{ Log("Data Type", yytext); return VOID_DATA_TYPE; }
 
@@ -92,15 +92,15 @@ void Log(const char* type, const char* value)
 
 [()={}:,]			{ Log("Punctuators", yytext); return yytext[0]; }
 
-true				{ Log("Value", "true"); yylval = 1; return TRUE_VALUE; }
-false		        { Log("value", "false"); yylval = 0; return FALSE_VALUE; }
+true				{ Log("Value", "true"); yylval.BOOL_TYPE = 1; return TRUE_VALUE; }
+false		        { Log("value", "false"); yylval.BOOL_TYPE = 0; return FALSE_VALUE; }
 
 
-[_a-zA-Z][_a-zA-Z0-9]*		                    { Log("Identifier", yytext); yylval = strdup(yytext); return IDENTIFIER; } 
+[_a-zA-Z][_a-zA-Z0-9]*		                    { Log("Identifier", yytext); yylval.INTEGER_TYPE = yytext[0]; return IDENTIFIER; } 
 
--?[0-9]+			                            { Log("Integer Value", yytext); yylval = atoi(yytext); return INTEGER; }
--?[0-9]*[.][0-9]+		                        { Log("Float Value", yytext); yylval = atof(yytext); return FLOAT; }
-\"(\\.|[^\\"])*\"		                        { Log("String Value", yytext); yylval = strdup(yytext); return STRING;}
+-?[0-9]+			                            { Log("Integer Value", yytext); yylval.INTEGER_TYPE = atoi(yytext); return INTEGER; }
+-?[0-9]*[.][0-9]+		                        { Log("Float Value", yytext); yylval.FLOAT_TYPE = atof(yytext); return FLOAT; }
+\"(\\.|[^\\"])*\"		                        { Log("String Value", yytext); yylval.STRING_TYPE = strdup(yytext); return STRING;}
 
 (\n)+				                            {nline += yyleng ; nword++; }               /* Ignore the new line */
 
