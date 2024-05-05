@@ -8,10 +8,7 @@
     #define YYSTYPE int
 
     void yyerror (char *s); 
-    int yyparse();
-    int yywrap();
     int yylex();
-    extern FILE *yyin;
     extern int nline;
     extern int yyleng;
 
@@ -66,14 +63,6 @@
     }
 
 
-    // --------- Operators Functions ----------------
-    struct NodeType* perform_arithmetic(struct NodeType* first_operand, struct NodeType* second_operand, char operator);
-    struct NodeType* perform_bitwise_operation(struct NodeType* first_operand, struct NodeType* second_operand, char operator);
-    struct NodeType* perform_logical_operation(struct NodeType* first_operand, struct NodeType* second_operand, char operator);
-    struct NodeType* perform_comparison(struct NodeType* first_operand, struct NodeType* second_operand, char* operator);
-    struct NodeType* perform_conversion(struct NodeType* term, char *target_type);
-
-
     // ----- Symbol Table Variables ------
     int symbol_table_index = 0;
 
@@ -85,15 +74,23 @@
     struct NodeType {
         char *type;
         union {
-                int integer_value;
-                float float_value;
-                char* string_value;
-                int bool_value;
-        }value;
+                int integer_value_node;
+                float float_value_node;
+                char* string_value_node;
+                int bool_value_node;
+        }value_node;
 
         // check if the expression is a constant ==> helps in if statements with constant expressions
         int isConstant; 
     };
+
+    // --------- Operators Functions ----------------
+    struct NodeType* perform_arithmetic(struct NodeType* first_operand, struct NodeType* second_operand, char operator);
+    struct NodeType* perform_bitwise_operation(struct NodeType* first_operand, struct NodeType* second_operand, char operator);
+    struct NodeType* perform_logical_operation(struct NodeType* first_operand, struct NodeType* second_operand, char operator);
+    struct NodeType* perform_comparison(struct NodeType* first_operand, struct NodeType* second_operand, char* operator);
+    struct NodeType* perform_conversion(struct NodeType* term, char *target_type);
+
 
     // --------- Types Functions -------------
     struct NodeType* create_int_node();
@@ -103,17 +100,16 @@
     struct NodeType* create_enum_node();
 
     void check_type(struct NodeType* first_type, struct NodeType* second_type);
-    void check_type_2(char symbol, struct NodeType* second_type);
     void check_type_3(char* first_type, char* second_type);
 
-    int check_variable_declaration(char variable_name);
-    void check_same_scope_redeclaration(char variable_name);
-    void check_out_of_scope_declaration(char variable_name);
-    void check_initialization(char variable_name);
-    void check_using_variables();
     void check_reassignment_constant_variable(char variable_name);
+    void check_initialization(char variable_name);
+    int check_variable_declaration(char variable_name);
+    void check_using_variables();
     void check_constant_expression_if_statement(struct NodeType* expression);
     int check_variable_declaration_as_constant_same_scope(char variable_name);
+    void check_same_scope_redeclaration(char variable_name);
+    void check_out_of_scope_declaration(char variable_name);
 
     /* ------------------------------------------------------------------------*/
 
@@ -122,11 +118,11 @@
         char name;
         char *type;
         union {
-                int integer_value;
-                float float_value;
-                char* string_value;
-                int bool_value;
-        }value;
+                int integer_value_symbol;
+                float float_value_symbol;
+                char* string_value_symbol;
+                int bool_value_symbol;
+        }value_symbol;
         int declared_flag, constant_flag, initialized_flag, used_flag, scope;
     };
 
@@ -155,8 +151,6 @@
     // -------------- Quadruples --------------------
     #define show_quadruples 1
     #define MAX_STACK_SIZE 100
-    void print_function_start(const char* function_name);
-
 
     int end_label_stack[MAX_STACK_SIZE];
     int end_label_stack_ptr = -1;
@@ -174,9 +168,9 @@
     int start_label_number = 0;
 
     // ---------Functions --------------
-    void print_function_start(const char* function_name);
-    void print_function_end(const char* function_name);
-    void print_function_call(const char* function_name);
+    void print_function_start(char function_name);
+    void print_function_end(char function_name);
+    void print_function_call(char function_name);
     void print_function_return();
     void print_instruction(const char* instruction);
     void print_push_integer(int value);
@@ -199,6 +193,19 @@
     void print_end_enum(char enum_name);
 
 
+    // ---------------
+    int counter_arguments = 0;
+    int function_pointer = -1;
+    int counter_parameters = 0;
+    int counter_enum = 0;
+
+
+    //------------
+    struct NodeType* fill_enum_values;
+
+    //------------------
+    void display_node_value(struct NodeType* node);
+
 %}
 
 /* --------------- Yacc definitions ---------------*/
@@ -215,6 +222,7 @@
     char* STRING_TYPE;
     void* VOID_TYPE;
     char* DATA_TYPE;
+
     char* DATA_MODIFIER;
     struct NodeType* NODE_TYPE;
 }
@@ -224,7 +232,6 @@
 %token IF ELSE ELSE_IF 
 %token FOR WHILE REPEAT UNTIL 
 %token SWITCH CASE DEFAULT CONTINUE BREAK RETURN 
-%token SHIFT_LEFT SHIFT_RIGHT AND OR NOT 
 %token ENUM
 
 // -----Operators-----
@@ -245,10 +252,11 @@
 
 
 // ----- Data Types -----
-%token <INTEGER_DATA_TYPE> INTEGER
-%token <FLOAT_DATA_TYPE> FLOAT
-%token <STRING_DATA_TYPE> STRING
-%token <BOOL_DATA_TYPE> TRUE_VALUE FALSE_VALUE
+%token <INTEGER_TYPE> INTEGER
+%token <FLOAT_TYPE> FLOAT
+%token <STRING_TYPE> STRING
+%token <BOOL_TYPE> TRUE_VALUE 
+%token <BOOL_TYPE> FALSE_VALUE
 
 // ----- Return Types (NON TERMINALS) -----
 %type <VOID_TYPE> program statement_list control_statement statement
@@ -256,10 +264,7 @@
 %type <VOID_TYPE> function_arguments function_parameters
 
 %type <DATA_MODIFIER> data_modifier
-
-
-%type <NODE_TYPE> literal
-%type <NODE_TYPE> expression assignment data_type declaration function_call
+%type <NODE_TYPE> literal expression assignment data_type declaration function_call
 
 %%
 
@@ -288,51 +293,54 @@ control_statement   :  {print_push_end_label(++end_label_number);} if_condition 
 statement : assignment                   {;}
           | expression                   {;}
           | declaration                  {;}
-          | PRINT '(' expression ')'     {display_node_value($3);}
+          | BREAK                        {print_jump_end_label();}
+          | CONTINUE                     {;}
+          | RETURN                       {print_function_return();}
+          | RETURN expression            {print_function_return();}
           | PRINT '(' IDENTIFIER ')'     {display_node_value(get_symbol_value($3)); mark_variable_used_in_symbol_table($3);}
-          | jump_statement               {;}
+          | PRINT '(' expression ')'     {display_node_value($3);}
           ;
 /* ----------------------------DONE---------------------------------*/
-declaration : data_modifier data_type IDENTIFIER    {check_same_scope_redeclaration($3);} '=' expression { check_Type_3($2, $6); add_symbol($3, $2->type, 1, 0, 0, scopes[scope_index-1]); modify_symbol_value($3, $6); set_variable_initialized_in_symbol_table($3); print_pop_identifier($3);} 
+declaration : data_modifier data_type IDENTIFIER    {check_same_scope_redeclaration($3);} '=' expression { check_type($2, $6); add_symbol($3, $2->type, 1, 0, 0, scopes[scope_index-1]); modify_symbol_value($3, $6); set_variable_initialized_in_symbol_table($3); print_pop_identifier($3);} 
             | data_type IDENTIFIER                  { check_same_scope_redeclaration($2); add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); print_pop_identifier($2); }
-            | data_type IDENTIFIER                  { check_same_scope_redeclaration($2);} '=' expression {check_Type_3($1, $5); add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); modify_symbol_value($2,$5); set_variable_initialized_in_symbol_table($2); print_pop_identifier($2);}
+            | data_type IDENTIFIER                  { check_same_scope_redeclaration($2);} '=' expression {check_type($1, $5); add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); modify_symbol_value($2,$5); set_variable_initialized_in_symbol_table($2); print_pop_identifier($2);}
             ;
 /* --------------------------DONE-----------------------------------*/
 data_modifier : CONSTANT
               ;
 /* ---------------------------DONE----------------------------------*/
-assignment : IDENTIFIER '=' expression              {check_out_of_scope_declaration($1); check_reassignment_constant_variable(); check_type_2($1,$3); mark_variable_used_in_symbol_table($1); modify_symbol_value($1, $3); $$ = $3; set_variable_initialized_in_symbol_table($3); print_pop_identifier($1);}
+assignment : IDENTIFIER '=' expression              {check_out_of_scope_declaration($1); check_reassignment_constant_variable($1); check_type_2($1,$3); mark_variable_used_in_symbol_table($1); modify_symbol_value($1, $3); $$ = $3; set_variable_initialized_in_symbol_table($1); print_pop_identifier($1);}
            | enum_definition                        {;} 
            | data_type enum_declaration             {/*check if redeclared*/;}
            ;
 /* ----------------------------DONE---------------------------------*/
 expression : function_call                                      {$$->isConstant=0;}
            
-           | '-' literal                                        {print_instruction("Negative or Negation"); if($2->type == "int") {$$ = create_int_node(); $$->value.integer_value = -$2->value.integer_value;} else if ($2->type == "float") { $$ = create_float_node(); $$->value.float_value = -$2->value.float_value;} $$->isConstant = $2->isConstant;}
-           | NOT literal                                        {print_instruction("Negation or NOT"); if($2->type == "bool") {$$ = create_bool_node(); $$->value.bool_value = !$2->value.bool_value;} else if ($2->value.integer_value) {$$ = create_bool_node(); $$->value.bool_value = 0;} else {$$ = create_bool_node(); $$->value.bool_value = 1;} $$->isConstant = $2->isConstant;}
+           | '-' literal                                        {print_instruction("Negative or Negation"); if($2->type == "int") {$$ = create_int_node(); $$->value_node.integer_value_node = -$2->value_node.integer_value_node;} else { $$ = create_float_node(); $$->value_node.float_value_node = -$2->value_node.float_value_node;} $$->isConstant = $2->isConstant;}
+           | NOT literal                                        {print_instruction("Negation or NOT"); if($2->type == "bool") {$$ = create_bool_node(); $$->value_node.bool_value_node = !$2->value_node.bool_value_node;} else { if ($2->value_node.integer_value_node) {$$ = create_bool_node(); $$->value_node.bool_value_node = 0;} else {$$ = create_bool_node(); $$->value_node.bool_value_node = 1;}} $$->isConstant = $2->isConstant;}
            
-           | expression '|' expression                          {print_instruction("Bitwise OR"); $$ = perform_bitwise_operation($1, $3, '|'); $$->isConstant = $1->isConstant && $3->isConstant;}
-           | expression '&' expression                          {print_instruction("Bitwise AND"); $$ = perform_bitwise_operation($1, $3, '&'); $$->isConstant = $1->isConstant && $3->isConstant;}
-           | expression '^' expression                          {print_instruction("Bitwise XOR"); $$ = perform_bitwise_operation($1, $3, '^'); $$->isConstant = $1->isConstant && $3->isConstant;}
+           | expression '|' expression                          {print_instruction("Bitwise OR"); $$ = perform_bitwise_operation($1, $3, '|'); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression '&' expression                          {print_instruction("Bitwise AND"); $$ = perform_bitwise_operation($1, $3, '&'); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression '^' expression                          {print_instruction("Bitwise XOR"); $$ = perform_bitwise_operation($1, $3, '^'); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
            
-           | expression '+' expression                          {print_instruction("Addition"); $$ = perform_arithmetic($1, $3, '+'); $$->isConstant = $1->isConstant && $3->isConstant;}
-           | expression '-' expression                          {print_instruction("Subtraction"); $$ = perform_arithmetic($1, $3, '-'); $$->isConstant = $1->isConstant && $3->isConstant;}
-           | expression '*' expression                          {print_instruction("Multiplication"); $$ = perform_arithmetic($1, $3, '*'); $$->isConstant = $1->isConstant && $3->isConstant;}
-           | expression '/' expression                          {print_instruction("Division"); $$ = perform_arithmetic($1, $3, '/'); $$->isConstant = $1->isConstant && $3->isConstant;}
-           | expression '%' expression                          {print_instruction("Modulus"); $$ = perform_arithmetic($1, $3, '%'); $$->isConstant = $1->isConstant && $3->isConstant;}
+           | expression '+' expression                          {print_instruction("Addition"); $$ = perform_arithmetic($1, $3, '+'); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression '-' expression                          {print_instruction("Subtraction"); $$ = perform_arithmetic($1, $3, '-'); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression '*' expression                          {print_instruction("Multiplication"); $$ = perform_arithmetic($1, $3, '*'); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression '/' expression                          {print_instruction("Division"); $$ = perform_arithmetic($1, $3, '/'); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression '%' expression                          {print_instruction("Modulus"); $$ = perform_arithmetic($1, $3, '%'); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
            
-           | expression AND expression                          {print_instruction("Logical AND"); $$ = perform_logical_operation($1, $3, '&'); $$->isConstant = $1->isConstant && $3->isConstant;}
-           | expression OR expression                           {print_instruction("Logical OR"); $$ = perform_logical_operation($1, $3, '|'); $$->isConstant = $1->isConstant && $3->isConstant;}
+           | expression AND expression                          {print_instruction("Logical AND"); $$ = perform_logical_operation($1, $3, '&'); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression OR expression                           {print_instruction("Logical OR"); $$ = perform_logical_operation($1, $3, '|'); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
 
-           | expression SHIFT_LEFT expression                   {print_instruction("Shift Left"); perform_bitwise_operation($1, $3, '<'); $$->isConstant = $1->isConstant && $3->isConstant;}
-           | expression SHIFT_RIGHT expression                  {print_instruction("Shift Right"); perform_bitwise_operation($1, $3, '>'); $$->isConstant = $1->isConstant && $3->isConstant;}
+           | expression SHIFT_LEFT expression                   {print_instruction("Shift Left"); perform_bitwise_operation($1, $3, '<'); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression SHIFT_RIGHT expression                  {print_instruction("Shift Right"); perform_bitwise_operation($1, $3, '>'); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
 
-           | expression LESS_THAN expression                    {print_instruction("Less Than"); $$ = perform_comparison($1, $3, "<"); $$->isConstant = $1->isConstant && $3->isConstant;}
-           | expression GREATER_THAN expression                 {print_instruction("Greater Than"); $$ = perform_comparison($1, $3, ">"); $$->isConstant = $1->isConstant && $3->isConstant;}
-           | expression LESS_THAN_OR_EQUAL expression           {print_instruction("Less Than or Equal"); $$ = perform_comparison($1, $3, "<="); $$->isConstant = $1->isConstant && $3->isConstant;}
-           | expression GREATER_THAN_OR_EQUAL expression        {print_instruction("Greater Than or Equal"); $$ = perform_comparison($1, $3, ">="); $$->isConstant = $1->isConstant && $3->isConstant;}
-           | expression EQUAL expression                        {print_instruction("Equal"); $$ = perform_comparison($1, $3, "=="); $$->isConstant = $1->isConstant && $3->isConstant;}
-           | expression NOT_EQUAL expression                    {print_instruction("Not Equal"); $$ = perform_comparison($1, $3, "!="); $$->isConstant = $1->isConstant && $3->isConstant;}
+           | expression LESS_THAN expression                    {print_instruction("Less Than"); $$ = perform_comparison($1, $3, "<"); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression GREATER_THAN expression                 {print_instruction("Greater Than"); $$ = perform_comparison($1, $3, ">"); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression LESS_THAN_OR_EQUAL expression           {print_instruction("Less Than or Equal"); $$ = perform_comparison($1, $3, "<="); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression GREATER_THAN_OR_EQUAL expression        {print_instruction("Greater Than or Equal"); $$ = perform_comparison($1, $3, ">="); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression EQUAL expression                        {print_instruction("Equal"); $$ = perform_comparison($1, $3, "=="); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression NOT_EQUAL expression                    {print_instruction("Not Equal"); $$ = perform_comparison($1, $3, "!="); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
            
            | literal                                            {$$ = $1;}
            | '(' data_type ')' literal                          {print_instruction("Casting or Conversion"); $$ = perform_conversion($4, $2->type); $$->isConstant = $4->isConstant;}
@@ -340,38 +348,35 @@ expression : function_call                                      {$$->isConstant=
 /* -------------------------------------------------------------*/
 
 // ------------ Conditions ------------------
-if_condition             : IF '(' expression  ')' '{' statement_list '}' else_condition {;}
-                        ;
+if_condition             : IF '(' expression { check_constant_expression_if_statement($3); print_jump_false_label(++label_number); } ')' '{' {enter_scope();} statement_list '}' {print_jump_end_label(); print_pop_label(); exit_scope();} else_condition {;}
+                         ;
+
 else_condition           : {;}
-                        | ELSE_IF '(' expression  ')' '{' statement_list '}' else_condition {;}
-                        | ELSE {;}'{' statement_list '}'     {;}
+                        | ELSE {;} if_condition {;}
+                        | ELSE {;} '{' {enter_scope();} statement_list '}' {exit_scope();} 
+                        | ELSE_IF '(' expression { check_constant_expression_if_statement($3); print_jump_false_label(++label_number); } ')' '{' {enter_scope();} statement_list '}' {print_jump_end_label(); print_pop_label(); exit_scope();} else_condition {;}
                         ;
-case                    : CASE expression ':' statement_list                {;}
+
+case                    : CASE expression {print_peak_last_identifier_stack(); print_jump_false_label(++label_number); } ':' statement_list {print_pop_label();}
                         | DEFAULT ':' statement_list                        {;}
                         ;
-caseList                : caseList case
-                        | case 
-                        ;
-switch_Case          : SWITCH '(' IDENTIFIER ')' '{' caseList '}'        {;}
+
+case_list               : case_list case            {;}
+                        | case                      {;}
                         ;
 
-case_list : case_list case
-          | case
-          ;
+switch_Case          : SWITCH '(' IDENTIFIER ')' {print_push_last_identifier_stack($3); set_variable_initialized_in_symbol_table($3);} '{' {enter_scope();} case_list '}' {print_pop_last_identifier_stack(); exit_scope();}
+                     ;
 
 // ------------ Loops ------------------
-while_loop               : WHILE '(' expression ')'  '{' statement_list '}'                              {;}
-                        ;
-for_loop                 : FOR '(' assignment ';'  expression ';'  assignment ')' '{' statement_list '}' {;}
-                        ;
-repeat_until_loop         : REPEAT '{' statement_list '}' UNTIL '(' expression ')' ';'                    {;}
+while_loop               : WHILE '(' expression ')'  {print_jump_false_label(++label_number);} '{' {enter_scope();} statement_list '}' {print_jump_start_label(); print_pop_label(); exit_scope();}
                         ;
 
-jump_statement : CONTINUE                       {;}
-               | BREAK                          {print_jump_end_label();}
-               | RETURN                         {print_function_return();}
-               | RETURN expression              {print_function_return();}
-               ;
+for_loop                 : FOR '(' assignment ';' {print_push_start_label(++start_label_number);} expression ';' {print_jump_false_label(++label_number);} assignment ')' '{' {enter_scope();} statement_list '}' {print_jump_start_label(); print_pop_label(); print_pop_start_label(); exit_scope();}
+                        ;
+
+repeat_until_loop         : REPEAT '{' {enter_scope();} statement_list '}' {exit_scope();} UNTIL '(' expression ')' {print_jump_false_label(++label_number); print_pop_label();}
+                        ;
 
 // ------------ Data Types DONE------------------
 data_type : BOOL_DATA_TYPE              {$$ = create_bool_node();}
@@ -381,42 +386,43 @@ data_type : BOOL_DATA_TYPE              {$$ = create_bool_node();}
           | VOID_DATA_TYPE              {;}
           ;
 
-literal : INTEGER               {$$ = $1;}
-        | FLOAT                 {$$ = $1;}
-        | STRING                {$$ = $1;}
-        | TRUE_VALUE            {$$ = 1;}
-        | FALSE_VALUE           {$$ = 0;}
+literal : INTEGER               {print_push_integer($1); $$ = create_int_node(); $$->value_node.integer_value_node = $1; $$->isConstant = 1;}
+        | FLOAT                 {print_push_float($1); $$ = create_float_node(); $$->value_node.float_value_node = $1; $$->isConstant = 1;}
+        | STRING                {print_push_string($1); $$ = create_string_node(); $$->value_node.string_value_node = strdup($1); $$->isConstant = 1;}
+        | TRUE_VALUE            {print_push_integer(1); $$ = create_bool_node(); $$->value_node.bool_value_node = 1; $$->isConstant = 1;}
+        | FALSE_VALUE           {print_push_integer(0); $$ = create_bool_node(); $$->value_node.bool_value_node = 0; $$->isConstant = 1;}
+        | IDENTIFIER            {print_push_identifier($1); check_out_of_scope_declaration($1); $$ = get_symbol_value($1); check_initialization($1); $$->isConstant = check_variable_declaration_as_constant_same_scope($1); mark_variable_used_in_symbol_table($1);}
+        | '(' expression ')'    {$$ = $2;}
         ;
 // ------------ Function ------------------
-function_arguments : data_type IDENTIFIER                                 {;}
-                   | data_type IDENTIFIER ',' function_arguments          {;}
+function_arguments : data_type IDENTIFIER     {print_pop_identifier($2);} { check_same_scope_redeclaration($2); add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); counter_arguments = symbol_table_index - counter_arguments;}
+                   | data_type IDENTIFIER     {print_pop_identifier($2);} { check_same_scope_redeclaration($2); add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); } ',' function_arguments
                    ;
 
-function_parameters : literal                                          {;}
-                    | literal ',' function_parameters                  {;}
+function_parameters : literal                 {check_type_3($1->type, symbol_table[++function_pointer].type); counter_parameters--; };
+                    | literal                 {check_type_3($1->type, symbol_table[++function_pointer].type); counter_parameters--; } ',' function_parameters
                     ;
 
-function_definition : data_type IDENTIFIER '(' function_arguments ')' '{' statement_list '}'         {;}
+function_definition : data_type IDENTIFIER  {print_function_start($2);} {check_same_scope_redeclaration($2); add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); counter_arguments = symbol_table_index;} {enter_scope();} '(' function_arguments ')' '{' statement_list '}' {exit_scope(); print_function_end($2); modify_symbol_parameter($2, counter_arguments);}
                     | data_type IDENTIFIER '(' ')' '{' statement_list '}'                            {;}
                     ;
 
-function_call : IDENTIFIER '(' function_parameters ')'        {;}
-              | IDENTIFIER '(' ')'                            {;}
+function_call : IDENTIFIER {counter_parameters = get_symbol_value($1)->value_node.integer_value_node; function_pointer = retrieve_symbol_index($1);} '(' ')' { check_out_of_scope_declaration($1); $$ = get_symbol_value($1); print_function_call($1); if( counter_parameters != 0 ) {log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, $1); }}
               ;
 
 
 // ------------ Enum ------------------
-enum_definition : ENUM IDENTIFIER '{' enum_body '}'         {;}
-         ;
+enum_definition : ENUM IDENTIFIER {print_start_enum($2); check_same_scope_redeclaration($2); add_symbol($2, "enum", 1, 1, 0, scopes[scope_index-1]);} '{' enum_body '}' {print_end_enum($2); counter_enum = 0;}
+                ;
 
-enum_body : IDENTIFIER                                      {;}
-          | IDENTIFIER '=' expression                       {;}
-          | enum_body ',' IDENTIFIER                        {;}
-          | enum_body ',' IDENTIFIER  '=' expression        {;}
+enum_body : IDENTIFIER                                      { check_same_scope_redeclaration($1); add_symbol($1, "int", 1, 1, 0, scopes[scope_index-1]); fill_enum_values->value_node.integer_value_node = 0; modify_symbol_value($1, fill_enum_values); print_push_integer(++counter_enum); print_pop_identifier($1); }
+          | IDENTIFIER '=' expression                       { check_same_scope_redeclaration($1); check_type(fill_enum_values, $3); add_symbol($1, "int", 1, 1, 0, scopes[scope_index-1]); fill_enum_values->value_node.integer_value_node = $3->value_node.integer_value_node; modify_symbol_value($1, fill_enum_values); print_pop_identifier($1); }
+          | enum_body ',' IDENTIFIER                        { check_same_scope_redeclaration($3); add_symbol($3, "int", 1, 1, 0, scopes[scope_index-1]); fill_enum_values->value_node.integer_value_node++; modify_symbol_value($3, fill_enum_values); print_push_integer(++counter_enum); print_pop_identifier($3); }
+          | enum_body ',' IDENTIFIER  '=' expression        { check_same_scope_redeclaration($3); check_type(fill_enum_values, $5); add_symbol($3, "int", 1, 1, 0, scopes[scope_index-1]); fill_enum_values->value_node.integer_value_node = $5->value_node.integer_value_node; modify_symbol_value($3, fill_enum_values); print_pop_identifier($3); }
           ;
 
-enum_declaration : IDENTIFIER IDENTIFIER                         {;}
-                 | IDENTIFIER IDENTIFIER '=' expression          {;}
+enum_declaration : IDENTIFIER IDENTIFIER                         { check_out_of_scope_declaration($1); check_type_2($1, create_enum_node()); check_same_scope_redeclaration($2); add_symbol($2, "int", 0, 0, 0, scopes[scope_index-1]); }
+                 | IDENTIFIER IDENTIFIER '=' expression          { check_out_of_scope_declaration($1); check_type_2($1, create_enum_node()); check_same_scope_redeclaration($2); add_symbol($2, "int", 0, 1, 0, scopes[scope_index-1]); check_type($4, create_int_node()); modify_symbol_value($2, $4); print_pop_identifier($2); }
                  ;
 
 // --------------------------------------------------------------------
@@ -480,7 +486,7 @@ void add_symbol(char symbol_name, char* symbol_type, int constant_flag, int init
     symbol_table[symbol_table_index].initialized_flag = initialized_flag; 
     symbol_table[symbol_table_index].used_flag = used_flag;
     symbol_table[symbol_table_index].scope = symbol_scope; 
-    symbol_table_index++; 
+    ++symbol_table_index; 
 }
 
 /* ------------------------------------------------------------------------*/
@@ -501,16 +507,16 @@ struct NodeType* get_symbol_value(char symbol) {
     
     // Check the type of the symbol and assign its value to the node
     if (strcmp(symbol_table[bucket].type, "int") == 0)
-        ptr->value.integer_value = symbol_table[bucket].value.integer_value;
+        ptr->value_node.integer_value_node = symbol_table[bucket].value_symbol.integer_value_symbol;
     
     else if (strcmp(symbol_table[bucket].type, "float") == 0)
-        ptr->value.float_value = symbol_table[bucket].value.float_value;
+        ptr->value_node.float_value_node = symbol_table[bucket].value_symbol.float_value_symbol;
     
     else if (strcmp(symbol_table[bucket].type, "bool") == 0)
-        ptr->value.bool_value = symbol_table[bucket].value.bool_value;
+        ptr->value_node.bool_value_node = symbol_table[bucket].value_symbol.bool_value_symbol;
     
     else if (strcmp(symbol_table[bucket].type, "string") == 0)
-        ptr->value.string_value = symbol_table[bucket].value.string_value;
+        ptr->value_node.string_value_node = symbol_table[bucket].value_symbol.string_value_symbol;
     
     return ptr;
 }
@@ -550,16 +556,16 @@ void modify_symbol_value(char symbol, struct NodeType* new_value){
     int bucket = find_symbol_index(symbol);
     
     if( strcmp(symbol_table[bucket].type, "int") == 0)
-        symbol_table [bucket].value.integer_value = new_value->value.integer_value;
+        symbol_table [bucket].value_symbol.integer_value_symbol = new_value->value_node.integer_value_node;
     
     else if( strcmp(symbol_table[bucket].type, "float") == 0)
-        symbol_table[bucket].value.float_value = new_value->value.float_value;
+        symbol_table[bucket].value_symbol.float_value_symbol = new_value->value_node.float_value_node;
     
     else if( strcmp(symbol_table[bucket].type, "bool") == 0)
-        symbol_table[bucket].value.bool_value = new_value->value.bool_value;
+        symbol_table[bucket].value_symbol.bool_value_symbol = new_value->value_node.bool_value_node;
     
     else if( strcmp(symbol_table[bucket].type, "string") == 0)
-        symbol_table[bucket].value.string_value = new_value->value.string_value;
+        symbol_table[bucket].value_symbol.string_value_symbol = new_value->value_node.string_value_node;
 }
 
 /* ------------------------------------------------------------------------*/
@@ -574,7 +580,7 @@ Usage: in function definition (later)
 
 void modify_symbol_parameter(char symbol, int new_parameter){
     int bucket = find_symbol_index(symbol);
-    symbol_table [bucket].value.integer_value = new_parameter;
+    symbol_table [bucket].value_symbol.integer_value_symbol = new_parameter;
 }
 
 
@@ -583,13 +589,13 @@ void modify_symbol_parameter(char symbol, int new_parameter){
 void display_node_value(struct NodeType* node)
 {
     if( strcmp(node->type, "int") == 0 )
-        printf("%d\n", node->value.integer_value);
+        printf("%d\n", node->value_node.integer_value_node);
     else if( strcmp(node->type, "float") == 0 )
-        printf("%f\n", node->value.float_value);
+        printf("%f\n", node->value_node.float_value_node);
     else if( strcmp(node->type, "bool") == 0 )
-        printf("%d\n", node->value.bool_value);
+        printf("%d\n", node->value_node.bool_value_node);
     else if(strcmp( node->type, "string" ) == 0)
-        printf("%s\n", node->value.string_value);
+        printf("%s\n", node->value_node.string_value_node);
 }
 
 /* ------------------------------------------------------------------------*/
@@ -610,22 +616,22 @@ void write_symbol_table_to_file(){
         
         if( strcmp(symbol_table[i].type, "int") == 0 ){
             fprintf(filePointer, "Name:%c, Type:%s, Value:%d, Declared:%d, Initialized:%d, Used:%d, Constant:%d, Scope:%d\n", 
-                        symbol_table[i].name, symbol_table[i].type, symbol_table[i].value.integer_value, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
+                        symbol_table[i].name, symbol_table[i].type, symbol_table[i].value_node.integer_value_node, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
         }
         
         else if( strcmp(symbol_table[i].type, "float" ) == 0){
             fprintf(filePointer, "Name:%c,Type:%s,Value:%f,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
-                        symbol_table[i].name, symbol_table[i].type, symbol_table[i].value.float_value, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
+                        symbol_table[i].name, symbol_table[i].type, symbol_table[i].value_node.float_value_node, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
         }
         
         else if( strcmp(symbol_table[i].type, "bool" ) == 0){
             fprintf(filePointer, "Name:%c,Type:%s,Value:%d,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
-                        symbol_table[i].name, symbol_table[i].type, symbol_table[i].value.bool_value, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
+                        symbol_table[i].name, symbol_table[i].type, symbol_table[i].value_node.bool_value_node, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
         }
         
         else if( strcmp(symbol_table[i].type, "string" ) == 0){
             fprintf(filePointer, "Name:%c,Type:%s,Value:%s,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
-                        symbol_table[i].name, symbol_table[i].type, symbol_table[i].value.string_value, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
+                        symbol_table[i].name, symbol_table[i].type, symbol_table[i].value_node.string_value_node, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
         }
     }
 
@@ -649,19 +655,19 @@ struct NodeType* perform_arithmetic(struct NodeType* first_operand, struct NodeT
 
         switch (operator) {
             case '+':
-                result_node->value.integer_value = first_operand->value.integer_value + second_operand->value.integer_value;
+                result_node->value_node.integer_value_node = first_operand->value_node.integer_value_node + second_operand->value_node.integer_value_node;
                 break;
             case '-':
-                result_node->value.integer_value = first_operand->value.integer_value - second_operand->value.integer_value;
+                result_node->value_node.integer_value_node = first_operand->value_node.integer_value_node - second_operand->value_node.integer_value_node;
                 break;
             case '*':
-                result_node->value.integer_value = first_operand->value.integer_value * second_operand->value.integer_value;
+                result_node->value_node.integer_value_node = first_operand->value_node.integer_value_node * second_operand->value_node.integer_value_node;
                 break;
             case '/':
-                result_node->value.integer_value = first_operand->value.integer_value / second_operand->value.integer_value;
+                result_node->value_node.integer_value_node = first_operand->value_node.integer_value_node / second_operand->value_node.integer_value_node;
                 break;
             case '%':
-                result_node->value.integer_value = first_operand->value.integer_value % second_operand->value.integer_value;
+                result_node->value_node.integer_value_node = first_operand->value_node.integer_value_node % second_operand->value_node.integer_value_node;
                 break;
             default:
                 log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, second_operand->type);
@@ -672,16 +678,16 @@ struct NodeType* perform_arithmetic(struct NodeType* first_operand, struct NodeT
 
         switch (operator) {
             case '+':
-                result_node->value.float_value = first_operand->value.float_value + second_operand->value.float_value;
+                result_node->value_node.float_value_node = first_operand->value_node.float_value_node + second_operand->value_node.float_value_node;
                 break;
             case '-':
-                result_node->value.float_value = first_operand->value.float_value - second_operand->value.float_value;
+                result_node->value_node.float_value_node = first_operand->value_node.float_value_node - second_operand->value_node.float_value_node;
                 break;
             case '*':
-                result_node->value.float_value = first_operand->value.float_value * second_operand->value.float_value;
+                result_node->value_node.float_value_node = first_operand->value_node.float_value_node * second_operand->value_node.float_value_node;
                 break;
             case '/':
-                result_node->value.float_value = first_operand->value.float_value / second_operand->value.float_value;
+                result_node->value_node.float_value_node = first_operand->value_node.float_value_node / second_operand->value_node.float_value_node;
                 break;
             default:
                 log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, second_operand->type);
@@ -692,16 +698,16 @@ struct NodeType* perform_arithmetic(struct NodeType* first_operand, struct NodeT
 
         switch (operator) {
             case '+':
-                result_node->value.float_value = first_operand->value.integer_value + second_operand->value.float_value;
+                result_node->value_node.float_value_node = first_operand->value_node.integer_value_node + second_operand->value_node.float_value_node;
                 break;
             case '-':
-                result_node->value.float_value = first_operand->value.integer_value - second_operand->value.float_value;
+                result_node->value_node.float_value_node = first_operand->value_node.integer_value_node - second_operand->value_node.float_value_node;
                 break;
             case '*':
-                result_node->value.float_value = first_operand->value.integer_value * second_operand->value.float_value;
+                result_node->value_node.float_value_node = first_operand->value_node.integer_value_node * second_operand->value_node.float_value_node;
                 break;
             case '/':
-                result_node->value.float_value = first_operand->value.integer_value / second_operand->value.float_value;
+                result_node->value_node.float_value_node = first_operand->value_node.integer_value_node / second_operand->value_node.float_value_node;
                 break;
             default:
                 log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, second_operand->type);
@@ -712,16 +718,16 @@ struct NodeType* perform_arithmetic(struct NodeType* first_operand, struct NodeT
         
         switch (operator) {
             case '+':
-                result_node->value.float_value = first_operand->value.float_value + second_operand->value.integer_value;
+                result_node->value_node.float_value_node = first_operand->value_node.float_value_node + second_operand->value_node.integer_value_node;
                 break;
             case '-':
-                result_node->value.float_value = first_operand->value.float_value - second_operand->value.integer_value;
+                result_node->value_node.float_value_node = first_operand->value_node.float_value_node - second_operand->value_node.integer_value_node;
                 break;
             case '*':
-                result_node->value.float_value = first_operand->value.float_value * second_operand->value.integer_value;
+                result_node->value_node.float_value_node = first_operand->value_node.float_value_node * second_operand->value_node.integer_value_node;
                 break;
             case '/':
-                result_node->value.float_value = first_operand->value.float_value / second_operand->value.integer_value;
+                result_node->value_node.float_value_node = first_operand->value_node.float_value_node / second_operand->value_node.integer_value_node;
                 break;
             default:
                 log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, second_operand->type);
@@ -745,19 +751,19 @@ struct NodeType* perform_bitwise_operation(struct NodeType* first_operand, struc
 
         switch (operator) {
             case '|':
-                result_node->value.integer_value = first_operand->value.integer_value | second_operand->value.integer_value;
+                result_node->value_node.integer_value_node = first_operand->value_node.integer_value_node | second_operand->value_node.integer_value_node;
                 break;
             case '&':
-                result_node->value.integer_value = first_operand->value.integer_value & second_operand->value.integer_value;
+                result_node->value_node.integer_value_node = first_operand->value_node.integer_value_node & second_operand->value_node.integer_value_node;
                 break;
             case '^':
-                result_node->value.integer_value = first_operand->value.integer_value ^ second_operand->value.integer_value;
+                result_node->value_node.integer_value_node = first_operand->value_node.integer_value_node ^ second_operand->value_node.integer_value_node;
                 break;
             case '<':
-                result_node->value.integer_value = first_operand->value.integer_value << second_operand->value.integer_value;
+                result_node->value_node.integer_value_node = first_operand->value_node.integer_value_node << second_operand->value_node.integer_value_node;
                 break;
             case '>':
-                result_node->value.integer_value = first_operand->value.integer_value >> second_operand->value.integer_value;
+                result_node->value_node.integer_value_node = first_operand->value_node.integer_value_node >> second_operand->value_node.integer_value_node;
                 break;
             default:
                 log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, operator);
@@ -781,10 +787,10 @@ struct NodeType* perform_logical_operation(struct NodeType* first_operand, struc
 
         switch (operator) {
             case '&':
-                result_node->value.bool_value = first_operand->value.bool_value && second_operand->value.bool_value;
+                result_node->value_node.bool_value_node = first_operand->value_node.bool_value_node && second_operand->value_node.bool_value_node;
                 break;
             case '|':
-                result_node->value.bool_value = first_operand->value.bool_value || second_operand->value.bool_value;
+                result_node->value_node.bool_value_node = first_operand->value_node.bool_value_node || second_operand->value_node.bool_value_node;
                 break;
             default:
                 log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, operator);
@@ -811,22 +817,22 @@ struct NodeType* perform_comparison(struct NodeType* first_operand, struct NodeT
         
         // ----------- float values -----------
         if (strcmp(operator, "==") == 0) {
-            result_node->value.bool_value = first_operand->value.float_value == second_operand->value.float_value;
+            result_node->value_node.bool_value_node = first_operand->value_node.float_value_node == second_operand->value_node.float_value_node;
         } 
         else if (strcmp(operator, "!=") == 0) {
-            result_node->value.bool_value = first_operand->value.float_value != second_operand->value.float_value;
+            result_node->value_node.bool_value_node = first_operand->value_node.float_value_node != second_operand->value_node.float_value_node;
         } 
         else if (strcmp(operator, ">") == 0) {
-            result_node->value.bool_value = first_operand->value.float_value > second_operand->value.float_value;
+            result_node->value_node.bool_value_node = first_operand->value_node.float_value_node > second_operand->value_node.float_value_node;
         } 
         else if (strcmp(operator, ">=") == 0) {
-            result_node->value.bool_value = first_operand->value.float_value >= second_operand->value.float_value;
+            result_node->value_node.bool_value_node = first_operand->value_node.float_value_node >= second_operand->value_node.float_value_node;
         } 
         else if (strcmp(operator, "<") == 0) {
-            result_node->value.bool_value = first_operand->value.float_value < second_operand->value.float_value;
+            result_node->value_node.bool_value_node = first_operand->value_node.float_value_node < second_operand->value_node.float_value_node;
         } 
         else if (strcmp(operator, "<=") == 0) {
-            result_node->value.bool_value = first_operand->value.float_value <= second_operand->value.float_value;
+            result_node->value_node.bool_value_node = first_operand->value_node.float_value_node <= second_operand->value_node.float_value_node;
         } 
         else {
             log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, second_operand->type);
@@ -835,22 +841,22 @@ struct NodeType* perform_comparison(struct NodeType* first_operand, struct NodeT
     // ----------- integer values -----------
     else {
         if (strcmp(operator, "==") == 0) {
-            result_node->value.bool_value = first_operand->value.integer_value == second_operand->value.integer_value;
+            result_node->value_node.bool_value_node = first_operand->value_node.integer_value_node == second_operand->value_node.integer_value_node;
         } 
         else if (strcmp(operator, "!=") == 0) {
-            result_node->value.bool_value = first_operand->value.integer_value != second_operand->value.integer_value;
+            result_node->value_node.bool_value_node = first_operand->value_node.integer_value_node != second_operand->value_node.integer_value_node;
         } 
         else if (strcmp(operator, ">") == 0) {
-            result_node->value.bool_value = first_operand->value.integer_value > second_operand->value.integer_value;
+            result_node->value_node.bool_value_node = first_operand->value_node.integer_value_node > second_operand->value_node.integer_value_node;
         } 
         else if (strcmp(operator, ">=") == 0) {
-            result_node->value.bool_value = first_operand->value.integer_value >= second_operand->value.integer_value;
+            result_node->value_node.bool_value_node = first_operand->value_node.integer_value_node >= second_operand->value_node.integer_value_node;
         } 
         else if (strcmp(operator, "<") == 0) {
-            result_node->value.bool_value = first_operand->value.integer_value < second_operand->value.integer_value;
+            result_node->value_node.bool_value_node = first_operand->value_node.integer_value_node < second_operand->value_node.integer_value_node;
         } 
         else if (strcmp(operator, "<=") == 0) {
-            result_node->value.bool_value = first_operand->value.integer_value <= second_operand->value.integer_value;
+            result_node->value_node.bool_value_node = first_operand->value_node.integer_value_node <= second_operand->value_node.integer_value_node;
         } 
         else {
             log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, second_operand->type);
@@ -872,18 +878,18 @@ struct NodeType* perform_conversion(struct NodeType* term, char *target_type) {
         converted_node->type = "int";
         /* ------------------------- Float to Integer -----------------------------*/        
         if( strcmp(term->type, "float") == 0 ) {
-            converted_node->value.integer_value = (int)term->value.float_value;
+            converted_node->value_node.integer_value_node = (int)term->value_node.float_value_node;
         } 
         /* ------------------------- Bool to Integer -----------------------------*/        
         else if(strcmp(term->type, "bool") == 0) {
-            converted_node->value.integer_value = (int)term->value.bool_value;
+            converted_node->value_node.integer_value_node = (int)term->value_node.bool_value_node;
         } 
         /* ------------------------- String to Integer -----------------------------*/        
         else if(strcmp(term->type, "string") == 0) {
-            char *str = strdup(term->value.string_value);
+            char *str = strdup(term->value_node.string_value_node);
             str++;
             str[strlen(str)-1] = '\0';
-            converted_node->value.integer_value = atoi(str);
+            converted_node->value_node.integer_value_node = atoi(str);
         } 
         else {
             log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, term->type);
@@ -896,18 +902,18 @@ struct NodeType* perform_conversion(struct NodeType* term, char *target_type) {
 
         /* ------------------------- Integer to Float -----------------------------*/        
         if( strcmp(term->type, "int") == 0 ) {
-            converted_node->value.float_value = (float)term->value.integer_value;
+            converted_node->value_node.float_value_node = (float)term->value_node.integer_value_node;
         } 
         /* ------------------------- Bool to Float -----------------------------*/        
         else if(strcmp(term->type, "bool") == 0) {
-            converted_node->value.float_value = (float)term->value.bool_value;
+            converted_node->value_node.float_value_node = (float)term->value_node.bool_value_node;
         }
         /* ------------------------- String to Float -----------------------------*/         
         else if(strcmp(term->type, "string") == 0) {
-            char *str = strdup(term->value.string_value);
+            char *str = strdup(term->value_node.string_value_node);
             str++;
             str[strlen(str)-1] = '\0';
-            converted_node->value.float_value = atof(str);
+            converted_node->value_node.float_value_node = atof(str);
         } 
         else {
             log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, term->type);
@@ -920,18 +926,18 @@ struct NodeType* perform_conversion(struct NodeType* term, char *target_type) {
 
         /* ------------------------- Bool to Integer -----------------------------*/         
         if(strcmp(term->type, "int") == 0) {
-            converted_node->value.bool_value = (int)term->value.integer_value!=0;
+            converted_node->value_node.bool_value_node = (int)term->value_node.integer_value_node!=0;
         } 
         /* ------------------------- Bool to Float -----------------------------*/         
         else if(strcmp(term->type, "float") == 0) {
-            converted_node->value.bool_value = (int)term->value.float_value!=0;
+            converted_node->value_node.bool_value_node = (int)term->value_node.float_value_node!=0;
         } 
         /* ------------------------- Bool to String -----------------------------*/         
         else if(strcmp(term->type, "string") == 0) {
-            char *str = strdup(term->value.string_value);
+            char *str = strdup(term->value_node.string_value_node);
             str++;
             str[strlen(str)-1] = '\0';
-            converted_node->value.bool_value = str[0] != '\0';
+            converted_node->value_node.bool_value_node = str[0] != '\0';
         } 
         else {
             log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, term->type);
@@ -944,20 +950,20 @@ struct NodeType* perform_conversion(struct NodeType* term, char *target_type) {
         /* ------------------------- String to Integer -----------------------------*/         
         if(strcmp(term->type, "int") == 0) {
             char temp[100];
-            sprintf(temp, "%d", term->value.integer_value);
-            converted_node->value.string_value = strdup(temp);
+            sprintf(temp, "%d", term->value_node.integer_value_node);
+            converted_node->value_node.string_value_node = strdup(temp);
         } 
         /* ------------------------- String to Float -----------------------------*/         
         else if(strcmp(term->type, "float") == 0) {
             char temp[100];
-            sprintf(temp, "%f", term->value.float_value);
-            converted_node->value.string_value = strdup(temp);
+            sprintf(temp, "%f", term->value_node.float_value_node);
+            converted_node->value_node.string_value_node = strdup(temp);
         } 
         /* ------------------------- String to Bool -----------------------------*/         
         else if(strcmp(term->type, "bool") == 0) {
             char temp[100];
-            sprintf(temp, "%d", term->value.bool_value);
-            converted_node->value.string_value = strdup(temp);
+            sprintf(temp, "%d", term->value_node.bool_value_node);
+            converted_node->value_node.string_value_node = strdup(temp);
         } 
         else {
             log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, term->type);
@@ -978,35 +984,35 @@ a new node of 'int' &&  initial value = 0 && Returns: A pointer to the node
 struct NodeType* create_int_node() {
     struct NodeType* new_node = malloc(sizeof(struct NodeType));
     new_node->type = "int";
-    new_node->value.integer_value = 0;
+    new_node->value_node.integer_value_node = 0;
     return new_node;
 }
 
 struct NodeType* create_float_node() {
     struct NodeType* ptr = malloc(sizeof(struct NodeType));
     ptr->type = "float";
-    ptr->value.integer_value = 0;
+    ptr->value_node.integer_value_node = 0;
     return ptr;
 }
 
 struct NodeType* create_bool_node() {
     struct NodeType* ptr = malloc(sizeof(struct NodeType));
     ptr->type = "bool";
-    ptr->value.integer_value = 0;
+    ptr->value_node.integer_value_node = 0;
     return ptr;
 }
 
 struct NodeType* create_string_node() {
     struct NodeType* ptr = malloc(sizeof(struct NodeType));
     ptr->type = "string";
-    ptr->value.integer_value = 0;
+    ptr->value_node.integer_value_node = 0;
     return ptr;
 }
 
 struct NodeType* create_enum_node() {
     struct NodeType* ptr = malloc(sizeof(struct NodeType));
     ptr->type = "enum";
-    ptr->value.integer_value = 0;
+    ptr->value_node.integer_value_node = 0;
     return ptr;
 }
 
@@ -1165,7 +1171,7 @@ Checks if a conditional expression in an if statement is constant
 ------------------------- */
 void check_constant_expression_if_statement(struct NodeType* expression) {
     if(expression->isConstant == 1) {
-        log_semantic_error(SEMANTIC_WARNING_CONSTANT_IF, expression->value.bool_value != 0);
+        log_semantic_error(SEMANTIC_WARNING_CONSTANT_IF, expression->value_node.bool_value_node != 0);
     }
 }
 
@@ -1279,7 +1285,7 @@ void exit_scope() {
 /* -------------------------
 Prints the start of a function with its name if the show_quadruples flag is enabled
 ------------------------- */
-void print_function_start(const char* function_name)
+void print_function_start(char function_name)
 {
     if (show_quadruples) {
         printf("Quadruple(%d) \tPROC %s\n", nline, function_name); 
@@ -1290,7 +1296,7 @@ void print_function_start(const char* function_name)
 /* -------------------------
 Prints the end of a function along with its name if the show_quadruples flag is enabled.
 ------------------------- */
-void print_function_end(const char* function_name)
+void print_function_end(char function_name)
 {
     if (show_quadruples) {
         printf("Quadruple(%d) \tENDPROC %s\n", nline, function_name); 
@@ -1300,7 +1306,7 @@ void print_function_end(const char* function_name)
 /* -------------------------
 Prints the call of a function with its name if the show_quadruples flag is enabled.
 ------------------------- */
-void print_function_call(const char* function_name)
+void print_function_call(char function_name)
 {
     if (show_quadruples) {
         printf("Quadruple(%d) \tCALL %s\n", nline, function_name);
@@ -1490,24 +1496,19 @@ void print_end_enum(char enum_name)
 
 /* ------------------------------------------------------------------------*/
 
-void yyerror(char *s) {
-     fprintf(stderr, "Error: %s at line %d\n", s, nline);
-     write_symbol_table_to_file();
+
+int main( void ) {
+
+    fill_enum_values = create_int_node();
+    yyparse();
+    check_using_variables();
+    print_symbol_table();
+    return 0;
 }
 
-int main(int argc, char *argv[]) {
-    yyin = fopen(argv[1], "r");
-    if (yyin == NULL) {
-        printf("File not found, Interpreter mode..\n");
-        
-        yyparse();
-    }
-    else{
-        yyparse();
-        check_using_variables();
 
-        fclose(yyin);
-        write_symbol_table_to_file();
-        return 0;
-    }
+void yyerror(char *s) {
+    printf("Syntax error (%d) Near line %d: %s\n", nline, nline, s);
+    fprintf(stderr, "Syntax error (%d) Near line %d: %s\n", nline, nline, s);
+    printSymbolTable();
 }
