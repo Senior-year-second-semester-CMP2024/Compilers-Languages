@@ -328,8 +328,8 @@ expression : function_call                                      {$$->isConstant=
            | expression AND expression                          {print_instruction("Logical AND"); $$ = perform_logical_operation($1, $3, '&'); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
            | expression OR expression                           {print_instruction("Logical OR"); $$ = perform_logical_operation($1, $3, '|'); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
 
-           | expression SHIFT_LEFT expression                   {print_instruction("Shift Left"); perform_bitwise_operation($1, $3, '<'); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
-           | expression SHIFT_RIGHT expression                  {print_instruction("Shift Right"); perform_bitwise_operation($1, $3, '>'); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression SHIFT_LEFT expression                   {print_instruction("Shift Left"); $$ = perform_bitwise_operation($1, $3, '<'); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression SHIFT_RIGHT expression                  {print_instruction("Shift Right"); $$ = perform_bitwise_operation($1, $3, '>'); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
 
            | expression LESS_THAN expression                    {print_instruction("Less Than"); $$ = perform_comparison($1, $3, "<"); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
            | expression GREATER_THAN expression                 {print_instruction("Greater Than"); $$ = perform_comparison($1, $3, ">"); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
@@ -1502,7 +1502,9 @@ int main( void ) {
     return 0;
 }
 
-
+// Declare the file pointer for the error file
+FILE *errorFile;
+    
 void yyerror(char *s) {
     printf("Syntax error (%d) Near line %d: %s\n", nline, nline, s);
     fprintf(stderr, "Syntax error (%d) Near line %d: %s\n", nline, nline, s);

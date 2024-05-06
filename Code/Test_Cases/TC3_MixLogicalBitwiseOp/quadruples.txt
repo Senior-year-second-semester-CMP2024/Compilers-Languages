@@ -1,0 +1,26 @@
+	PUSH 1
+	POP a
+	PUSH 0
+	POP b
+	PUSH "More logic"
+Value: "More logic"
+	PUSH a
+	Negation or NOT
+Value: 0
+	PUSH 1
+	POP x
+	PUSH 0
+	POP y
+	PUSH x
+	PUSH y
+	Logical AND
+Value: 0
+	PUSH x
+	PUSH x
+	Logical AND
+	PUSH y
+	Logical AND
+	PUSH x
+	Logical OR
+Value: 1
+Semantic error (8): Unused variable 'b'

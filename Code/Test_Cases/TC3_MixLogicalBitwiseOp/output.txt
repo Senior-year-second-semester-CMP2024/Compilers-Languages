@@ -32,6 +32,7 @@ Lex(4) Punctuators: )
 Value: 0
 Lex(4) End Of Statement: ; 
 
+Lex(4) InLine Comment: // 0
 Lex(5) Data Type: bool
 Lex(5) Identifier: x
 Lex(5) Punctuators: =
@@ -60,6 +61,7 @@ Lex(7) Punctuators: )
 Value: 0
 Lex(7) End Of Statement: ; 
 
+Lex(7) InLine Comment: // 0
 Lex(8) Command: print
 Lex(8) Punctuators: (
 Lex(8) Punctuators: (
@@ -82,4 +84,5 @@ Lex(8) Punctuators: )
 Value: 1
 Lex(8) End Of Statement: ; 
 
+Lex(8) InLine Comment: // 1
 Semantic error (8): Unused variable 'b'

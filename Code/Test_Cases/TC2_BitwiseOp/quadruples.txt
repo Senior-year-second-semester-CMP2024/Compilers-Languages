@@ -1,0 +1,44 @@
+	PUSH "bitwise"
+Value: "bitwise"
+	PUSH 10
+	POP a
+	PUSH 2
+	POP c
+	PUSH a
+	PUSH c
+	Bitwise OR
+	PUSH 10
+	Equal
+Value: 1
+	PUSH a
+	PUSH c
+	Bitwise AND
+	PUSH 2
+	Equal
+Value: 1
+	PUSH a
+	PUSH c
+	Bitwise XOR
+	PUSH 8
+	Equal
+Value: 1
+	PUSH a
+	PUSH c
+	Shift Left
+	PUSH 40
+	Equal
+Value: 1
+	PUSH a
+	PUSH c
+	Shift Right
+	PUSH 2
+	Equal
+Value: 1
+	PUSH a
+	PUSH c
+	Shift Left
+	PUSH c
+	Shift Right
+	PUSH 10
+	Equal
+Value: 1

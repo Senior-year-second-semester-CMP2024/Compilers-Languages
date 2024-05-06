@@ -1,0 +1,142 @@
+Lex(1) Command: print
+Lex(1) Punctuators: (
+Lex(1) String Value: "bitwise"
+	PUSH "bitwise"
+Lex(1) Punctuators: )
+Value: "bitwise"
+Lex(1) End Of Statement: ; 
+
+Lex(2) Data Type: int
+Lex(2) Identifier: a
+Lex(2) Punctuators: =
+Lex(2) Integer Value: 10
+	PUSH 10
+Lex(2) End Of Statement: ; 
+
+	POP a
+Lex(3) Data Type: int
+Lex(3) Identifier: c
+Lex(3) Punctuators: =
+Lex(3) Integer Value: 2
+	PUSH 2
+Lex(3) End Of Statement: ; 
+
+	POP c
+Lex(4) Command: print
+Lex(4) Punctuators: (
+Lex(4) Punctuators: (
+Lex(4) Identifier: a
+Lex(4) Bitwise Operator: |
+	PUSH a
+Lex(4) Identifier: c
+Lex(4) Punctuators: )
+	PUSH c
+	Bitwise OR
+Lex(4) Comparison Operator: ==
+Lex(4) Integer Value: 10
+	PUSH 10
+Lex(4) Punctuators: )
+	Equal
+Value: 1
+Lex(4) End Of Statement: ; 
+
+Lex(4) InLine Comment: // 1010 | 0010 = 1010 = 10
+Lex(5) Command: print
+Lex(5) Punctuators: (
+Lex(5) Punctuators: (
+Lex(5) Identifier: a
+Lex(5) Bitwise Operator: &
+	PUSH a
+Lex(5) Identifier: c
+Lex(5) Punctuators: )
+	PUSH c
+	Bitwise AND
+Lex(5) Comparison Operator: ==
+Lex(5) Integer Value: 2
+	PUSH 2
+Lex(5) Punctuators: )
+	Equal
+Value: 1
+Lex(5) End Of Statement: ; 
+
+Lex(5) InLine Comment: // 1010 & 0010 = 0010 = 2
+Lex(6) Command: print
+Lex(6) Punctuators: (
+Lex(6) Punctuators: (
+Lex(6) Identifier: a
+Lex(6) Bitwise Operator: ^
+	PUSH a
+Lex(6) Identifier: c
+Lex(6) Punctuators: )
+	PUSH c
+	Bitwise XOR
+Lex(6) Comparison Operator: ==
+Lex(6) Integer Value: 8
+	PUSH 8
+Lex(6) Punctuators: )
+	Equal
+Value: 1
+Lex(6) End Of Statement: ; 
+
+Lex(6) InLine Comment: // 1010 ^ 0010 = 1000 = 8
+Lex(7) Command: print
+Lex(7) Punctuators: (
+Lex(7) Punctuators: (
+Lex(7) Identifier: a
+Lex(7) BitWise Operator: <<
+	PUSH a
+Lex(7) Identifier: c
+Lex(7) Punctuators: )
+	PUSH c
+	Shift Left
+Lex(7) Comparison Operator: ==
+Lex(7) Integer Value: 40
+	PUSH 40
+Lex(7) Punctuators: )
+	Equal
+Value: 1
+Lex(7) End Of Statement: ; 
+
+Lex(7) InLine Comment: // 1010 << 0010 = 101000 = 40
+Lex(8) Command: print
+Lex(8) Punctuators: (
+Lex(8) Punctuators: (
+Lex(8) Identifier: a
+Lex(8) BitWise Operator: >>
+	PUSH a
+Lex(8) Identifier: c
+Lex(8) Punctuators: )
+	PUSH c
+	Shift Right
+Lex(8) Comparison Operator: ==
+Lex(8) Integer Value: 2
+	PUSH 2
+Lex(8) Punctuators: )
+	Equal
+Value: 1
+Lex(8) End Of Statement: ; 
+
+Lex(8) InLine Comment: // 1010 >> 0010 = 10 = 2
+Lex(9) Command: print
+Lex(9) Punctuators: (
+Lex(9) Punctuators: (
+Lex(9) Identifier: a
+Lex(9) BitWise Operator: <<
+	PUSH a
+Lex(9) Identifier: c
+Lex(9) Punctuators: )
+	PUSH c
+	Shift Left
+Lex(9) BitWise Operator: >>
+Lex(9) Identifier: c
+Lex(9) Comparison Operator: ==
+	PUSH c
+	Shift Right
+Lex(9) Integer Value: 10
+	PUSH 10
+Lex(9) Punctuators: )
+	Equal
+Value: 1
+Lex(9) End Of Statement: ; 
+
+Lex(9) InLine Comment: // 10

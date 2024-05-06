@@ -1,0 +1,32 @@
+	PUSH "logic"
+Value: "logic"
+	PUSH 1
+	POP a
+	PUSH 0
+	POP b
+Value: 1
+Value: 0
+	PUSH a
+	PUSH b
+	Equal
+Value: 0
+	PUSH a
+	PUSH b
+	Not Equal
+Value: 1
+	PUSH a
+	PUSH b
+	Less Than
+Value: 0
+	PUSH a
+	PUSH b
+	Greater Than
+Value: 1
+	PUSH a
+	PUSH b
+	Less Than or Equal
+Value: 0
+	PUSH a
+	PUSH b
+	Greater Than or Equal
+Value: 1

@@ -1,0 +1,118 @@
+Lex(1) Command: print
+Lex(1) Punctuators: (
+Lex(1) String Value: "logic"
+	PUSH "logic"
+Lex(1) Punctuators: )
+Value: "logic"
+Lex(1) End Of Statement: ; 
+
+Lex(2) Data Type: int
+Lex(2) Identifier: a
+Lex(2) Punctuators: =
+Lex(2) Integer Value: 1
+	PUSH 1
+Lex(2) End Of Statement: ; 
+
+	POP a
+Lex(3) Data Type: int
+Lex(3) Identifier: b
+Lex(3) Punctuators: =
+Lex(3) Integer Value: 0
+	PUSH 0
+Lex(3) End Of Statement: ; 
+
+	POP b
+Lex(4) Command: print
+Lex(4) Punctuators: (
+Lex(4) Identifier: a
+Lex(4) Punctuators: )
+Value: 1
+Lex(4) End Of Statement: ; 
+
+Lex(4) InLine Comment: // 1
+Lex(5) Command: print
+Lex(5) Punctuators: (
+Lex(5) Identifier: b
+Lex(5) Punctuators: )
+Value: 0
+Lex(5) End Of Statement: ; 
+
+Lex(5) InLine Comment: // 0
+Lex(6) Command: print
+Lex(6) Punctuators: (
+Lex(6) Identifier: a
+Lex(6) Comparison Operator: ==
+	PUSH a
+Lex(6) Identifier: b
+Lex(6) Punctuators: )
+	PUSH b
+	Equal
+Value: 0
+Lex(6) End Of Statement: ; 
+
+Lex(6) InLine Comment: // 0
+Lex(7) Command: print
+Lex(7) Punctuators: (
+Lex(7) Identifier: a
+Lex(7) Comparison Operator: !=
+	PUSH a
+Lex(7) Identifier: b
+Lex(7) Punctuators: )
+	PUSH b
+	Not Equal
+Value: 1
+Lex(7) End Of Statement: ; 
+
+Lex(7) InLine Comment: // 1
+Lex(8) Command: print
+Lex(8) Punctuators: (
+Lex(8) Identifier: a
+Lex(8) Comparison Operator: <
+	PUSH a
+Lex(8) Identifier: b
+Lex(8) Punctuators: )
+	PUSH b
+	Less Than
+Value: 0
+Lex(8) End Of Statement: ; 
+
+Lex(8) InLine Comment: // 0
+Lex(9) Command: print
+Lex(9) Punctuators: (
+Lex(9) Identifier: a
+Lex(9) Comparison Operator: >
+	PUSH a
+Lex(9) Identifier: b
+Lex(9) Punctuators: )
+	PUSH b
+	Greater Than
+Value: 1
+Lex(9) End Of Statement: ; 
+
+Lex(9) InLine Comment: // 1
+Lex(10) Command: print
+Lex(10) Punctuators: (
+Lex(10) Identifier: a
+Lex(10) Comparison Operator: <=
+	PUSH a
+Lex(10) Identifier: b
+Lex(10) Punctuators: )
+	PUSH b
+	Less Than or Equal
+Value: 0
+Lex(10) End Of Statement: ; 
+
+Lex(10) InLine Comment: // 0
+Lex(11) Command: print
+Lex(11) Punctuators: (
+Lex(11) Identifier: a
+Lex(11) Comparison Operator: >=
+	PUSH a
+Lex(11) Identifier: b
+Lex(11) Punctuators: )
+	PUSH b
+	Greater Than or Equal
+Value: 1
+Lex(11) End Of Statement: ; 
+
+Lex(11) InLine Comment: // 1
