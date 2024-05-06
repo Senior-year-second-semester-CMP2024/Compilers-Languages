@@ -23,17 +23,13 @@ void Log(const char* type, const char* value)
         if (type == "int value")
         {
             printf("Lex(%d) %s: %d\n", nline, type, atoi(value));
-            // printf("\033[1;30mLex(%d) %s: %d\033[0m\n", nline, type, atoi(value));
         }
         else if (type == "float value")
         {
             printf("Lex(%d) %s: %f\n", nline, type, atof(value));
-            // printf("\033[1;30mLex(%d) %s: %f\033[0m\n", nline, type, atof(value));
         }
         else{
             printf("Lex(%d) %s: %s\n", nline, type, value);
-            // printf("\033[1;30mLex(%d) %s: %s\033[0m\n", nline, type, value);
-
         }
 
     }

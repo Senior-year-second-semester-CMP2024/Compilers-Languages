@@ -21,7 +21,7 @@ mv spider.tab.c spider.tab.h lex.yy.c output/
 gcc -g output/lex.yy.c output/spider.tab.c -o output/program -w
 
 # Execute the compiled program and redirect output to output.txt
-./output/program.exe < input.txt
+./output/program.exe < operations_TC1.txt > output/output.txt
 
 # Remove the input.txt file
 # rm input.txt

@@ -1,0 +1,80 @@
+	PUSH "arithmetic"
+Value: "arithmetic"
+	PUSH 5
+	POP a
+	PUSH 5
+	POP b
+	PUSH 2
+	POP c
+Value: 5
+Value: 5
+Value: 2
+	PUSH a
+	Negative or Negation
+	POP z
+	PUSH z
+	PUSH -5
+	Equal
+Value: 1
+	PUSH -3
+	PUSH 4
+	Subtraction
+	POP z
+Value: -7
+	PUSH a
+	PUSH b
+	Addition
+	POP z
+	PUSH z
+	PUSH 10
+	Equal
+Value: 1
+	PUSH a
+	PUSH b
+	Subtraction
+	POP z
+	PUSH z
+	PUSH 0
+	Equal
+Value: 1
+	PUSH a
+	PUSH b
+	Division
+	POP z
+	PUSH z
+	PUSH 1
+	Equal
+Value: 1
+	PUSH a
+	PUSH c
+	Modulus
+	POP z
+	PUSH a
+	PUSH c
+	Modulus
+	PUSH 0
+	Equal
+Value: 0
+	PUSH a
+	PUSH b
+	Multiplication
+	PUSH a
+	PUSH b
+	Division
+	Subtraction
+	POP z
+	PUSH z
+	PUSH 24
+	Equal
+Value: 1
+	PUSH 10
+	PUSH 8
+	Subtraction
+	POP z
+Value: 2
+	PUSH -100
+	PUSH 5
+	Subtraction
+	PUSH 5
+	Addition
+Value: -100
