@@ -5,3 +5,18 @@ bison -dy spider.y
 gcc lex.yy.c spider.tab.c – out.exe
 
 out.exe
+
+# Compile lexer and parser
+flex lexer.l
+bison -d parser.y
+gcc lex.yy.c parser.tab.c -o myparser
+
+# Run lexer with test input
+./myparser test_input.txt > token_output.txt
+
+# Run parser with test input
+./myparser test_input.txt > parse_output.txt
+
+# Inspect token and parse output
+cat token_output.txt
+cat parse_output.txt

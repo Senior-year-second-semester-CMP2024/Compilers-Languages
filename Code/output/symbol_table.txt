@@ -1,0 +1,4 @@
+Symbol Table:
+Name:x, Type:int, Value:5, Declared:1, Initialized:1, Used:1, Constant:0, Scope:0
+Name:y, Type:int, Value:3, Declared:1, Initialized:1, Used:1, Constant:0, Scope:0
+Name:z, Type:int, Value:8, Declared:1, Initialized:1, Used:1, Constant:0, Scope:0

@@ -2,10 +2,9 @@
 
 #include "spider.tab.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h> // For strdup
 #include <stdarg.h>
-
+#include <stdlib.h> // For atoi, atof
 // called by the parser in case of a syntax error. 
 void yyerror (char *s);
 
@@ -69,6 +68,7 @@ void Log(const char* type, const char* value)
 "break"				{ Log("Control Flow", yytext); return BREAK; }
 "return"			{ Log("Control Flow", yytext); return RETURN; }
 
+"enum"              {Log("enum", yytext);return ENUM;}
 
 "<<"				{ Log("BitWise Operator", yytext); return SHIFT_LEFT; }
 ">>"				{ Log("BitWise Operator", yytext); return SHIFT_RIGHT; }
@@ -92,8 +92,8 @@ void Log(const char* type, const char* value)
 
 [()={}:,]			{ Log("Punctuators", yytext); return yytext[0]; }
 
-true				{ Log("Value", "true"); yylval.BOOL_TYPE = 1; return TRUE_VALUE; }
-false		        { Log("value", "false"); yylval.BOOL_TYPE = 0; return FALSE_VALUE; }
+"true"				{ Log("Value", "true"); yylval.BOOL_TYPE = 1; return TRUE_VALUE; }
+"false"		        { Log("value", "false"); yylval.BOOL_TYPE = 0; return FALSE_VALUE; }
 
 
 [_a-zA-Z][_a-zA-Z0-9]*		                    { Log("Identifier", yytext); yylval.INTEGER_TYPE = yytext[0]; return IDENTIFIER; } 
@@ -102,9 +102,9 @@ false		        { Log("value", "false"); yylval.BOOL_TYPE = 0; return FALSE_VALUE
 -?[0-9]*[.][0-9]+		                        { Log("Float Value", yytext); yylval.FLOAT_TYPE = atof(yytext); return FLOAT; }
 \"(\\.|[^\\"])*\"		                        { Log("String Value", yytext); yylval.STRING_TYPE = strdup(yytext); return STRING;}
 
-(\n)+				                            {nline += yyleng ; nword++; }               /* Ignore the new line */
+\n	    			                            nline++;
 
-[ \r\t]+			                            { nword++; }                                /* Ignore White Spaces */
+[ \r\t] 			                            ;                                /* Ignore White Spaces */
 
 \/\/.*			                                { Log("InLine Comment", yytext); }          /* Ignore Inline Comment */
 
@@ -112,11 +112,10 @@ false		        { Log("value", "false"); yylval.BOOL_TYPE = 0; return FALSE_VALUE
 
 .                                               {Log("UnExpected Token", yytext); yyerror ("UnExpected Token");} /* Otherwise, Error Message */
 
-%%  
+%%
 
-//SubRoutines
+// SubRoutines
 // called by lex when input is exhausted. Return 1 if you are done
 int yywrap (void) {
-    printf("#words = %d\t #lines= %d\n", nword, nline-1);
     return 1;
 }

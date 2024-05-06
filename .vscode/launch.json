@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": ".",
-      "program": "build/Debug/outDebug",
+      "cwd": "g:/Computer_Eng/4_Fourth Year/Second_Term/Compilers _ Languages/Project/Compilers-Languages-Project",
+      "program": "g:/Computer_Eng/4_Fourth Year/Second_Term/Compilers _ Languages/Project/Compilers-Languages-Project/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
