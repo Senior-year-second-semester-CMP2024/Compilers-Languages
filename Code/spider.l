@@ -15,7 +15,7 @@ int yylex();
 
 int nword=0;
 extern int nline=1;
-#define SHOW_LOGS 0
+#define SHOW_LOGS 1
 void Log(const char* type, const char* value)
 {
     if(SHOW_LOGS)

@@ -365,7 +365,7 @@ switch_Case          : SWITCH '(' IDENTIFIER ')' {print_push_last_identifier_sta
                      ;
 
 // ------------ Loops ------------------
-while_loop               : WHILE '(' expression ')'  {print_jump_false_label(++label_number);} '{' {enter_scope();} statement_list '}' {print_jump_start_label(); print_pop_label(); exit_scope();}
+while_loop               : WHILE '(' expression ')'  {print_jump_false_label(++label_number);} '{' {enter_scope();} statement_list '}' {print_jump_start_label(); print_pop_label(); exit_scope();} {;}
                         ;
 
 for_loop                 : FOR '(' assignment ';' {print_push_start_label(++start_label_number);} expression ';' {print_jump_false_label(++label_number);} assignment ')' '{' {enter_scope();} statement_list '}' {print_jump_start_label(); print_pop_label(); print_pop_start_label(); exit_scope();}
@@ -1457,7 +1457,7 @@ void print_push_start_label(int start_label_number)
     if (show_quadruples) {
         /* Push the start label number to the stack */
         start_label_stack[++start_label_stack_ptr] = start_label_number;
-        printf("StartLabel_%d:\n", start_label_number);
+        printf("Label_%d:\n", start_label_number);
     }
 }
 
@@ -1466,7 +1466,7 @@ void print_jump_start_label()
     if (show_quadruples) {
         /* Get the last start label number from the stack */
         int start_label_number = start_label_stack[start_label_stack_ptr];
-        printf("\tJMP StartLabel_%d\n", start_label_number);
+        printf("\tJMP Label_%d\n", start_label_number);
     }
 }
 
