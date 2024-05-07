@@ -399,14 +399,19 @@ function_parameters : literal                 {check_type_3($1->type, symbol_tab
                     | literal                 {check_type_3($1->type, symbol_table[++function_pointer].type); counter_parameters--; } ',' function_parameters
                     ;
 
-function_definition : data_type IDENTIFIER  {print_function_start($2);} {check_same_scope_redeclaration($2); add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); counter_arguments = symbol_table_index;} {enter_scope();} '(' function_arguments ')' '{' statement_list '}' {exit_scope(); print_function_end($2); modify_symbol_parameter($2, counter_arguments);}
-                    | data_type IDENTIFIER '(' ')' '{' statement_list '}'                            {;}
+function_definition : data_type IDENTIFIER  {print_function_start($2);} {check_same_scope_redeclaration($2); add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); counter_arguments = symbol_table_index;} {enter_scope();} function_definition_res '{' statement_list '}' {exit_scope(); print_function_end($2); modify_symbol_parameter($2, counter_arguments);}
                     ;
 
-function_call : IDENTIFIER {counter_parameters = get_symbol_value($1)->value_node.integer_value_node; function_pointer = retrieve_symbol_index($1);} '(' ')' { check_out_of_scope_declaration($1); $$ = get_symbol_value($1); print_function_call($1); if( counter_parameters != 0 ) {log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, $1); }}
+function_definition_res : '(' function_arguments ')' 
+                        | '('              ')' 
+                        ;
+                        
+function_call : IDENTIFIER {counter_parameters = get_symbol_value($1)->value_node.integer_value_node; function_pointer = retrieve_symbol_index($1);} function_call_res { check_out_of_scope_declaration($1); $$ = get_symbol_value($1); print_function_call($1); if( counter_parameters != 0 ) {log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, $1); }}
               ;
 
-
+function_call_res       : '(' function_parameters ')'             {;}
+                        | '('              ')'               {;}
+                        ;
 // ------------ Enum ------------------
 enum_definition : ENUM IDENTIFIER {print_start_enum($2); check_same_scope_redeclaration($2); add_symbol($2, "enum", 1, 1, 0, scopes[scope_index-1]);} '{' enum_body '}' {print_end_enum($2); counter_enum = 0;}
                 ;

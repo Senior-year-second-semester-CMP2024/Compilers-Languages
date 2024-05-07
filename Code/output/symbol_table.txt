@@ -1,5 +1,0 @@
-Symbol Table:
-Name:f,Type:float,Value:100.500000,Declared:1,Initialized:1,Used:1,Const:0,Scope:0
-Name:i, Type:int, Value:100, Declared:1, Initialized:1, Used:1, Constant:0, Scope:0
-Name:b,Type:bool,Value:1,Declared:1,Initialized:1,Used:1,Const:0,Scope:0
-Name:s,Type:string,Value:1,Declared:1,Initialized:1,Used:1,Const:0,Scope:0
