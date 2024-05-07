@@ -1,0 +1,316 @@
+Lex(1) InLine Comment: // float to int
+Lex(2) Data Type: float
+Lex(2) Identifier: f
+Lex(2) Punctuators: =
+Lex(2) Float Value: 100.5
+	PUSH 100.500000
+Lex(2) End Of Statement: ; 
+
+	POP f
+Lex(3) Data Type: int
+Lex(3) Identifier: i
+Lex(3) Punctuators: =
+Lex(3) Punctuators: (
+Lex(3) Data Type: int
+Lex(3) Punctuators: )
+Lex(3) Identifier: f
+	PUSH f
+	Casting or Conversion
+Lex(3) End Of Statement: ; 
+
+	POP i
+Lex(4) Command: print
+Lex(4) Punctuators: (
+Lex(4) Identifier: i
+Lex(4) Punctuators: )
+Value: 100
+Lex(4) End Of Statement: ; 
+
+Lex(6) InLine Comment: // bool to int
+Lex(7) Data Type: bool
+Lex(7) Identifier: b
+Lex(7) Punctuators: =
+Lex(7) Value: true
+	PUSH 1
+Lex(7) End Of Statement: ; 
+
+	POP b
+Lex(8) Identifier: i
+Lex(8) Punctuators: =
+Lex(8) Punctuators: (
+Lex(8) Data Type: int
+Lex(8) Punctuators: )
+Lex(8) Identifier: b
+	PUSH b
+	Casting or Conversion
+Lex(8) End Of Statement: ; 
+
+	POP i
+Lex(9) Command: print
+Lex(9) Punctuators: (
+Lex(9) Identifier: i
+Lex(9) Punctuators: )
+Value: 1
+Lex(9) End Of Statement: ; 
+
+Lex(11) InLine Comment: // string to int
+Lex(12) Data Type: string
+Lex(12) Identifier: s
+Lex(12) Punctuators: =
+Lex(12) String Value: "999"
+	PUSH "999"
+Lex(12) End Of Statement: ; 
+
+	POP s
+Lex(13) Identifier: i
+Lex(13) Punctuators: =
+Lex(13) Punctuators: (
+Lex(13) Data Type: int
+Lex(13) Punctuators: )
+Lex(13) Identifier: s
+	PUSH s
+	Casting or Conversion
+Lex(13) End Of Statement: ; 
+
+	POP i
+Lex(14) Command: print
+Lex(14) Punctuators: (
+Lex(14) Identifier: i
+Lex(14) Punctuators: )
+Value: 999
+Lex(14) End Of Statement: ; 
+
+Lex(16) InLine Comment: // int to float
+Lex(17) Identifier: i
+Lex(17) Punctuators: =
+Lex(17) Integer Value: 100
+	PUSH 100
+Lex(17) End Of Statement: ; 
+
+	POP i
+Lex(18) Identifier: f
+Lex(18) Punctuators: =
+Lex(18) Punctuators: (
+Lex(18) Data Type: float
+Lex(18) Punctuators: )
+Lex(18) Identifier: i
+	PUSH i
+	Casting or Conversion
+Lex(18) End Of Statement: ; 
+
+	POP f
+Lex(19) Command: print
+Lex(19) Punctuators: (
+Lex(19) Identifier: f
+Lex(19) Punctuators: )
+Value: 100.000000
+Lex(19) End Of Statement: ; 
+
+Lex(21) InLine Comment: // bool to float
+Lex(22) Identifier: b
+Lex(22) Punctuators: =
+Lex(22) Value: true
+	PUSH 1
+Lex(22) End Of Statement: ; 
+
+	POP b
+Lex(23) Identifier: f
+Lex(23) Punctuators: =
+Lex(23) Punctuators: (
+Lex(23) Data Type: float
+Lex(23) Punctuators: )
+Lex(23) Identifier: b
+	PUSH b
+	Casting or Conversion
+Lex(23) End Of Statement: ; 
+
+	POP f
+Lex(24) Command: print
+Lex(24) Punctuators: (
+Lex(24) Identifier: f
+Lex(24) Punctuators: )
+Value: 1.000000
+Lex(24) End Of Statement: ; 
+
+Lex(26) InLine Comment: // string to float
+Lex(27) Identifier: s
+Lex(27) Punctuators: =
+Lex(27) String Value: "999.9"
+	PUSH "999.9"
+Lex(27) End Of Statement: ; 
+
+	POP s
+Lex(28) Identifier: f
+Lex(28) Punctuators: =
+Lex(28) Punctuators: (
+Lex(28) Data Type: float
+Lex(28) Punctuators: )
+Lex(28) Identifier: s
+	PUSH s
+	Casting or Conversion
+Lex(28) End Of Statement: ; 
+
+	POP f
+Lex(29) Command: print
+Lex(29) Punctuators: (
+Lex(29) Identifier: f
+Lex(29) Punctuators: )
+Value: 999.900024
+Lex(29) End Of Statement: ; 
+
+Lex(31) InLine Comment: // int to bool
+Lex(32) Identifier: i
+Lex(32) Punctuators: =
+Lex(32) Integer Value: 100
+	PUSH 100
+Lex(32) End Of Statement: ; 
+
+	POP i
+Lex(33) Identifier: b
+Lex(33) Punctuators: =
+Lex(33) Punctuators: (
+Lex(33) Data Type: bool
+Lex(33) Punctuators: )
+Lex(33) Identifier: i
+	PUSH i
+	Casting or Conversion
+Lex(33) End Of Statement: ; 
+
+	POP b
+Lex(34) Command: print
+Lex(34) Punctuators: (
+Lex(34) Identifier: b
+Lex(34) Punctuators: )
+Value: 1
+Lex(34) End Of Statement: ; 
+
+Lex(36) InLine Comment: // float to bool
+Lex(37) Identifier: f
+Lex(37) Punctuators: =
+Lex(37) Float Value: 100.5
+	PUSH 100.500000
+Lex(37) End Of Statement: ; 
+
+	POP f
+Lex(38) Identifier: b
+Lex(38) Punctuators: =
+Lex(38) Punctuators: (
+Lex(38) Data Type: bool
+Lex(38) Punctuators: )
+Lex(38) Identifier: f
+	PUSH f
+	Casting or Conversion
+Lex(38) End Of Statement: ; 
+
+	POP b
+Lex(39) Command: print
+Lex(39) Punctuators: (
+Lex(39) Identifier: b
+Lex(39) Punctuators: )
+Value: 1
+Lex(39) End Of Statement: ; 
+
+Lex(41) InLine Comment: // string to bool
+Lex(42) Identifier: s
+Lex(42) Punctuators: =
+Lex(42) String Value: "true"
+	PUSH "true"
+Lex(42) End Of Statement: ; 
+
+	POP s
+Lex(43) Identifier: b
+Lex(43) Punctuators: =
+Lex(43) Punctuators: (
+Lex(43) Data Type: bool
+Lex(43) Punctuators: )
+Lex(43) Identifier: s
+	PUSH s
+	Casting or Conversion
+Lex(43) End Of Statement: ; 
+
+	POP b
+Lex(44) Command: print
+Lex(44) Punctuators: (
+Lex(44) Identifier: b
+Lex(44) Punctuators: )
+Value: 1
+Lex(44) End Of Statement: ; 
+
+Lex(47) InLine Comment: // int to string
+Lex(48) Identifier: i
+Lex(48) Punctuators: =
+Lex(48) Integer Value: 100
+	PUSH 100
+Lex(48) End Of Statement: ; 
+
+	POP i
+Lex(49) Identifier: s
+Lex(49) Punctuators: =
+Lex(49) Punctuators: (
+Lex(49) Data Type: string
+Lex(49) Punctuators: )
+Lex(49) Identifier: i
+	PUSH i
+	Casting or Conversion
+Lex(49) End Of Statement: ; 
+
+	POP s
+Lex(50) Command: print
+Lex(50) Punctuators: (
+Lex(50) Identifier: s
+Lex(50) Punctuators: )
+Value: 100
+Lex(50) End Of Statement: ; 
+
+Lex(52) InLine Comment: // float to string
+Lex(53) Identifier: f
+Lex(53) Punctuators: =
+Lex(53) Float Value: 100.5
+	PUSH 100.500000
+Lex(53) End Of Statement: ; 
+
+	POP f
+Lex(54) Identifier: s
+Lex(54) Punctuators: =
+Lex(54) Punctuators: (
+Lex(54) Data Type: string
+Lex(54) Punctuators: )
+Lex(54) Identifier: f
+	PUSH f
+	Casting or Conversion
+Lex(54) End Of Statement: ; 
+
+	POP s
+Lex(55) Command: print
+Lex(55) Punctuators: (
+Lex(55) Identifier: s
+Lex(55) Punctuators: )
+Value: 100.500000
+Lex(55) End Of Statement: ; 
+
+Lex(57) InLine Comment: // bool to string
+Lex(58) Identifier: b
+Lex(58) Punctuators: =
+Lex(58) Value: true
+	PUSH 1
+Lex(58) End Of Statement: ; 
+
+	POP b
+Lex(59) Identifier: s
+Lex(59) Punctuators: =
+Lex(59) Punctuators: (
+Lex(59) Data Type: string
+Lex(59) Punctuators: )
+Lex(59) Identifier: b
+	PUSH b
+	Casting or Conversion
+Lex(59) End Of Statement: ; 
+
+	POP s
+Lex(60) Command: print
+Lex(60) Punctuators: (
+Lex(60) Identifier: s
+Lex(60) Punctuators: )
+Value: 1
+Lex(60) End Of Statement: ; 
+

@@ -1,0 +1,14 @@
+	PUSH "declaration"
+Value: "declaration"
+	PUSH 90
+	POP a
+Value: 90
+	PUSH 100.900002
+	POP b
+Value: 100.900002
+	PUSH 1
+	POP x
+Value: 1
+	PUSH "Karim"
+	POP y
+Value: "Karim"

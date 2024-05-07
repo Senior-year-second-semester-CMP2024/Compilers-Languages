@@ -1,0 +1,68 @@
+Lex(1) Command: print
+Lex(1) Punctuators: (
+Lex(1) String Value: "declaration"
+	PUSH "declaration"
+Lex(1) Punctuators: )
+Value: "declaration"
+Lex(1) End Of Statement: ; 
+
+Lex(3) Data Type: int
+Lex(3) Identifier: a
+Lex(3) Punctuators: =
+Lex(3) Integer Value: 90
+	PUSH 90
+Lex(3) End Of Statement: ; 
+
+	POP a
+Lex(4) Command: print
+Lex(4) Punctuators: (
+Lex(4) Identifier: a
+Lex(4) Punctuators: )
+Value: 90
+Lex(4) End Of Statement: ; 
+
+Lex(6) Data Type: float
+Lex(6) Identifier: b
+Lex(6) Punctuators: =
+Lex(6) Float Value: 100.9
+	PUSH 100.900002
+Lex(6) End Of Statement: ; 
+
+	POP b
+Lex(7) Command: print
+Lex(7) Punctuators: (
+Lex(7) Identifier: b
+Lex(7) Punctuators: )
+Value: 100.900002
+Lex(7) End Of Statement: ; 
+
+Lex(9) Data Type: bool
+Lex(9) Identifier: x
+Lex(9) Punctuators: =
+Lex(9) Value: true
+	PUSH 1
+Lex(9) End Of Statement: ; 
+
+	POP x
+Lex(10) Command: print
+Lex(10) Punctuators: (
+Lex(10) Identifier: x
+Lex(10) Punctuators: )
+Value: 1
+Lex(10) End Of Statement: ; 
+
+Lex(12) Data Type: string
+Lex(12) Identifier: y
+Lex(12) Punctuators: =
+Lex(12) String Value: "Karim"
+	PUSH "Karim"
+Lex(12) End Of Statement: ; 
+
+	POP y
+Lex(13) Command: print
+Lex(13) Punctuators: (
+Lex(13) Identifier: y
+Lex(13) Punctuators: )
+Value: "Karim"
+Lex(13) End Of Statement: ; 
+
