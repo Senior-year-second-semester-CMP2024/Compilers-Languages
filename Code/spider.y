@@ -375,7 +375,7 @@ while_loop               : WHILE '(' expression ')'  {print_jump_false_label(++l
 for_loop                 : FOR '(' assignment ';' {print_push_start_label(++start_label_number);} expression ';' {print_jump_false_label(++label_number);} assignment ')' '{' {enter_scope();} code_block '}' {print_jump_start_label(); print_pop_label(); exit_scope();}
                         ;
 
-repeat_until_loop         : REPEAT '{' {enter_scope();} code_block '}' {exit_scope();} UNTIL '(' expression ')' {print_jump_false_label(++label_number); print_jump_start_label(); print_pop_label();}
+repeat_until_loop         : REPEAT '{' {enter_scope();} code_block '}' {exit_scope();} UNTIL '(' expression ')' ';' {print_jump_false_label(++label_number); print_jump_start_label(); print_pop_label();}
                         ;
 
 // ------------ Data Types DONE------------------

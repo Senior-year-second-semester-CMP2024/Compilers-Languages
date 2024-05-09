@@ -1,0 +1,38 @@
+	POP a
+	PUSH "repeat loops"
+Value: "repeat loops"
+	PUSH 0
+	POP a
+StartLabel_1:
+Value: 0
+	PUSH a
+	PUSH 1
+	Addition
+	POP a
+Value: 1
+	PUSH a
+	PUSH 1
+	EQ
+	JF Label_1
+	JMP StartLabel_1
+Label_1:
+StartLabel_2:
+Value: 1
+	PUSH a
+	PUSH 1
+	Addition
+	POP a
+	PUSH a
+	PUSH 1
+	EQ
+	JF Label_2
+Value: 2
+	JMP EndLabel_1
+Label_2:
+EndLabel_1:
+	PUSH a
+	PUSH 1
+	EQ
+	JF Label_3
+	JMP StartLabel_2
+Label_3:
