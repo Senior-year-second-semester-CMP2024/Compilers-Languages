@@ -315,7 +315,8 @@ assignment : IDENTIFIER '=' expression              {check_out_of_scope_declarat
            | data_type enum_declaration             {/*check if redeclared*/;}
            ;
 /* ----------------------------DONE---------------------------------*/
-expression : function_call                                      {$$->isConstant=0;}
+expression : literal                                            {$$ = $1;}
+           | function_call                                      {$$->isConstant=0;}
            
            | '-' literal                                        {print_instruction("Negative or Negation"); if($2->type == "int") {$$ = create_int_node(); $$->value_node.integer_value_node = -$2->value_node.integer_value_node;} else { $$ = create_float_node(); $$->value_node.float_value_node = -$2->value_node.float_value_node;} $$->isConstant = $2->isConstant;}
            | NOT literal                                        {print_instruction("Negation or NOT"); if($2->type == "bool") {$$ = create_bool_node(); $$->value_node.bool_value_node = !$2->value_node.bool_value_node;} else { if ($2->value_node.integer_value_node) {$$ = create_bool_node(); $$->value_node.bool_value_node = 0;} else {$$ = create_bool_node(); $$->value_node.bool_value_node = 1;}} $$->isConstant = $2->isConstant;}
@@ -343,7 +344,6 @@ expression : function_call                                      {$$->isConstant=
            | expression LT expression                           {print_instruction("LT");   $$ = perform_comparison($1, $3, "<");   $$->isConstant = (($1->isConstant) && ($3->isConstant));}
            | expression LEQ expression                          {print_instruction("LEQ");  $$ = perform_comparison($1, $3, "<=");  $$->isConstant = (($1->isConstant) && ($3->isConstant));}
            
-           | literal                                            {$$ = $1;}
            | '(' data_type ')' literal                          {print_instruction("Casting or Conversion"); $$ = perform_conversion($4, $2->type); $$->isConstant = $4->isConstant;}
            ;
 /* -------------------------------------------------------------*/
@@ -403,7 +403,7 @@ function_parameters : literal                 {check_type_3($1->type, symbol_tab
                     | literal                 {check_type_3($1->type, symbol_table[++function_pointer].type); counter_parameters--; } ',' function_parameters
                     ;
 
-function_definition : data_type IDENTIFIER  {print_function_start($2);} {check_same_scope_redeclaration($2); add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); counter_arguments = symbol_table_index;} {enter_scope();} function_definition_res '{' statement_list '}' {exit_scope(); print_function_end($2); modify_symbol_parameter($2, counter_arguments);}
+function_definition : data_type IDENTIFIER  {print_function_start($2);} {check_same_scope_redeclaration($2); add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); counter_arguments = symbol_table_index;} {enter_scope();} function_definition_res '{' code_block '}' {exit_scope(); print_function_end($2); modify_symbol_parameter($2, counter_arguments);}
                     ;
 
 function_definition_res : '(' function_arguments ')' 

@@ -1,16 +1,5 @@
-print("functions");
-
-int x(int a, int b)
-{
+int x(int a) {
     print("add");
-    return 0;
+    return a;
 }
-x(1, 2);
-
-print("x");
-int y()
-{
-    print("y");
-    return 1;
-}
-print("y done");
+x(1); // function call
