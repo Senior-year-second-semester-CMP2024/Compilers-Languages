@@ -1,0 +1,28 @@
+Lex(1) Data Type: int
+Lex(1) Identifier: a
+Lex(1) Punctuators: =
+Lex(1) Integer Value: 5
+	PUSH 5
+Lex(1) End Of Statement: ; 
+
+	POP a
+Lex(2) Data Type: int
+Lex(2) Identifier: b
+Lex(2) Punctuators: =
+Lex(2) Integer Value: 10
+	PUSH 10
+Lex(2) End Of Statement: ; 
+
+	POP b
+Lex(3) Data Type: int
+Lex(3) Identifier: a
+Lex(3) Punctuators: =
+Semantic error (3): Redeclared variable 'a'
+Lex(3) Integer Value: 2
+	PUSH 2
+Lex(3) End Of Statement: ; 
+
+	POP a
+Semantic error (3): Unused variable 'a'
+Semantic error (3): Unused variable 'b'
+Semantic error (3): Unused variable 'a'

@@ -1,0 +1,5 @@
+	PUSH 5
+	POP b
+	POP c
+	PUSH a
+Semantic error (3): Variable 'a' out of scope

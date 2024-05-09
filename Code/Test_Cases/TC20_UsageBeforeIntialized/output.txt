@@ -1,0 +1,30 @@
+Lex(1) Data Type: int
+Lex(1) Identifier: b
+Lex(1) Punctuators: =
+Lex(1) Integer Value: 5
+	PUSH 5
+Lex(1) End Of Statement: ; 
+
+	POP b
+Lex(2) Data Type: int
+Lex(2) Identifier: a
+Lex(2) End Of Statement: ; 
+
+	POP a
+Lex(3) Data Type: int
+Lex(3) Identifier: c
+Lex(3) End Of Statement: ; 
+
+	POP c
+Lex(4) Identifier: c
+Lex(4) Punctuators: =
+Lex(4) Identifier: a
+Lex(4) Arithmetic Operator: +
+	PUSH a
+Semantic error (4): Uninitialized variable 'a'
+Lex(4) Identifier: b
+Lex(4) End Of Statement: ; 
+
+	PUSH b
+	Addition
+	POP c

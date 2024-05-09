@@ -1,0 +1,7 @@
+Symbol Table:
+Name:a, Type:int, Value:5, Declared:1, Initialized:1, Used:1, Constant:0, Scope:0
+Name:b, Type:int, Value:10, Declared:1, Initialized:1, Used:1, Constant:0, Scope:0
+Name:c,Type:float,Value:0.000000,Declared:1,Initialized:1,Used:0,Const:0,Scope:0
+Name:d,Type:bool,Value:1,Declared:1,Initialized:1,Used:1,Const:0,Scope:0
+Name:f,Type:bool,Value:0,Declared:1,Initialized:1,Used:1,Const:0,Scope:0
+Name:h,Type:string,Value:яж,Declared:1,Initialized:1,Used:0,Const:0,Scope:0

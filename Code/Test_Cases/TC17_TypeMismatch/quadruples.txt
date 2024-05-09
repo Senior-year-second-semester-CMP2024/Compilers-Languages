@@ -1,0 +1,21 @@
+	PUSH 5
+	POP a
+	PUSH 10
+	POP b
+	PUSH a
+	PUSH b
+	Addition
+Semantic error (3): Type mismatch error
+	POP c
+	PUSH 1
+	POP d
+	PUSH 0
+	POP f
+	PUSH d
+	PUSH f
+	Bitwise AND
+Semantic error (8): Type mismatch error
+Semantic error (8): Type mismatch error
+	POP h
+Semantic error (8): Unused variable 'c'
+Semantic error (8): Unused variable 'h'

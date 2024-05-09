@@ -1,0 +1,61 @@
+Lex(1) Data Type: int
+Lex(1) Identifier: a
+Lex(1) Punctuators: =
+Lex(1) Integer Value: 5
+	PUSH 5
+Lex(1) End Of Statement: ; 
+
+	POP a
+Lex(2) Data Type: int
+Lex(2) Identifier: b
+Lex(2) Punctuators: =
+Lex(2) Integer Value: 10
+	PUSH 10
+Lex(2) End Of Statement: ; 
+
+	POP b
+Lex(3) Data Type: float
+Lex(3) Identifier: c
+Lex(3) Punctuators: =
+Lex(3) Identifier: a
+Lex(3) Arithmetic Operator: +
+	PUSH a
+Lex(3) Identifier: b
+Lex(3) End Of Statement: ; 
+
+	PUSH b
+	Addition
+Semantic error (3): Type mismatch error
+	POP c
+Lex(5) Data Type: bool
+Lex(5) Identifier: d
+Lex(5) Punctuators: =
+Lex(5) Value: true
+	PUSH 1
+Lex(5) End Of Statement: ; 
+
+	POP d
+Lex(6) Data Type: bool
+Lex(6) Identifier: f
+Lex(6) Punctuators: =
+Lex(6) value: false
+	PUSH 0
+Lex(6) End Of Statement: ; 
+
+	POP f
+Lex(8) Data Type: string
+Lex(8) Identifier: h
+Lex(8) Punctuators: =
+Lex(8) Identifier: d
+Lex(8) Bitwise Operator: &
+	PUSH d
+Lex(8) Identifier: f
+Lex(8) End Of Statement: ; 
+
+	PUSH f
+	Bitwise AND
+Semantic error (8): Type mismatch error
+Semantic error (8): Type mismatch error
+	POP h
+Semantic error (8): Unused variable 'c'
+Semantic error (8): Unused variable 'h'

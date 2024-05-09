@@ -1,0 +1,10 @@
+	PUSH 5
+	POP a
+	PUSH 10
+	POP b
+Semantic error (3): Redeclared variable 'a'
+	PUSH 2
+	POP a
+Semantic error (3): Unused variable 'a'
+Semantic error (3): Unused variable 'b'
+Semantic error (3): Unused variable 'a'

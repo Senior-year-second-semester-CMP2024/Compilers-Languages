@@ -1,0 +1,8 @@
+int a = 5;
+int b = 10;
+float c = a + b;
+
+bool d = true;
+bool f = false;
+
+string h = d & f;
