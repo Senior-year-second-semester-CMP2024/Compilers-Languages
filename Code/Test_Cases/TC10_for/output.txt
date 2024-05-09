@@ -1,0 +1,53 @@
+Lex(1) Data Type: int
+Lex(1) Identifier: a
+Lex(1) End Of Statement: ; 
+
+	POP a
+Lex(2) Command: print
+Lex(2) Punctuators: (
+Lex(2) String Value: "for loops"
+	PUSH "for loops"
+Lex(2) Punctuators: )
+Value: "for loops"
+Lex(2) End Of Statement: ; 
+
+Lex(3) Control Flow: for
+Lex(3) Punctuators: (
+Lex(3) Identifier: a
+Lex(3) Punctuators: =
+Lex(3) Integer Value: 2
+	PUSH 2
+Lex(3) End Of Statement: ; 
+
+	POP a
+StartLabel_1:
+Lex(3) Identifier: a
+Lex(3) Comparison Operator: <
+	PUSH a
+Lex(3) Integer Value: 10
+	PUSH 10
+Lex(3) End Of Statement: ; 
+
+	LT
+	JF Label_1
+Lex(3) Identifier: a
+Lex(3) Punctuators: =
+Lex(3) Identifier: a
+Lex(3) Arithmetic Operator: +
+	PUSH a
+Lex(3) Integer Value: 1
+	PUSH 1
+Lex(3) Punctuators: )
+	Addition
+	POP a
+Lex(4) Punctuators: {
+Lex(5) Command: print
+Lex(5) Punctuators: (
+Lex(5) Identifier: a
+Lex(5) Punctuators: )
+Value: 3
+Lex(5) End Of Statement: ; 
+
+Lex(6) Punctuators: }
+	JMP StartLabel_1
+Label_1:

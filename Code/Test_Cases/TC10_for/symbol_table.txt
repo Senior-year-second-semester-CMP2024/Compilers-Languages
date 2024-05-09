@@ -1,3 +1,2 @@
 Symbol Table:
 Name:a, Type:int, Value:3, Declared:1, Initialized:1, Used:1, Constant:0, Scope:0
-Name:b, Type:int, Value:4, Declared:1, Initialized:1, Used:1, Constant:0, Scope:0

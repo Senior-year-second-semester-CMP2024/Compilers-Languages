@@ -1,0 +1,113 @@
+Lex(1) Data Type: int
+Lex(1) Identifier: a
+Lex(1) End Of Statement: ; 
+
+	POP a
+Lex(2) Data Type: int
+Lex(2) Identifier: b
+Lex(2) End Of Statement: ; 
+
+	POP b
+Lex(3) Control Flow: for
+Lex(3) Punctuators: (
+Lex(3) Identifier: a
+Lex(3) Punctuators: =
+Lex(3) Integer Value: 2
+	PUSH 2
+Lex(3) End Of Statement: ; 
+
+	POP a
+StartLabel_1:
+Lex(3) Identifier: a
+Lex(3) Comparison Operator: <
+	PUSH a
+Lex(3) Integer Value: 10
+	PUSH 10
+Lex(3) End Of Statement: ; 
+
+	LT
+	JF Label_1
+Lex(3) Identifier: a
+Lex(3) Punctuators: =
+Lex(3) Identifier: a
+Lex(3) Arithmetic Operator: +
+	PUSH a
+Lex(3) Integer Value: 1
+	PUSH 1
+Lex(3) Punctuators: )
+	Addition
+	POP a
+Lex(4) Punctuators: {
+Lex(5) Command: print
+Lex(5) Punctuators: (
+Lex(5) Identifier: a
+Lex(5) Punctuators: )
+Value: 3
+Lex(5) End Of Statement: ; 
+
+Lex(6) Identifier: b
+Lex(6) Punctuators: =
+Lex(6) Identifier: a
+Lex(6) End Of Statement: ; 
+
+	PUSH a
+	POP b
+Lex(7) Control Flow: while
+StartLabel_2:
+Lex(7) Punctuators: (
+Lex(7) Identifier: b
+Lex(7) Comparison Operator: <
+	PUSH b
+Lex(7) Integer Value: 10
+	PUSH 10
+Lex(7) Punctuators: )
+	LT
+	JF Label_2
+Lex(8) Punctuators: {
+Lex(9) Control Flow: if
+Lex(9) Punctuators: (
+Lex(9) Identifier: b
+Lex(9) Comparison Operator: ==
+	PUSH b
+Lex(9) Integer Value: 5
+	PUSH 5
+Lex(9) Punctuators: )
+	EQ
+	JF Label_3
+Lex(10) Punctuators: {
+Lex(11) Command: print
+Lex(11) Punctuators: (
+Lex(11) String Value: "hi"
+	PUSH "hi"
+Lex(11) Punctuators: )
+Value: "hi"
+Lex(11) End Of Statement: ; 
+
+Lex(12) Command: print
+Lex(12) Punctuators: (
+Lex(12) Identifier: b
+Lex(12) Punctuators: )
+Value: 3
+Lex(12) End Of Statement: ; 
+
+Lex(13) Punctuators: }
+	JMP EndLabel_1
+Label_3:
+Lex(15) Identifier: b
+EndLabel_1:
+Lex(15) Punctuators: =
+Lex(15) Identifier: b
+Lex(15) Arithmetic Operator: +
+	PUSH b
+Lex(15) Integer Value: 1
+	PUSH 1
+Lex(15) End Of Statement: ; 
+
+	Addition
+	POP b
+Lex(16) Punctuators: }
+	JMP StartLabel_2
+Label_2:
+Lex(17) Punctuators: }
+	JMP StartLabel_1
+Label_1:

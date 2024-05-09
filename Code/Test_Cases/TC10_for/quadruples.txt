@@ -1,0 +1,17 @@
+	POP a
+	PUSH "for loops"
+Value: "for loops"
+	PUSH 2
+	POP a
+StartLabel_1:
+	PUSH a
+	PUSH 10
+	LT
+	JF Label_1
+	PUSH a
+	PUSH 1
+	Addition
+	POP a
+Value: 3
+	JMP StartLabel_1
+Label_1:
