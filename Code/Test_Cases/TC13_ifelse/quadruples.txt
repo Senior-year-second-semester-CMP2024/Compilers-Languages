@@ -1,0 +1,81 @@
+	PUSH "conditions"
+Value: "conditions"
+	PUSH 10
+	POP a
+	PUSH "First if statement start"
+Value: "First if statement start"
+	PUSH a
+	PUSH 11
+	EQ
+	JF Label_1
+	PUSH 11
+	POP a
+	JMP EndLabel_1
+Label_1:
+EndLabel_1:
+	PUSH "second if statement start"
+Value: "second if statement start"
+	PUSH a
+	PUSH 100
+	EQ
+	JF Label_2
+	PUSH 100
+	POP a
+	JMP EndLabel_2
+Label_2:
+	PUSH a
+	PUSH 12
+	EQ
+	JF Label_3
+	PUSH a
+	PUSH 14
+	EQ
+	JF Label_4
+	PUSH 14
+	POP a
+	JMP EndLabel_3
+Label_4:
+	PUSH 13
+	POP a
+EndLabel_3:
+	JMP EndLabel_2
+Label_3:
+	PUSH a
+	PUSH 13
+	EQ
+	JF Label_5
+	PUSH a
+	PUSH 15
+	EQ
+	JF Label_6
+	PUSH 15
+	POP a
+	JMP EndLabel_4
+Label_6:
+	PUSH a
+	PUSH 11
+	EQ
+	JF Label_7
+	PUSH 11
+	POP a
+	JMP EndLabel_4
+Label_7:
+EndLabel_4:
+	JMP EndLabel_2
+Label_5:
+	PUSH 14
+	POP a
+EndLabel_2:
+	PUSH "Third if statement start"
+Value: "Third if statement start"
+	PUSH a
+	PUSH 11
+	EQ
+	JF Label_8
+	PUSH 11
+	POP a
+	JMP EndLabel_5
+Label_8:
+EndLabel_5:
+	PUSH 8
+	POP a
