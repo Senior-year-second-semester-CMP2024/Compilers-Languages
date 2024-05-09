@@ -1,19 +1,31 @@
-int a;
-print("while loops");
-a = 0;
-while (a < 20)
-{
-    print(a);
-    a = a + 1;
-}
-print(a);
+print("enums");
 
-while (a < 20)
+enum W
 {
-    if (a == 10)
-    {
-        print(a);
-    }
-    a = a + 1;
+    H,
+    R = 10,
+    G,
+    B = 50,
+    K
+};
+
+int W x = K;
+print(x);
+enum L
+{
+    M,
+    N
+};
+
+{
+    int W r = 1;
+    int W t = 10;
+    int W v = 3 + 5;
 }
-print(a);
+
+{
+    int C;
+    int C r = 1;
+    int C t = 10;
+    int C v = 3 + 5;
+}

@@ -1,0 +1,115 @@
+Lex(1) Data Type: int
+Lex(1) Identifier: a
+Lex(1) End Of Statement: ; 
+
+	POP a
+Lex(2) Command: print
+Lex(2) Punctuators: (
+Lex(2) String Value: "while loops"
+	PUSH "while loops"
+Lex(2) Punctuators: )
+Value: "while loops"
+Lex(2) End Of Statement: ; 
+
+Lex(3) Identifier: a
+Lex(3) Punctuators: =
+Lex(3) Integer Value: 0
+	PUSH 0
+Lex(3) End Of Statement: ; 
+
+	POP a
+Lex(4) Control Flow: while
+StartLabel_1:
+Lex(4) Punctuators: (
+Lex(4) Identifier: a
+Lex(4) Comparison Operator: <
+	PUSH a
+Lex(4) Integer Value: 20
+	PUSH 20
+Lex(4) Punctuators: )
+	LT
+	JF Label_1
+Lex(5) Punctuators: {
+Lex(6) Command: print
+Lex(6) Punctuators: (
+Lex(6) Identifier: a
+Lex(6) Punctuators: )
+Value: 0
+Lex(6) End Of Statement: ; 
+
+Lex(7) Identifier: a
+Lex(7) Punctuators: =
+Lex(7) Identifier: a
+Lex(7) Arithmetic Operator: +
+	PUSH a
+Lex(7) Integer Value: 1
+	PUSH 1
+Lex(7) End Of Statement: ; 
+
+	Addition
+	POP a
+Lex(8) Punctuators: }
+	JMP StartLabel_1
+Label_1:
+Lex(9) Command: print
+Lex(9) Punctuators: (
+Lex(9) Identifier: a
+Lex(9) Punctuators: )
+Value: 1
+Lex(9) End Of Statement: ; 
+
+Lex(10) Control Flow: while
+StartLabel_2:
+Lex(10) Punctuators: (
+Lex(10) Identifier: a
+Lex(10) Comparison Operator: <
+	PUSH a
+Lex(10) Integer Value: 20
+	PUSH 20
+Lex(10) Punctuators: )
+	LT
+	JF Label_2
+Lex(11) Punctuators: {
+Lex(12) Control Flow: if
+Lex(12) Punctuators: (
+Lex(12) Identifier: a
+Lex(12) Comparison Operator: ==
+	PUSH a
+Lex(12) Integer Value: 10
+	PUSH 10
+Lex(12) Punctuators: )
+	EQ
+	JF Label_3
+Lex(13) Punctuators: {
+Lex(14) Command: print
+Lex(14) Punctuators: (
+Lex(14) Identifier: a
+Lex(14) Punctuators: )
+Value: 1
+Lex(14) End Of Statement: ; 
+
+Lex(15) Punctuators: }
+	JMP EndLabel_1
+Label_3:
+Lex(16) Identifier: a
+EndLabel_1:
+Lex(16) Punctuators: =
+Lex(16) Identifier: a
+Lex(16) Arithmetic Operator: +
+	PUSH a
+Lex(16) Integer Value: 1
+	PUSH 1
+Lex(16) End Of Statement: ; 
+
+	Addition
+	POP a
+Lex(17) Punctuators: }
+	JMP StartLabel_2
+Label_2:
+Lex(18) Command: print
+Lex(18) Punctuators: (
+Lex(18) Identifier: a
+Lex(18) Punctuators: )
+Value: 2
+Lex(18) End Of Statement: ; 
+

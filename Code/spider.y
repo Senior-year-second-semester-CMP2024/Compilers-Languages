@@ -233,10 +233,12 @@
 // -----Operators-----
 %right '=' 
 %left AND OR
-%left  '|' '^' '&' 
-%left EQUAL NOT_EQUAL 
-%left GREATER_THAN GREATER_THAN_OR_EQUAL LESS_THAN LESS_THAN_OR_EQUAL 
-%left SHIFT_LEFT SHIFT_RIGHT
+%left  '|'
+%left '^'
+%left '&' 
+%left EQ NEQ 
+%left GT GEQ LT LEQ
+%left SHIFT_RIGHT SHIFT_LEFT
 %left '+' '-'
 %right NOT
 %left '*' '/' '%'
@@ -257,7 +259,7 @@
 // ----- Return Types (NON TERMINALS) -----
 %type <VOID_TYPE> program statement_list control_statement statement
 %type <VOID_TYPE> if_condition while_loop for_loop repeat_until_loop switch_Case case_list case
-%type <VOID_TYPE> function_arguments function_parameters
+%type <VOID_TYPE> code_block function_arguments function_parameters
 
 %type <DATA_MODIFIER> data_modifier
 %type <NODE_TYPE> literal expression assignment data_type declaration function_call
@@ -272,11 +274,14 @@ program : statement_list                            {;}
         ;
 /* ----------------------------DONE---------------------------------*/
 statement_list  : statement ';'                          {;}
-                | '{' {enter_scope();} statement_list '}' {exit_scope();}
+                | '{' {enter_scope();} code_block '}' {exit_scope();}
                 | control_statement                      {;}
-                | statement_list '{' {enter_scope();} statement_list '}' {exit_scope();}  {;}        
+                | statement_list '{' {enter_scope();} code_block '}' {exit_scope();}  {;}        
                 | statement_list statement ';'           {;} 
                 | statement_list control_statement       {;}
+                ;
+
+code_block      : statement_list                         {;}
                 ;
 /* -----------------------------DONE--------------------------------*/
 control_statement   :  {print_push_end_label(++end_label_number);} if_condition {print_pop_end_label();}
@@ -302,7 +307,7 @@ declaration : data_modifier data_type IDENTIFIER    {check_same_scope_redeclarat
             | data_type IDENTIFIER                  { check_same_scope_redeclaration($2);} '=' expression {check_type($1, $5); add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); modify_symbol_value($2,$5); set_variable_initialized_in_symbol_table($2); print_pop_identifier($2);}
             ;
 /* --------------------------DONE-----------------------------------*/
-data_modifier : CONSTANT
+data_modifier : CONSTANT        {;}
               ;
 /* ---------------------------DONE----------------------------------*/
 assignment : IDENTIFIER '=' expression              {check_out_of_scope_declaration($1); check_reassignment_constant_variable($1); check_type_2($1,$3); mark_variable_used_in_symbol_table($1); modify_symbol_value($1, $3); $$ = $3; set_variable_initialized_in_symbol_table($1); print_pop_identifier($1);}
@@ -331,12 +336,12 @@ expression : function_call                                      {$$->isConstant=
            | expression SHIFT_LEFT expression                   {print_instruction("Shift Left"); $$ = perform_bitwise_operation($1, $3, '<'); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
            | expression SHIFT_RIGHT expression                  {print_instruction("Shift Right"); $$ = perform_bitwise_operation($1, $3, '>'); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
 
-           | expression LESS_THAN expression                    {print_instruction("Less Than"); $$ = perform_comparison($1, $3, "<"); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
-           | expression GREATER_THAN expression                 {print_instruction("Greater Than"); $$ = perform_comparison($1, $3, ">"); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
-           | expression LESS_THAN_OR_EQUAL expression           {print_instruction("Less Than or Equal"); $$ = perform_comparison($1, $3, "<="); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
-           | expression GREATER_THAN_OR_EQUAL expression        {print_instruction("Greater Than or Equal"); $$ = perform_comparison($1, $3, ">="); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
-           | expression EQUAL expression                        {print_instruction("Equal"); $$ = perform_comparison($1, $3, "=="); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
-           | expression NOT_EQUAL expression                    {print_instruction("Not Equal"); $$ = perform_comparison($1, $3, "!="); $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression EQ expression                           {print_instruction("EQ");   $$ = perform_comparison($1, $3, "==");  $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression NEQ expression                          {print_instruction("NEQ");  $$ = perform_comparison($1, $3, "!=");  $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression GT expression                           {print_instruction("GT");   $$ = perform_comparison($1, $3, ">");   $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression GEQ expression                          {print_instruction("GEQ");  $$ = perform_comparison($1, $3, ">=");  $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression LT expression                           {print_instruction("LT");   $$ = perform_comparison($1, $3, "<");   $$->isConstant = (($1->isConstant) && ($3->isConstant));}
+           | expression LEQ expression                          {print_instruction("LEQ");  $$ = perform_comparison($1, $3, "<=");  $$->isConstant = (($1->isConstant) && ($3->isConstant));}
            
            | literal                                            {$$ = $1;}
            | '(' data_type ')' literal                          {print_instruction("Casting or Conversion"); $$ = perform_conversion($4, $2->type); $$->isConstant = $4->isConstant;}
@@ -344,13 +349,12 @@ expression : function_call                                      {$$->isConstant=
 /* -------------------------------------------------------------*/
 
 // ------------ Conditions ------------------
-if_condition             : IF '(' expression { check_constant_expression_if_statement($3); print_jump_false_label(++label_number); } ')' '{' {enter_scope();} statement_list '}' {print_jump_end_label(); print_pop_label(); exit_scope();} else_condition {;}
+if_condition             : IF '(' expression { check_constant_expression_if_statement($3); print_jump_false_label(++label_number); } ')' '{' {enter_scope();} code_block '}' {print_jump_end_label(); exit_scope(); print_pop_label();} else_condition {;}
                          ;
 
 else_condition           : {;}
                         | ELSE {;} if_condition {;}
-                        | ELSE {;} '{' {enter_scope();} statement_list '}' {exit_scope();} 
-                        | ELSE_IF '(' expression { check_constant_expression_if_statement($3); print_jump_false_label(++label_number); } ')' '{' {enter_scope();} statement_list '}' {print_jump_end_label(); print_pop_label(); exit_scope();} else_condition {;}
+                        | ELSE {;} '{' {enter_scope();} code_block '}' {exit_scope();} 
                         ;
 
 case                    : CASE expression {print_peak_last_identifier_stack(); print_jump_false_label(++label_number); } ':' statement_list {print_pop_label();}
@@ -365,13 +369,13 @@ switch_Case          : SWITCH '(' IDENTIFIER ')' {print_push_last_identifier_sta
                      ;
 
 // ------------ Loops ------------------
-while_loop               : WHILE '(' expression ')'  {print_jump_false_label(++label_number);} '{' {enter_scope();} statement_list '}' {print_jump_start_label(); print_pop_label(); exit_scope();} {;}
+while_loop               : WHILE '(' expression ')'  {print_jump_false_label(++label_number);} '{' {enter_scope();} code_block '}' {exit_scope(); print_jump_start_label(); print_pop_label();} {;}
                         ;
 
-for_loop                 : FOR '(' assignment ';' {print_push_start_label(++start_label_number);} expression ';' {print_jump_false_label(++label_number);} assignment ')' '{' {enter_scope();} statement_list '}' {print_jump_start_label(); print_pop_label(); print_pop_start_label(); exit_scope();}
+for_loop                 : FOR '(' assignment ';' {print_push_start_label(++start_label_number);} expression ';' {print_jump_false_label(++label_number);} assignment ')' '{' {enter_scope();} code_block '}' {print_jump_start_label(); print_pop_label(); exit_scope();}
                         ;
 
-repeat_until_loop         : REPEAT '{' {enter_scope();} statement_list '}' {exit_scope();} UNTIL '(' expression ')' {print_jump_false_label(++label_number); print_pop_label();}
+repeat_until_loop         : REPEAT '{' {enter_scope();} code_block '}' {exit_scope();} UNTIL '(' expression ')' {print_jump_false_label(++label_number); print_jump_start_label(); print_pop_label();}
                         ;
 
 // ------------ Data Types DONE------------------
@@ -1457,7 +1461,7 @@ void print_push_start_label(int start_label_number)
     if (show_quadruples) {
         /* Push the start label number to the stack */
         start_label_stack[++start_label_stack_ptr] = start_label_number;
-        printf("Label_%d:\n", start_label_number);
+        printf("StartLabel_%d:\n", start_label_number);
     }
 }
 
@@ -1466,7 +1470,7 @@ void print_jump_start_label()
     if (show_quadruples) {
         /* Get the last start label number from the stack */
         int start_label_number = start_label_stack[start_label_stack_ptr];
-        printf("\tJMP Label_%d\n", start_label_number);
+        printf("\tJMP StartLabel_%d\n", start_label_number);
     }
 }
 

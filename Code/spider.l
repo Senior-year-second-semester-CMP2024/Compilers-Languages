@@ -15,7 +15,7 @@ int yylex();
 
 int nword=0;
 extern int nline=1;
-#define SHOW_LOGS 1
+#define SHOW_LOGS 0
 void Log(const char* type, const char* value)
 {
     if(SHOW_LOGS)
@@ -69,12 +69,12 @@ void Log(const char* type, const char* value)
 "<<"				{ Log("BitWise Operator", yytext); return SHIFT_LEFT; }
 ">>"				{ Log("BitWise Operator", yytext); return SHIFT_RIGHT; }
 
-"<"				    { Log("Comparison Operator", yytext); return LESS_THAN; }
-">"				    { Log("Comparison Operator", yytext); return GREATER_THAN; }
-"<="				{ Log("Comparison Operator", yytext); return LESS_THAN_OR_EQUAL; }
-">="				{ Log("Comparison Operator", yytext); return GREATER_THAN_OR_EQUAL; }
-"=="				{ Log("Comparison Operator", yytext); return EQUAL; }
-"!="				{ Log("Comparison Operator", yytext); return NOT_EQUAL; }
+"<"				    { Log("Comparison Operator", yytext); return LT; }
+">"				    { Log("Comparison Operator", yytext); return GT; }
+"<="				{ Log("Comparison Operator", yytext); return LEQ; }
+">="				{ Log("Comparison Operator", yytext); return GEQ; }
+"=="				{ Log("Comparison Operator", yytext); return EQ; }
+"!="				{ Log("Comparison Operator", yytext); return NEQ; }
 
 "&&"				{ Log("Logical Operator", yytext); return AND; }
 "||"				{ Log("Logical Operator", yytext); return OR; }

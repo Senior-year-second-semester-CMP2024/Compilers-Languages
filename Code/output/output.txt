@@ -1,115 +1,58 @@
-Lex(1) Data Type: int
-Lex(1) Identifier: a
-Lex(1) End Of Statement: ; 
-
-	POP a
-Lex(2) Command: print
-Lex(2) Punctuators: (
-Lex(2) String Value: "while loops"
-	PUSH "while loops"
-Lex(2) Punctuators: )
-Value: "while loops"
-Lex(2) End Of Statement: ; 
-
-Lex(3) Identifier: a
-Lex(3) Punctuators: =
-Lex(3) Integer Value: 0
-	PUSH 0
-Lex(3) End Of Statement: ; 
-
-	POP a
-Lex(4) Control Flow: while
-Label_1:
-Lex(4) Punctuators: (
-Lex(4) Identifier: a
-Lex(4) Comparison Operator: <
-	PUSH a
-Lex(4) Integer Value: 20
-	PUSH 20
-Lex(4) Punctuators: )
-	Less Than
-	JF Label_1
-Lex(5) Punctuators: {
-Lex(6) Command: print
-Lex(6) Punctuators: (
-Lex(6) Identifier: a
-Lex(6) Punctuators: )
-Value: 0
-Lex(6) End Of Statement: ; 
-
-Lex(7) Identifier: a
-Lex(7) Punctuators: =
-Lex(7) Identifier: a
-Lex(7) Arithmetic Operator: +
-	PUSH a
-Lex(7) Integer Value: 1
+	PUSH "enums"
+Value: "enums"
+	ENUM W
 	PUSH 1
-Lex(7) End Of Statement: ; 
-
-	Addition
-	POP a
-Lex(8) Punctuators: }
-	JMP Label_1
-Label_1:
-Lex(9) Command: print
-Lex(9) Punctuators: (
-Lex(9) Identifier: a
-Lex(9) Punctuators: )
-Value: 1
-Lex(9) End Of Statement: ; 
-
-Lex(11) Control Flow: while
-Label_2:
-Lex(11) Punctuators: (
-Lex(11) Identifier: a
-Lex(11) Comparison Operator: <
-	PUSH a
-Lex(11) Integer Value: 20
-	PUSH 20
-Lex(11) Punctuators: )
-	Less Than
-	JF Label_2
-Lex(12) Punctuators: {
-Lex(13) Control Flow: if
-Lex(13) Punctuators: (
-Lex(13) Identifier: a
-Lex(13) Comparison Operator: ==
-	PUSH a
-Lex(13) Integer Value: 10
+	POP H
 	PUSH 10
-Lex(13) Punctuators: )
-	Equal
-	JF Label_3
-Lex(14) Punctuators: {
-Lex(15) Command: print
-Lex(15) Punctuators: (
-Lex(15) Identifier: a
-Lex(15) Punctuators: )
-Value: 1
-Lex(15) End Of Statement: ; 
-
-Lex(16) Punctuators: }
-	JMP EndLabel_1
-Label_3:
-Lex(17) Identifier: a
-EndLabel_1:
-Lex(17) Punctuators: =
-Lex(17) Identifier: a
-Lex(17) Arithmetic Operator: +
-	PUSH a
-Lex(17) Integer Value: 1
+	POP R
+	PUSH 2
+	POP G
+	PUSH 50
+	POP B
+	PUSH 3
+	POP K
+	ENDENUM W
+	PUSH K
+	POP x
+Value: 51
+	ENUM L
 	PUSH 1
-Lex(17) End Of Statement: ; 
-
+	POP M
+	PUSH 2
+	POP N
+	ENDENUM L
+	PUSH 1
+	POP r
+	PUSH 10
+	POP t
+	PUSH 3
+	PUSH 5
 	Addition
-	POP a
-Lex(18) Punctuators: }
-	JMP Label_2
-Label_2:
-Lex(19) Command: print
-Lex(19) Punctuators: (
-Lex(19) Identifier: a
-Lex(19) Punctuators: )
-Value: 2
-Lex(19) End Of Statement: ; 
-
+	POP v
+	POP C
+	PUSH 1
+Semantic error (28): Type mismatch error
+	POP r
+	PUSH 10
+Semantic error (29): Type mismatch error
+	POP t
+	PUSH 3
+	PUSH 5
+	Addition
+Semantic error (30): Type mismatch error
+	POP v
+Semantic error (31): Unused variable 'W'
+Semantic error (31): Unused variable 'H'
+Semantic error (31): Unused variable 'R'
+Semantic error (31): Unused variable 'G'
+Semantic error (31): Unused variable 'B'
+Semantic error (31): Unused variable 'L'
+Semantic error (31): Unused variable 'M'
+Semantic error (31): Unused variable 'N'
+Semantic error (31): Unused variable 'r'
+Semantic error (31): Unused variable 't'
+Semantic error (31): Unused variable 'v'
+Semantic error (31): Unused variable 'C'
+Semantic error (31): Unused variable 'r'
+Semantic error (31): Unused variable 't'
+Semantic error (31): Unused variable 'v'

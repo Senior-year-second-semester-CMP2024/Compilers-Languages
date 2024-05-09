@@ -1,2 +1,16 @@
 Symbol Table:
-Name:a, Type:int, Value:2, Declared:1, Initialized:1, Used:1, Constant:0, Scope:0
+Name:H, Type:int, Value:0, Declared:1, Initialized:1, Used:0, Constant:1, Scope:0
+Name:R, Type:int, Value:10, Declared:1, Initialized:1, Used:0, Constant:1, Scope:0
+Name:G, Type:int, Value:11, Declared:1, Initialized:1, Used:0, Constant:1, Scope:0
+Name:B, Type:int, Value:50, Declared:1, Initialized:1, Used:0, Constant:1, Scope:0
+Name:K, Type:int, Value:51, Declared:1, Initialized:1, Used:1, Constant:1, Scope:0
+Name:x, Type:int, Value:51, Declared:1, Initialized:1, Used:1, Constant:0, Scope:0
+Name:M, Type:int, Value:0, Declared:1, Initialized:1, Used:0, Constant:1, Scope:0
+Name:N, Type:int, Value:1, Declared:1, Initialized:1, Used:0, Constant:1, Scope:0
+Name:r, Type:int, Value:1, Declared:1, Initialized:1, Used:0, Constant:0, Scope:1
+Name:t, Type:int, Value:10, Declared:1, Initialized:1, Used:0, Constant:0, Scope:1
+Name:v, Type:int, Value:8, Declared:1, Initialized:1, Used:0, Constant:0, Scope:1
+Name:C, Type:int, Value:0, Declared:1, Initialized:0, Used:0, Constant:0, Scope:2
+Name:r, Type:int, Value:1, Declared:1, Initialized:1, Used:0, Constant:0, Scope:2
+Name:t, Type:int, Value:10, Declared:1, Initialized:1, Used:0, Constant:0, Scope:2
+Name:v, Type:int, Value:8, Declared:1, Initialized:1, Used:0, Constant:0, Scope:2
