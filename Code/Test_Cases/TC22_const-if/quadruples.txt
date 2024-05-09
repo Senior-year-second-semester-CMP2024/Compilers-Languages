@@ -1,0 +1,112 @@
+	PUSH 0
+Semantic warning (1): If statement is always False
+	JF Label_1
+	POP a
+	JMP EndLabel_1
+Label_1:
+EndLabel_1:
+	PUSH 5
+	PUSH 3
+	LT
+Semantic warning (3): If statement is always False
+	JF Label_2
+	POP a
+	JMP EndLabel_2
+Label_2:
+EndLabel_2:
+	PUSH 10
+	POP x
+	PUSH x
+	PUSH 3
+	LT
+Semantic warning (6): If statement is always False
+	JF Label_3
+	POP a
+	JMP EndLabel_3
+Label_3:
+EndLabel_3:
+	PUSH 10
+	POP g
+	PUSH g
+	PUSH 10
+	GT
+Semantic warning (10): If statement is always False
+	JF Label_4
+	POP a
+	JMP EndLabel_4
+Label_4:
+EndLabel_4:
+	PUSH "hi"
+Semantic warning (12): If statement is always True
+	JF Label_5
+	POP a
+	JMP EndLabel_5
+Label_5:
+	PUSH 1
+	PUSH 4
+	GT
+Semantic warning (14): If statement is always False
+	JF Label_6
+	POP a
+	JMP EndLabel_5
+Label_6:
+EndLabel_5:
+	PUSH 0
+Semantic warning (16): If statement is always False
+	JF Label_7
+	POP a
+	JMP EndLabel_6
+Label_7:
+	PUSH 1.100000
+Semantic warning (18): If statement is always True
+	JF Label_8
+	POP a
+	JMP EndLabel_6
+Label_8:
+	PUSH 100
+Semantic warning (20): If statement is always True
+	JF Label_9
+	POP a
+	JMP EndLabel_6
+Label_9:
+EndLabel_6:
+	PUSH 1
+	PUSH 2
+	Logical AND
+Semantic error (22): Type mismatch error
+Semantic warning (22): If statement is always True
+	JF Label_10
+	POP a
+	JMP EndLabel_7
+Label_10:
+	PUSH 1
+	PUSH 0
+	Logical OR
+Semantic error (24): Type mismatch error
+Semantic warning (24): If statement is always True
+	JF Label_11
+	POP a
+	JMP EndLabel_7
+Label_11:
+EndLabel_7:
+	PUSH 10
+	POP a
+	PUSH a
+Semantic error (27): Uninitialized variable 'a'
+	JF Label_12
+	POP a
+	JMP EndLabel_8
+Label_12:
+EndLabel_8:
+Semantic error (28): Unused variable 'a'
+Semantic error (28): Unused variable 'a'
+Semantic error (28): Unused variable 'a'
+Semantic error (28): Unused variable 'a'
+Semantic error (28): Unused variable 'a'
+Semantic error (28): Unused variable 'a'
+Semantic error (28): Unused variable 'a'
+Semantic error (28): Unused variable 'a'
+Semantic error (28): Unused variable 'a'
+Semantic error (28): Unused variable 'a'
+Semantic error (28): Unused variable 'a'
+Semantic error (28): Unused variable 'a'

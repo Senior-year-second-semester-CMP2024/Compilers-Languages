@@ -1,4 +1,16 @@
-int b = 5
-int a;
-int c;
-c = a + b;
+print("functions");
+
+int x(int a, int b)
+{
+    print("add");
+    return 0;
+}
+x(1, 2);
+
+print("x");
+int y()
+{
+    print("y");
+    return 1;
+}
+print("y done");
