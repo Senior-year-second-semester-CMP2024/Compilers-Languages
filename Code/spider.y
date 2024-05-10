@@ -620,7 +620,7 @@ void write_symbol_table_to_file(){
     for( int i=0 ; i < symbol_table_index ; i++ ){
         
         if( strcmp(symbol_table[i].type, "int") == 0 ){
-            fprintf(filePointer, "Name:%c, Type:%s, Value:%d, Declared:%d, Initialized:%d, Used:%d, Constant:%d, Scope:%d\n", 
+            fprintf(filePointer, "Name:%c,Type:%s,Value:%d,Declared:%d,Initialized:%d,Used:%d,Constant:%d,Scope:%d\n", 
                         symbol_table[i].name, symbol_table[i].type, symbol_table[i].value_symbol.integer_value_symbol, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
         }
         
@@ -1293,7 +1293,7 @@ Prints the start of a function with its name if the show_quadruples flag is enab
 void print_function_start(char function_name)
 {
     if (show_quadruples) {
-        printf("\tPROC %s\n", function_name); 
+        printf("Quads(%d)\tPROC %s\n", nline, function_name); 
     }
 }
 
@@ -1304,7 +1304,7 @@ Prints the end of a function along with its name if the show_quadruples flag is 
 void print_function_end(char function_name)
 {
     if (show_quadruples) {
-        printf("\tENDPROC %s\n", function_name); 
+        printf("Quads(%d)\tENDPROC %s\n", nline, function_name); 
     }
 }
 
@@ -1314,7 +1314,7 @@ Prints the call of a function with its name if the show_quadruples flag is enabl
 void print_function_call(char function_name)
 {
     if (show_quadruples) {
-        printf("\tCALL %s\n", function_name);
+        printf("Quads(%d)\tCALL %s\n", nline, function_name);
     }
 }
 
@@ -1324,7 +1324,7 @@ Prints the return from a function if the show_quadruples flag is enabled.
 void print_function_return()
 {
     if (show_quadruples) {
-        printf("\tRET\n");
+        printf("Quads(%d)\tRET\n");
     }
 }
 
@@ -1334,42 +1334,42 @@ Prints a quadruple instruction if the show_quadruples flag is enabled.
 void print_instruction(const char* instruction)
 {
     if (show_quadruples) {
-        printf("\t%s\n", instruction);
+        printf("Quads(%d)\t%s\n", nline, instruction);
     }
 }
 
 void print_push_integer(int value)
 {
     if (show_quadruples) {
-        printf("\tPUSH %d\n", value);
+        printf("Quads(%d)\tPUSH %d\n", nline, value);
     }
 }
 
 void print_push_float(float value)
 {
     if (show_quadruples) {
-        printf("\tPUSH %f\n", value);
+        printf("Quads(%d)\tPUSH %f\n", nline, value);
     }
 }
 
 void print_push_identifier(char symbol)
 {
     if (show_quadruples) {
-        printf("\tPUSH %c\n", symbol);
+        printf("Quads(%d)\tPUSH %c\n", nline, symbol);
     }
 }
 
 void print_push_string(char* str)
 {
     if (show_quadruples) {
-        printf("\tPUSH %s\n", str);
+        printf("Quads(%d)\tPUSH %s\n", nline, str);
     }
 }
 
 void print_pop_identifier(char symbol)
 {
     if (show_quadruples) {
-        printf("\tPOP %c\n", symbol);
+        printf("Quads(%d)\tPOP %c\n", nline, symbol);
     }
 }
 
@@ -1386,7 +1386,7 @@ void print_jump_end_label()
     if (show_quadruples) {
         /* Get the last end label number from the stack */
         int end_label_number = end_label_stack[end_label_stack_ptr];
-        printf("\tJMP EndLabel_%d\n", end_label_number);
+        printf("Quads(%d)\tJMP EndLabel_%d\n", nline, end_label_number);
     }
 }
 
@@ -1399,14 +1399,14 @@ void print_pop_end_label()
     /* Get the last end label number from the stack */
     int end_label_number = end_label_stack[end_label_stack_ptr--];
     if (show_quadruples) {
-        printf("EndLabel_%d:\n", end_label_number);
+        printf("Quads(%d) EndLabel_%d:\n", nline, end_label_number);
     }
 }
 
 void print_jump_false_label(int label_number)
 {
     if (show_quadruples) {
-        printf("\tJF Label_%d\n", label_number);
+        printf("Quads(%d)\tJF Label_%d\n", nline, label_number);
         /* Push the label number to the stack */
         label_stack[label_stack_ptr++] = label_number;
     }
@@ -1421,7 +1421,7 @@ void print_pop_label()
     /* Get the last label number from the stack */
     int label_number = label_stack[--label_stack_ptr];
     if (show_quadruples) {
-        printf("Label_%d:\n", label_number);
+        printf("Quads(%d) Label_%d:\n", nline, label_number);
     }
 }
 
@@ -1442,7 +1442,7 @@ void print_peak_last_identifier_stack()
     /* Get the last identifier from the stack */
     char identifier = last_identifier_stack[last_identifier_stack_ptr];
     if (show_quadruples) {
-        printf("\tPUSH %c\n", identifier);
+        printf("Quads(%d)\tPUSH %c\n", nline, identifier);
     }
 }
 
@@ -1461,7 +1461,7 @@ void print_push_start_label(int start_label_number)
     if (show_quadruples) {
         /* Push the start label number to the stack */
         start_label_stack[++start_label_stack_ptr] = start_label_number;
-        printf("StartLabel_%d:\n", start_label_number);
+        printf("Quads(%d) StartLabel_%d:\n", nline, start_label_number);
     }
 }
 
@@ -1470,7 +1470,7 @@ void print_jump_start_label()
     if (show_quadruples) {
         /* Get the last start label number from the stack */
         int start_label_number = start_label_stack[start_label_stack_ptr];
-        printf("\tJMP StartLabel_%d\n", start_label_number);
+        printf("Quads(%d)\tJMP StartLabel_%d\n", nline, start_label_number);
     }
 }
 
@@ -1487,14 +1487,14 @@ void print_pop_start_label()
 void print_start_enum(char enum_name)
 {
     if (show_quadruples) {
-        printf("\tENUM %c\n", enum_name);
+        printf("Quads(%d)\tENUM %c\n", nline, enum_name);
     }
 }
 
 void print_end_enum(char enum_name)
 {
     if (show_quadruples) {
-        printf("\tENDENUM %c\n", enum_name);
+        printf("Quads(%d)\tENDENUM %c\n", nline, enum_name);
     }
 }
 

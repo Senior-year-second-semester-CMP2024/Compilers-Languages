@@ -1,5 +1,0 @@
-int x(int a) {
-    print("add");
-    return a;
-}
-x(1); // function call

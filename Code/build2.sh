@@ -18,10 +18,10 @@ flex spider.l
 mv spider.tab.c spider.tab.h lex.yy.c output/
 
 # Compile the generated C files
-gcc -g output/lex.yy.c output/spider.tab.c -o output/program -w
+gcc -g output/lex.yy.c output/spider.tab.c -o program -w
 
 # Execute the compiled program and redirect output to output.txt
-./output/program.exe < operations_TC2.txt > output/output.txt
+./program.exe < operations_TC2.txt > output/output.txt
 
 # Remove the input.txt file
 # rm input.txt
