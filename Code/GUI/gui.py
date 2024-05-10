@@ -21,7 +21,7 @@ semantic_warning_line_pattern = r'Semantic warning \((\d+)\).+'
 
 # Application customizations
 TITLE_STYLE_SHEET = "font-size: 20px; font-weight: bold; color: #3366CC;"
-TEXT_EDITOR_FONT_SIZE = 16
+TEXT_EDITOR_FONT_SIZE = 15
 TEXT_EDITOR_WIDTH = 800
 TEXT_EDITOR_HEIGHT = 550
 CODE_FONT_FAMILY = "Courier New"
@@ -61,7 +61,7 @@ class MainWindow(QWidget):
         self.showMaximized()
 
         # Change the title of the window
-        self.setWindowTitle("C+- Compiler")
+        self.setWindowTitle("Spider Compiler")
 
         # Change the background color of the window
         # self.setStyleSheet("background-color: #FFFFFF;")
