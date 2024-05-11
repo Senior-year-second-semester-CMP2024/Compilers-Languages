@@ -1,83 +1,18 @@
-Lex(1) Data Type: bool
-Lex(1) Identifier: x
-Lex(1) Punctuators: =
-Lex(1) value: false
-Quads(1)	PUSH 0
-Lex(1) End Of Statement: ; 
-
-Quads(1)	POP x
-Lex(2) Data Type: int
-Lex(2) Identifier: i
-Lex(2) Punctuators: =
-Lex(2) Integer Value: 0
-Quads(2)	PUSH 0
-Lex(2) End Of Statement: ; 
-
-Quads(2)	POP i
-Lex(3) Control Flow: while
-Quads(3) StartLabel_1:
-Lex(3) Punctuators: (
-Lex(3) Identifier: i
-Lex(3) Comparison Operator: <
-Quads(3)	PUSH i
-Lex(3) Integer Value: 10
-Quads(3)	PUSH 10
-Lex(3) Punctuators: )
-Quads(3)	LT
-Quads(3)	JF Label_1
-Lex(4) Punctuators: {
-Lex(5) Control Flow: if
-Lex(5) Punctuators: (
-Lex(5) Identifier: i
-Lex(5) Comparison Operator: ==
-Quads(5)	PUSH i
-Lex(5) Integer Value: 2
-Quads(5)	PUSH 2
-Lex(5) Punctuators: )
-Quads(5)	EQ
-Quads(5)	JF Label_2
-Lex(5) Punctuators: {
-Lex(6) Identifier: x
-Lex(6) Punctuators: =
-Lex(6) Value: true
-Quads(6)	PUSH 1
-Lex(6) End Of Statement: ; 
-
-Quads(6)	POP x
-Lex(7) Punctuators: }
-Quads(7)	JMP EndLabel_1
-Quads(7) Label_2:
-Lex(8) Identifier: i
-Quads(8) EndLabel_1:
-Lex(8) Punctuators: =
-Lex(8) Identifier: i
-Lex(8) Arithmetic Operator: +
-Quads(8)	PUSH i
-Lex(8) Integer Value: 1
-Quads(8)	PUSH 1
-Lex(8) End Of Statement: ; 
-
-Quads(8)	Addition
-Quads(8)	POP i
-Lex(9) Punctuators: }
-Quads(9)	JMP StartLabel_1
-Quads(9) Label_1:
-Lex(11) Control Flow: if
-Lex(11) Punctuators: (
-Lex(11) Identifier: x
-Lex(11) Punctuators: )
-Quads(11)	PUSH x
-Quads(11)	JF Label_3
-Lex(12) Punctuators: {
-Lex(13) Command: print
-Lex(13) Punctuators: (
-Lex(13) String Value: "mark"
-Quads(13)	PUSH "mark"
-Lex(13) Punctuators: )
-Value: "mark"
-Lex(13) End Of Statement: ; 
-
-Lex(14) Punctuators: }
-Quads(14)	JMP EndLabel_2
-Quads(14) Label_3:
-Quads(15) EndLabel_2:
+Quads(1)	POP a
+Quads(2)	PUSH "while loops"
+Value: "while loops"
+Quads(3)	PUSH 0
+Quads(3)	POP a
+Quads(4) StartLabel_1:
+Quads(4)	PUSH a
+Quads(4)	PUSH 20
+Quads(4)	LT
+Quads(4)	JF Label_1
+Value: 0
+Quads(7)	PUSH a
+Quads(7)	PUSH 1
+Quads(7)	Addition
+Quads(7)	POP a
+Quads(8)	JMP StartLabel_1
+Quads(8) Label_1:
+Value: 1

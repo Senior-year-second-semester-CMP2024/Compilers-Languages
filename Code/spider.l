@@ -1,21 +1,20 @@
 %{
-
+/* ----------------------------------- HEADER FILES ----------------------------------- */
 #include "spider.tab.h"
 #include <stdio.h>
-#include <string.h> // For strdup
+#include <string.h> 
 #include <stdarg.h>
-#include <stdlib.h> // For atoi, atof
-// called by the parser in case of a syntax error. 
-void yyerror (char *s);
+#include <stdlib.h> 
 
-// called by the parser whenever it needs a token. 
-// This is where the lexical analyzer is called. 
+/* ----------------------------------- DEFINES ----------------------------------- */
+void yyerror (char *s);
 int yylex();
 
-
-int nword=0;
+/* ----------------------------------- GLOBAL VARIABLES ----------------------------------- */
+#define SHOW_LOGS 0
 extern int nline=1;
-#define SHOW_LOGS 1
+
+/* ----------------------------------- Tokens Log ----------------------------------- */
 void Log(const char* type, const char* value)
 {
     if(SHOW_LOGS)
@@ -39,8 +38,10 @@ void Log(const char* type, const char* value)
 
 
 %%
-"print"				{ Log("Command", yytext); return PRINT; }            /* yytext => matched string */ 
+
+"print"				{ Log("Command", yytext); return PRINT; }             
 "const"				{ Log("Data Modifier", yytext); return CONSTANT; }
+"exit"				{ Log("Exit Code", yytext); return EXIT;}
 
 "bool"				{ Log("Data Type", yytext); return BOOL_DATA_TYPE; }
 "string"			{ Log("Data Type", yytext); return STRING_DATA_TYPE; }
@@ -50,7 +51,6 @@ void Log(const char* type, const char* value)
 
 "if"				{ Log("Control Flow", yytext); return IF; }
 "else"				{ Log("Control Flow", yytext); return ELSE; }
-"elif"				{ Log("Control Flow", yytext); return ELSE_IF; }
 
 "for"				{ Log("Control Flow", yytext); return FOR; }
 "while"				{ Log("Control Flow", yytext); return WHILE; }
