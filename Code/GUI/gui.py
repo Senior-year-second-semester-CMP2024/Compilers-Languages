@@ -21,7 +21,7 @@ semantic_warning_line_pattern = r'Semantic warning \((\d+)\).+'
 
 # Application customizations
 TITLE_STYLE_SHEET = "font-size: 20px; font-weight: bold; color: #3366CC;"
-TEXT_EDITOR_FONT_SIZE = 15
+TEXT_EDITOR_FONT_SIZE = 13
 TEXT_EDITOR_WIDTH = 800
 TEXT_EDITOR_HEIGHT = 550
 CODE_FONT_FAMILY = "Courier New"
@@ -119,7 +119,7 @@ class MainWindow(QWidget):
         self.code_text_editor.setFixedWidth(TEXT_EDITOR_WIDTH)
         self.code_text_editor.setFixedHeight(TEXT_EDITOR_HEIGHT)
 
-        self.line_widget = LineNumberWidget(self.code_text_editor, number_color=LINE_NUMBER_COLOR, font_size=TEXT_EDITOR_FONT_SIZE-2)
+        self.line_widget = LineNumberWidget(self.code_text_editor, number_color=LINE_NUMBER_COLOR, font_size=TEXT_EDITOR_FONT_SIZE)
         self.line_widget.setFixedHeight(TEXT_EDITOR_HEIGHT)
         self.code_text_editor.textChanged.connect(self.line_widget_line_count_changed)
 

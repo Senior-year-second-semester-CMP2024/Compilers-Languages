@@ -1,18 +1,34 @@
-Quads(1)	POP a
-Quads(2)	PUSH "while loops"
+Quads(1)	PROC m
+Quads(2)	POP a
+Quads(3)	PUSH "while loops"
 Value: "while loops"
-Quads(3)	PUSH 0
-Quads(3)	POP a
-Quads(4) StartLabel_1:
-Quads(4)	PUSH a
-Quads(4)	PUSH 20
-Quads(4)	LT
-Quads(4)	JF Label_1
+Quads(4)	PUSH 0
+Quads(4)	POP a
+Quads(5) StartLabel_1:
+Quads(5)	PUSH a
+Quads(5)	PUSH 20
+Quads(5)	LT
+Quads(5)	JF Label_1
 Value: 0
-Quads(7)	PUSH a
-Quads(7)	PUSH 1
-Quads(7)	Addition
-Quads(7)	POP a
-Quads(8)	JMP StartLabel_1
-Quads(8) Label_1:
+Quads(8)	PUSH a
+Quads(8)	PUSH 1
+Quads(8)	Addition
+Quads(8)	POP a
+Quads(9)	JMP StartLabel_1
+Quads(9) Label_1:
 Value: 1
+Quads(11)	PUSH 0
+Quads(11)	RET
+Quads(12)	ENDPROC m
+Quads(14)	PUSH 0
+Quads(14)	POP x
+Quads(15)	PUSH 2
+Quads(15)	POP x
+Quads(16)	POP t
+Quads(17)	CALL m
+Quads(17)	POP t
+Quads(19)	PUSH t
+Quads(19)	PUSH 1
+Quads(19)	Addition
+Quads(19)	POP t
+Semantic error (19): Unused variable 'm'

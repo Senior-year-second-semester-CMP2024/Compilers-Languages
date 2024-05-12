@@ -330,6 +330,7 @@ assignment : IDENTIFIER '=' expression              {   check_out_of_scope_decla
                                                         set_variable_initialized_in_symbol_table($1); 
                                                         print_pop_identifier($1);}
 
+
            | enum_definition                        {;} 
            | data_type enum_declaration             {;}
            ;
@@ -525,7 +526,7 @@ function_arguments : data_type IDENTIFIER       {   print_pop_identifier($2);}
                                                     add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); } ',' function_arguments
                    ;
 
-function_definition : data_type IDENTIFIER      {   print_function_start($2);} 
+function_definition : data_type IDENTIFIER      { print_function_start($2);   } 
                                                 {   check_same_scope_redeclaration($2); 
                                                     add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); 
                                                     counter_arguments = symbol_table_index;} 
@@ -541,7 +542,8 @@ function_definition_res : '(' function_arguments ')'
 function_call : IDENTIFIER                      {   counter_parameters = get_symbol_value($1)->value_node.integer_value_node; function_pointer = retrieve_symbol_index($1);} 
                                                 function_call_res 
                                                 {   check_out_of_scope_declaration($1); $$ = get_symbol_value($1); print_function_call($1); 
-                                                    if( counter_parameters != 0 ) {log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, $1); }}
+                                                    // if( counter_parameters != 0 ) {log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, $1); }
+                                                    }
               ;
 
 function_call_res       : '(' function_parameters ')'               {;}
@@ -687,7 +689,6 @@ struct NodeType* get_symbol_value(char symbol) {
     
     else if (strcmp(symbol_table[bucket].symbol_type, "string") == 0)
         ptr->value_node.string_value_node = symbol_table[bucket].value_symbol.string_value_symbol;
-    
     return ptr;
 }
 
@@ -1444,28 +1445,28 @@ void exit_scope() {
 void print_function_start(char function_name)
 {
     if (show_quadruples) {
-        printf("Quads(%d)\tPROC %s\n", nline, function_name); 
+        printf("Quads(%d)\tPROC %c\n", nline, function_name); 
     }
 }
 
 void print_function_end(char function_name)
 {
     if (show_quadruples) {
-        printf("Quads(%d)\tENDPROC %s\n", nline, function_name); 
+        printf("Quads(%d)\tENDPROC %c\n", nline, function_name); 
     }
 }
 
 void print_function_call(char function_name)
 {
     if (show_quadruples) {
-        printf("Quads(%d)\tCALL %s\n", nline, function_name);
+        printf("Quads(%d)\tCALL %c\n", nline, function_name);
     }
 }
 
 void print_function_return()
 {
     if (show_quadruples) {
-        printf("Quads(%d)\tRET\n");
+        printf("Quads(%d)\tRET\n",nline);
     }
 }
 
