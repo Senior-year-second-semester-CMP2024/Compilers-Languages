@@ -1,18 +1,24 @@
-int m(){
+int m(int y){
     int a;
-    print("while loops");
+    y = 1;
+    print("this is a function to test loops");
     a = 0;
     while (a < 20)
     {
         print(a);
-        a = a + 1;
+        a = a + 1 / y;
     }
+			
     print(a);
-    return 0;
+    return a;
 }
 
 int x = 0;
 x = 2;
 int t;
-t = m();
+t = m(x);
 t  = t + 1;
+if (t>10)
+{
+	t=0;
+}

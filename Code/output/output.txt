@@ -1,34 +1,49 @@
-Quads(1)	PROC m
-Quads(2)	POP a
-Quads(3)	PUSH "while loops"
-Value: "while loops"
-Quads(4)	PUSH 0
-Quads(4)	POP a
-Quads(5) StartLabel_1:
-Quads(5)	PUSH a
-Quads(5)	PUSH 20
-Quads(5)	LT
-Quads(5)	JF Label_1
+Quad(1)	PROC m
+Quad(1)	POP y
+Quad(2)	POP a
+Quad(3)	PUSH 1
+Quad(3)	POP y
+Quad(4)	PUSH "this is a function to test loops"
+Value: "this is a function to test loops"
+Quad(5)	PUSH 0
+Quad(5)	POP a
+Quad(6) StartLabel_1:
+Quad(6)	PUSH a
+Quad(6)	PUSH 20
+Quad(6)	LT
+Quad(6)	JF Label_1
 Value: 0
-Quads(8)	PUSH a
-Quads(8)	PUSH 1
-Quads(8)	Addition
-Quads(8)	POP a
-Quads(9)	JMP StartLabel_1
-Quads(9) Label_1:
+Quad(9)	PUSH a
+Quad(9)	PUSH 1
+Quad(9)	PUSH y
+Quad(9)	Division
+Quad(9)	Addition
+Quad(9)	POP a
+Quad(10)	JMP StartLabel_1
+Quad(10) Label_1:
 Value: 1
-Quads(11)	PUSH 0
-Quads(11)	RET
-Quads(12)	ENDPROC m
-Quads(14)	PUSH 0
-Quads(14)	POP x
-Quads(15)	PUSH 2
-Quads(15)	POP x
-Quads(16)	POP t
-Quads(17)	CALL m
-Quads(17)	POP t
-Quads(19)	PUSH t
-Quads(19)	PUSH 1
-Quads(19)	Addition
-Quads(19)	POP t
-Semantic error (19): Unused variable 'm'
+Quad(13)	PUSH a
+Quad(13)	RET
+Quad(14)	ENDPROC m
+Quad(16)	PUSH 0
+Quad(16)	POP x
+Quad(17)	PUSH 2
+Quad(17)	POP x
+Quad(18)	POP t
+Quad(19)	PUSH x
+Quad(19)	CALL m
+Quad(19)	POP t
+Quad(20)	PUSH t
+Quad(20)	PUSH 1
+Quad(20)	Addition
+Quad(20)	POP t
+Quad(21)	PUSH t
+Quad(21)	PUSH 10
+Quad(21)	GT
+Quad(21)	JF Label_2
+Quad(23)	PUSH 0
+Quad(23)	POP t
+Quad(24)	JMP EndLabel_1
+Quad(24) Label_2:
+Quad(24) EndLabel_1:
+Semantic error (24): Unused variable 'm'

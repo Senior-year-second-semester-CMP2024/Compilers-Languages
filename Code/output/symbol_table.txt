@@ -1,5 +1,6 @@
 Symbol Table:
 Name:m,Type:int,Value:1,Declared:1,Initialized:0,Used:0,Constant:0,Scope:0
+Name:y,Type:int,Value:1,Declared:1,Initialized:1,Used:1,Constant:0,Scope:1
 Name:a,Type:int,Value:1,Declared:1,Initialized:1,Used:1,Constant:0,Scope:1
 Name:x,Type:int,Value:2,Declared:1,Initialized:1,Used:1,Constant:0,Scope:0
-Name:t,Type:int,Value:2,Declared:1,Initialized:1,Used:1,Constant:0,Scope:0
+Name:t,Type:int,Value:0,Declared:1,Initialized:1,Used:1,Constant:0,Scope:0
