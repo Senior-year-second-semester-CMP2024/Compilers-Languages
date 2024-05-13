@@ -1,0 +1,26 @@
+int m(int y){
+    float a;
+    y = 1;
+    print("this is a function to test loops");
+    a = 0.0;
+    while (a < 20)
+    {
+        print(a);
+        a = a + 1 / y;
+    }
+			
+    print(a);
+    return a;
+}
+
+int x = 0;
+x = 2;
+int t;
+string s = "mark is here";
+t = m(x);
+bool f  = t > 1;
+if (f)
+{
+	t=0;
+  	print(s);
+}

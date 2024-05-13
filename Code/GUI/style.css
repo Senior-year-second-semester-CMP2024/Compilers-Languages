@@ -1,0 +1,94 @@
+/* styles.css */
+
+body {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+#code-section {
+  flex-basis: 48%;
+  margin-bottom: 20px;
+}
+#code-input {
+  width: calc(100% - 20px);
+  height: 290px;
+}
+#compile-button {
+  width: calc(100% - 30px);
+  padding: 10px;
+  margin-left: 30px;
+  margin-top: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.play-icon:before {
+  content: "\25B6"; /* Unicode character for play icon */
+  font-size: 1.2em;
+  margin-right: 5px;
+}
+.output-section {
+  flex-basis: 48%;
+  overflow-y: auto; /* Add scrollbar */
+}
+#console-output {
+  height: 200px; /* Fixed height */
+  width: 95%;
+  padding: 10px;
+  margin-left: 20px;
+  overflow-y: auto; /* Add scrollbar */
+}
+#quadruples-output {
+  height: 300px; /* Fixed height */
+  width: 96%;
+  padding: 10px;
+  overflow-y: auto; /* Add scrollbar */
+}
+#console-output {
+  background-color: black;
+  color: white;
+}
+#quadruples-output {
+  background-color: #f0f0f0;
+}
+#symbol-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+#symbol-table table th,
+#symbol-table table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+#symbol-table table th {
+  background-color: #f2f2f2;
+}
+/* CodeMirror styles */
+.CodeMirror {
+  background-color: #f0f0f0; /* Set background color to grey */
+  font-size: 16px;
+}
+.cm-keyword {
+  color: blue; /* Color for keywords */
+  font-weight: bold;
+}
+.cm-atom {
+  color: blue; /* Color for atoms, e.g., true, false */
+}
+.cm-variable {
+  color: navy; /* Color for variables */
+}
+.cm-number {
+  color: purple; /* Color for numbers */
+}
+.cm-string {
+  color: rgb(192, 41, 0); /* Color for strings */
+}
+.cm-comment {
+  color: green; /* Color for comments */
+}

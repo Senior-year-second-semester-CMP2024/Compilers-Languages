@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spider Compiler</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/mode/clike/clike.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Spider Compiler</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div id="code-section">
+      <h2>Source Code</h2>
+      <textarea id="code-input" placeholder="Enter your code here"></textarea>
+      <button id="compile-button" type="button">
+        <span class="play-icon"></span> Compile
+      </button>
+    </div>
+    <div class="output-section">
+      <h2>Quadruples Output</h2>
+      <div id="quadruples-output"></div>
+    </div>
+    <div class="output-section">
+      <h2>Console Output</h2>
+      <div id="console-output"></div>
+    </div>
+    <div class="output-section">
+      <h2>Symbol Table</h2>
+      <div id="symbol-table"></div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
