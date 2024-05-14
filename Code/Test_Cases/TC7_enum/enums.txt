@@ -1,0 +1,12 @@
+print("enums");
+
+enum E
+{
+    a,
+    b,
+    c,
+    d
+};
+
+int E x = c;
+print(x);

@@ -1,18 +1,80 @@
-Quads(1)	POP a
-Quads(2)	PUSH "while loops"
-Value: "while loops"
-Quads(3)	PUSH 0
-Quads(3)	POP a
-Quads(4) StartLabel_1:
+Quads(1)	PUSH "conditions"
+Value: "conditions"
+Quads(2)	PUSH 10
+Quads(2)	POP a
+Quads(3)	PUSH "First if statement start"
+Value: "First if statement start"
 Quads(4)	PUSH a
-Quads(4)	PUSH 20
-Quads(4)	LT
+Quads(4)	PUSH 11
+Quads(4)	EQ
 Quads(4)	JF Label_1
-Value: 0
-Quads(7)	PUSH a
-Quads(7)	PUSH 1
-Quads(7)	Addition
-Quads(7)	POP a
-Quads(8)	JMP StartLabel_1
-Quads(8) Label_1:
-Value: 1
+Quads(5)	PUSH 11
+Quads(5)	POP a
+Quads(6)	JMP EndLabel_1
+Quads(6) Label_1:
+Quads(7) EndLabel_1:
+Quads(7)	PUSH "second if statement start"
+Value: "second if statement start"
+Quads(8)	PUSH a
+Quads(8)	PUSH 100
+Quads(8)	EQ
+Quads(8)	JF Label_2
+Quads(9)	PUSH 100
+Quads(9)	POP a
+Quads(10)	JMP EndLabel_2
+Quads(10) Label_2:
+Quads(11)	PUSH a
+Quads(11)	PUSH 12
+Quads(11)	EQ
+Quads(11)	JF Label_3
+Quads(12)	PUSH a
+Quads(12)	PUSH 14
+Quads(12)	EQ
+Quads(12)	JF Label_4
+Quads(13)	PUSH 14
+Quads(13)	POP a
+Quads(14)	JMP EndLabel_3
+Quads(14) Label_4:
+Quads(16)	PUSH 13
+Quads(16)	POP a
+Quads(17) EndLabel_3:
+Quads(18)	JMP EndLabel_2
+Quads(18) Label_3:
+Quads(19)	PUSH a
+Quads(19)	PUSH 13
+Quads(19)	EQ
+Quads(19)	JF Label_5
+Quads(20)	PUSH a
+Quads(20)	PUSH 15
+Quads(20)	EQ
+Quads(20)	JF Label_6
+Quads(21)	PUSH 15
+Quads(21)	POP a
+Quads(22)	JMP EndLabel_4
+Quads(22) Label_6:
+Quads(23)	PUSH a
+Quads(23)	PUSH 11
+Quads(23)	EQ
+Quads(23)	JF Label_7
+Quads(24)	PUSH 11
+Quads(24)	POP a
+Quads(25)	JMP EndLabel_4
+Quads(25) Label_7:
+Quads(26) EndLabel_4:
+Quads(26)	JMP EndLabel_2
+Quads(26) Label_5:
+Quads(28)	PUSH 14
+Quads(28)	POP a
+Quads(29) EndLabel_2:
+Quads(30)	PUSH "Third if statement start"
+Value: "Third if statement start"
+Quads(31)	PUSH a
+Quads(31)	PUSH 11
+Quads(31)	EQ
+Quads(31)	JF Label_8
+Quads(32)	PUSH 11
+Quads(32)	POP a
+Quads(33)	JMP EndLabel_5
+Quads(33) Label_8:
+Quads(35) EndLabel_5:
+Value: 11

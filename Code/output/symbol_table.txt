@@ -1,2 +1,2 @@
 Symbol Table:
-Name:a,Type:int,Value:1,Declared:1,Initialized:1,Used:1,Constant:0,Scope:0
+Name:a,Type:int,Value:11,Declared:1,Initialized:1,Used:1,Constant:0,Scope:0
