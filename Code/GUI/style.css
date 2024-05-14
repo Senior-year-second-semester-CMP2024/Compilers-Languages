@@ -15,6 +15,7 @@ body {
 }
 #compile-button {
   width: calc(100% - 30px);
+  height: 40px;
   padding: 10px;
   margin-left: 30px;
   margin-top: 10px;
@@ -37,7 +38,7 @@ body {
 }
 #console-output {
   height: 200px; /* Fixed height */
-  width: 95%;
+  width: 93%;
   padding: 10px;
   margin-left: 20px;
   overflow-y: auto; /* Add scrollbar */
@@ -68,6 +69,11 @@ body {
 #symbol-table table th {
   background-color: #f2f2f2;
 }
+#quadruples-output {
+  white-space: pre-wrap; /* Ensures white spaces, tabs, and line breaks are preserved */
+  font-family: monospace; /* Use a monospace font for better alignment of text */
+}
+
 /* CodeMirror styles */
 .CodeMirror {
   background-color: #f0f0f0; /* Set background color to grey */
@@ -91,4 +97,30 @@ body {
 }
 .cm-comment {
   color: green; /* Color for comments */
+}
+
+/* spinner */
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border-left-color: #09f;
+  animation: spin 1s ease infinite;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.button-text {
+  display: inline-block;
+  vertical-align: middle;
 }
