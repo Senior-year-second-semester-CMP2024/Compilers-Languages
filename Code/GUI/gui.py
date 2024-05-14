@@ -13,7 +13,7 @@ output_file_path = 'output/output.txt'
 
 # Regex patterns for output file parsing
 lexer_line_pattern = r'Lex\((\d+)\).+'
-quads_line_pattern = r'Quads.+'
+quads_line_pattern = r'Quad\((\d+)\).+'
 syntax_error_line_pattern = r'Syntax error \((\d+)\).+'
 semantic_error_line_pattern = r'Semantic error \((\d+)\).+'
 semantic_warning_line_pattern = r'Semantic warning \((\d+)\).+'
@@ -21,7 +21,7 @@ semantic_warning_line_pattern = r'Semantic warning \((\d+)\).+'
 
 # Application customizations
 TITLE_STYLE_SHEET = "font-size: 20px; font-weight: bold; color: #3366CC;"
-TEXT_EDITOR_FONT_SIZE = 15
+TEXT_EDITOR_FONT_SIZE = 13
 TEXT_EDITOR_WIDTH = 800
 TEXT_EDITOR_HEIGHT = 550
 CODE_FONT_FAMILY = "Courier New"
@@ -47,27 +47,14 @@ class MainWindow(QWidget):
         self.symbol_table_headers = ['Name', 'Type', 'Value', 'Declared', 'Initialized', 'Used', 'Scope']
         self.current_line = 1
 
-        self.open_new_file_shortcut = QShortcut(QKeySequence('Ctrl+O'), self)
-        self.open_new_file_shortcut.activated.connect(self.open_new_file)
-
-        self.save_current_file_shortcut = QShortcut(QKeySequence('Ctrl+S'), self)
-        self.save_current_file_shortcut.activated.connect(self.save_current_file)
-
         self.style_layout()
         self.highlighter = CCodeHighlighter(self.code_text_editor.document())
-        # self.remove_highlight_button.clicked.connect(lambda: self.highlighter.clear_highlight())
 
         # Make the window full screen
         self.showMaximized()
 
         # Change the title of the window
         self.setWindowTitle("Spider Compiler")
-
-        # Change the background color of the window
-        # self.setStyleSheet("background-color: #FFFFFF;")
-
-        # print the resolution of the screen
-        # print("Resolution:", QApplication.desktop().screenGeometry())
 
 
     def style_layout(self):
@@ -119,7 +106,7 @@ class MainWindow(QWidget):
         self.code_text_editor.setFixedWidth(TEXT_EDITOR_WIDTH)
         self.code_text_editor.setFixedHeight(TEXT_EDITOR_HEIGHT)
 
-        self.line_widget = LineNumberWidget(self.code_text_editor, number_color=LINE_NUMBER_COLOR, font_size=TEXT_EDITOR_FONT_SIZE-2)
+        self.line_widget = LineNumberWidget(self.code_text_editor, number_color=LINE_NUMBER_COLOR, font_size=TEXT_EDITOR_FONT_SIZE)
         self.line_widget.setFixedHeight(TEXT_EDITOR_HEIGHT)
         self.code_text_editor.textChanged.connect(self.line_widget_line_count_changed)
 
@@ -271,8 +258,8 @@ class MainWindow(QWidget):
         
         # Remove the temporary files (if they exist) and return to the working directory
         os.chdir('..')
-        if os.path.exists(test_file_path):
-            os.remove(test_file_path)
+        # if os.path.exists(test_file_path):
+        #     os.remove(test_file_path)
         # os.remove('test/out/temp.out')
         os.chdir('GUI')
 
@@ -356,26 +343,6 @@ class MainWindow(QWidget):
             n = int(self.code_text_editor.document().lineCount())
             self.line_widget.changeLineCount(n)
 
-
-    def open_new_file(self):
-        self.file_path, _ = QFileDialog.getOpenFileName(self, "Open a new file", "", "*.c")
-        if self.file_path:
-            with open(self.file_path, "r") as f:
-                file_contents = f.read()
-                self.code_text_editor.setText(file_contents)
-
-
-    def save_current_file(self):
-        if not self.file_path:
-            new_file_path, _ = QFileDialog.getSaveFileName(self, "Save file as", "", "*.c")
-            if new_file_path:
-                self.file_path = new_file_path
-        try:
-            file_contents = self.code_text_editor.toPlainText()
-            with open(self.file_path, "w") as f:
-                f.write(file_contents)
-        except:
-            print("file not saved")
         
     def code_text_editor_text_changed(self):
             # Get the last typed character
@@ -489,12 +456,6 @@ class CCodeHighlighter(QSyntaxHighlighter):
         self.bool = [
             'true', 'false'
         ]
-        
-        # Define the C preprocessor directives
-        self.directives = [
-            '#include', '#define', '#ifndef', '#ifdef', '#endif', '#undef', '#if', '#elif', '#else', '#error', '#pragma'
-        ]
-        
         # Define the text formats for syntax highlighting
         self.keywordFormat = QTextCharFormat()
         self.keywordFormat.setForeground(QColor(64, 128, 255))
@@ -536,10 +497,7 @@ class CCodeHighlighter(QSyntaxHighlighter):
 
         boolPattern = '\\b(' + '|'.join(self.bool) + ')\\b'
         self.rules.append((QRegExp(boolPattern), self.boolFormat))
-        
-        # C preprocessor directives
-        directivePattern = '\\b(' + '|'.join(self.directives) + ')\\b'
-        self.rules.append((QRegExp(directivePattern), self.directiveFormat))
+    
         
         # String literals
         self.rules.append((QRegExp('".*?"'), self.stringFormat))

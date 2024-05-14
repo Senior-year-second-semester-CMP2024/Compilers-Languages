@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Quads(1)	PUSH "conditions"
 Value: "conditions"
 Quads(2)	PUSH 10
@@ -78,3 +79,56 @@ Quads(33)	JMP EndLabel_5
 Quads(33) Label_8:
 Quads(35) EndLabel_5:
 Value: 11
+=======
+Quad(1)	PROC m
+Quad(1)	POP y
+Quad(2)	POP a
+Quad(3)	PUSH 1
+Quad(3)	POP y
+Quad(4)	PUSH "this is a function to test loops"
+Value: "this is a function to test loops"
+Quad(5)	PUSH 0.000000
+Quad(5)	POP a
+Quad(6) StartLabel_1:
+Quad(6)	PUSH a
+Quad(6)	PUSH 20
+Quad(6)	LT
+Semantic error (6): Type mismatch error
+Quad(6)	JF Label_1
+Value: 0.000000
+Quad(9)	PUSH a
+Quad(9)	PUSH 1
+Quad(9)	PUSH y
+Quad(9)	Division
+Quad(9)	Addition
+Quad(9)	POP a
+Quad(10)	JMP StartLabel_1
+Quad(10) Label_1:
+Value: 1.000000
+Quad(13)	PUSH a
+Quad(13)	RET
+Quad(14)	ENDPROC m
+Quad(16)	PUSH 0
+Quad(16)	POP x
+Quad(17)	PUSH 2
+Quad(17)	POP x
+Quad(18)	POP t
+Quad(19)	PUSH "mark is here"
+Quad(19)	POP s
+Quad(20)	PUSH x
+Quad(20)	CALL m
+Quad(20)	POP t
+Quad(21)	PUSH t
+Quad(21)	PUSH 1
+Quad(21)	GT
+Quad(21)	POP f
+Quad(22)	PUSH f
+Quad(22)	JF Label_2
+Quad(24)	PUSH 0
+Quad(24)	POP t
+Value: "mark is here"
+Quad(26)	JMP EndLabel_1
+Quad(26) Label_2:
+Quad(26) EndLabel_1:
+Semantic error (26): Unused variable 'm'
+>>>>>>> 7cc06db588b65a250b712cacae5f6c79e25ed319

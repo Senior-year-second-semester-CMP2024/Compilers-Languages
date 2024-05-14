@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 print("conditions");
 int a = 10;
 print("First if statement start");
@@ -33,3 +34,29 @@ if (a == 11){
 }
 
 print(a);
+=======
+int m(int y){
+    int a;
+    y = 1;
+    print("this is a function to test loops");
+    a = 0;
+    while (a < 20)
+    {
+        print(a);
+        a = a + 1 / y;
+    }
+			
+    print(a);
+    return a;
+}
+
+int x = 0;
+x = 2;
+int t;
+t = m(x);
+t  = t + 1;
+if (t>10)
+{
+	t=0;
+}
+>>>>>>> 7cc06db588b65a250b712cacae5f6c79e25ed319

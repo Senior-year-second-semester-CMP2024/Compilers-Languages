@@ -331,6 +331,7 @@ assignment : IDENTIFIER '=' expression              {   check_out_of_scope_decla
                                                         set_variable_initialized_in_symbol_table($1); 
                                                         print_pop_identifier($1);}
 
+
            | enum_definition                        {;} 
            | data_type enum_declaration             {;}
            ;
@@ -519,6 +520,7 @@ function_arguments : data_type IDENTIFIER       {   print_pop_identifier($2);}
                                                     add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); } ',' function_arguments
                    ;
 
+<<<<<<< HEAD
 function_parameters : literal                   {   check_type_3($1->type, symbol_table[++function_pointer].symbol_type); /* Compares two types specified as strings */
                                                     counter_parameters--; };
 
@@ -528,6 +530,9 @@ function_parameters : literal                   {   check_type_3($1->type, symbo
 
 
 function_definition : data_type IDENTIFIER      {   print_function_start($2);} 
+=======
+function_definition : data_type IDENTIFIER      { print_function_start($2);   } 
+>>>>>>> 7cc06db588b65a250b712cacae5f6c79e25ed319
                                                 {   check_same_scope_redeclaration($2); 
                                                     add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); 
                                                     counter_arguments = symbol_table_index;} 
@@ -543,7 +548,8 @@ function_definition_res : '(' function_arguments ')'
 function_call : IDENTIFIER                      {   counter_parameters = get_symbol_value($1)->value_node.integer_value_node; function_pointer = retrieve_symbol_index($1);} 
                                                 function_call_res 
                                                 {   check_out_of_scope_declaration($1); $$ = get_symbol_value($1); print_function_call($1); 
-                                                    if( counter_parameters != 0 ) {log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, $1); }}
+                                                    // if( counter_parameters != 0 ) {log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, $1); }
+                                                    }
               ;
 
 function_call_res       : '(' function_parameters ')'               {;}
@@ -675,21 +681,21 @@ struct NodeType* get_symbol_value(char symbol) {
     int bucket = find_symbol_index(symbol); 
 
     struct NodeType* ptr = malloc(sizeof(struct NodeType)); 
-    ptr->type = symbol_table[bucket].symbol_type; 
+    char* sym_type = symbol_table[bucket].symbol_type;
+    ptr->type = sym_type; 
     
     // Check the type of the symbol and assign its value to the node
-    if (strcmp(symbol_table[bucket].symbol_type, "int") == 0)
+    if (strcmp(sym_type, "int") == 0)
         ptr->value_node.integer_value_node = symbol_table[bucket].value_symbol.integer_value_symbol;
     
-    else if (strcmp(symbol_table[bucket].symbol_type, "float") == 0)
+    else if (strcmp(sym_type, "float") == 0)
         ptr->value_node.float_value_node = symbol_table[bucket].value_symbol.float_value_symbol;
     
-    else if (strcmp(symbol_table[bucket].symbol_type, "bool") == 0)
+    else if (strcmp(sym_type, "bool") == 0)
         ptr->value_node.bool_value_node = symbol_table[bucket].value_symbol.bool_value_symbol;
     
-    else if (strcmp(symbol_table[bucket].symbol_type, "string") == 0)
+    else if (strcmp(sym_type, "string") == 0)
         ptr->value_node.string_value_node = symbol_table[bucket].value_symbol.string_value_symbol;
-    
     return ptr;
 }
 
@@ -726,17 +732,17 @@ Parameters:
 void modify_symbol_value(char symbol, struct NodeType* new_value){
 	// Find the index of the symbol
     int bucket = find_symbol_index(symbol);
-    
-    if( strcmp(symbol_table[bucket].symbol_type, "int") == 0)
+    char* sym_type = symbol_table[bucket].symbol_type;
+    if( strcmp(sym_type, "int") == 0)
         symbol_table [bucket].value_symbol.integer_value_symbol = new_value->value_node.integer_value_node;
     
-    else if( strcmp(symbol_table[bucket].symbol_type, "float") == 0)
+    else if( strcmp(sym_type, "float") == 0)
         symbol_table[bucket].value_symbol.float_value_symbol = new_value->value_node.float_value_node;
     
-    else if( strcmp(symbol_table[bucket].symbol_type, "bool") == 0)
+    else if( strcmp(sym_type, "bool") == 0)
         symbol_table[bucket].value_symbol.bool_value_symbol = new_value->value_node.bool_value_node;
     
-    else if( strcmp(symbol_table[bucket].symbol_type, "string") == 0)
+    else if( strcmp(sym_type, "string") == 0)
         symbol_table[bucket].value_symbol.string_value_symbol = new_value->value_node.string_value_node;
 }
 
@@ -786,24 +792,27 @@ void write_symbol_table_to_file(){
     // Iterate through the symbol table and write each entry to the file
     for( int i=0 ; i < symbol_table_index ; i++ ){
         
-        if( strcmp(symbol_table[i].symbol_type, "int") == 0 ){
-            fprintf(filePointer, "Name:%c,Type:%s,Value:%d,Declared:%d,Initialized:%d,Used:%d,Constant:%d,Scope:%d\n", 
+        switch (symbol_table[i].symbol_type[0]) 
+        {
+            case 'i':
+                fprintf(filePointer, "Name:%c,Type:%s,Value:%d,Declared:%d,Initialized:%d,Used:%d,Constant:%d,Scope:%d\n", 
                         symbol_table[i].name, symbol_table[i].symbol_type, symbol_table[i].value_symbol.integer_value_symbol, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
-        }
-        
-        else if( strcmp(symbol_table[i].symbol_type, "float" ) == 0){
-            fprintf(filePointer, "Name:%c,Type:%s,Value:%f,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
+                break;
+            case 'f':
+                fprintf(filePointer, "Name:%c,Type:%s,Value:%f,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
                         symbol_table[i].name, symbol_table[i].symbol_type, symbol_table[i].value_symbol.float_value_symbol, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
-        }
-        
-        else if( strcmp(symbol_table[i].symbol_type, "bool" ) == 0){
-            fprintf(filePointer, "Name:%c,Type:%s,Value:%d,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
+                break;
+            case 'b':
+                fprintf(filePointer, "Name:%c,Type:%s,Value:%d,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
                         symbol_table[i].name, symbol_table[i].symbol_type, symbol_table[i].value_symbol.bool_value_symbol, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
-        }
-        
-        else if( strcmp(symbol_table[i].symbol_type, "string" ) == 0){
-            fprintf(filePointer, "Name:%c,Type:%s,Value:%s,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
+                break;
+            case 's':
+                fprintf(filePointer, "Name:%c,Type:%s,Value:%s,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
                         symbol_table[i].name, symbol_table[i].symbol_type, symbol_table[i].value_symbol.string_value_symbol, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
+                break;
+            default:
+                fprintf(filePointer, "Error: Invalid type\n");
+                break;
         }
     }
 
@@ -1446,70 +1455,70 @@ void exit_scope() {
 void print_function_start(char function_name)
 {
     if (show_quadruples) {
-        printf("Quads(%d)\tPROC %s\n", nline, function_name); 
+        printf("Quad(%d)\tPROC %c\n", nline, function_name); 
     }
 }
 
 void print_function_end(char function_name)
 {
     if (show_quadruples) {
-        printf("Quads(%d)\tENDPROC %s\n", nline, function_name); 
+        printf("Quad(%d)\tENDPROC %c\n", nline, function_name); 
     }
 }
 
 void print_function_call(char function_name)
 {
     if (show_quadruples) {
-        printf("Quads(%d)\tCALL %s\n", nline, function_name);
+        printf("Quad(%d)\tCALL %c\n", nline, function_name);
     }
 }
 
 void print_function_return()
 {
     if (show_quadruples) {
-        printf("Quads(%d)\tRET\n");
+        printf("Quad(%d)\tRET\n",nline);
     }
 }
 
 void print_instruction(const char* instruction)
 {
     if (show_quadruples) {
-        printf("Quads(%d)\t%s\n", nline, instruction);
+        printf("Quad(%d)\t%s\n", nline, instruction);
     }
 }
 
 void print_push_integer(int value)
 {
     if (show_quadruples) {
-        printf("Quads(%d)\tPUSH %d\n", nline, value);
+        printf("Quad(%d)\tPUSH %d\n", nline, value);
     }
 }
 
 void print_push_float(float value)
 {
     if (show_quadruples) {
-        printf("Quads(%d)\tPUSH %f\n", nline, value);
+        printf("Quad(%d)\tPUSH %f\n", nline, value);
     }
 }
 
 void print_push_identifier(char symbol)
 {
     if (show_quadruples) {
-        printf("Quads(%d)\tPUSH %c\n", nline, symbol);
+        printf("Quad(%d)\tPUSH %c\n", nline, symbol);
     }
 }
 
 void print_push_string(char* str)
 {
     if (show_quadruples) {
-        printf("Quads(%d)\tPUSH %s\n", nline, str);
+        printf("Quad(%d)\tPUSH %s\n", nline, str);
     }
 }
 
 void print_pop_identifier(char symbol)
 {
     if (show_quadruples) {
-        printf("Quads(%d)\tPOP %c\n", nline, symbol);
+        printf("Quad(%d)\tPOP %c\n", nline, symbol);
     }
 }
 
@@ -1526,7 +1535,7 @@ void print_jump_end_label()
     if (show_quadruples) {
         /* Get the last end label number from the stack */
         int end_label_number = end_label_stack[end_label_stack_ptr];
-        printf("Quads(%d)\tJMP EndLabel_%d\n", nline, end_label_number);
+        printf("Quad(%d)\tJMP EndLabel_%d\n", nline, end_label_number);
     }
 }
 
@@ -1539,14 +1548,14 @@ void print_pop_end_label()
     /* Get the last end label number from the stack */
     int end_label_number = end_label_stack[end_label_stack_ptr--];
     if (show_quadruples) {
-        printf("Quads(%d) EndLabel_%d:\n", nline, end_label_number);
+        printf("Quad(%d) EndLabel_%d:\n", nline, end_label_number);
     }
 }
 
 void print_jump_false_label(int label_number)
 {
     if (show_quadruples) {
-        printf("Quads(%d)\tJF Label_%d\n", nline, label_number);
+        printf("Quad(%d)\tJF Label_%d\n", nline, label_number);
         /* Push the label number to the stack */
         label_stack[label_stack_ptr++] = label_number;
     }
@@ -1561,7 +1570,7 @@ void print_pop_label()
     /* Get the last label number from the stack */
     int label_number = label_stack[--label_stack_ptr];
     if (show_quadruples) {
-        printf("Quads(%d) Label_%d:\n", nline, label_number);
+        printf("Quad(%d) Label_%d:\n", nline, label_number);
     }
 }
 
@@ -1582,7 +1591,7 @@ void print_peak_last_identifier_stack()
     /* Get the last identifier from the stack */
     char identifier = last_identifier_stack[last_identifier_stack_ptr];
     if (show_quadruples) {
-        printf("Quads(%d)\tPUSH %c\n", nline, identifier);
+        printf("Quad(%d)\tPUSH %c\n", nline, identifier);
     }
 }
 
@@ -1601,7 +1610,7 @@ void print_push_start_label(int start_label_number)
     if (show_quadruples) {
         /* Push the start label number to the stack */
         start_label_stack[++start_label_stack_ptr] = start_label_number;
-        printf("Quads(%d) StartLabel_%d:\n", nline, start_label_number);
+        printf("Quad(%d) StartLabel_%d:\n", nline, start_label_number);
     }
 }
 
@@ -1610,7 +1619,7 @@ void print_jump_start_label()
     if (show_quadruples) {
         /* Get the last start label number from the stack */
         int start_label_number = start_label_stack[start_label_stack_ptr];
-        printf("Quads(%d)\tJMP StartLabel_%d\n", nline, start_label_number);
+        printf("Quad(%d)\tJMP StartLabel_%d\n", nline, start_label_number);
     }
 }
 
@@ -1627,14 +1636,14 @@ void print_pop_start_label()
 void print_start_enum(char enum_name)
 {
     if (show_quadruples) {
-        printf("Quads(%d)\tENUM %c\n", nline, enum_name);
+        printf("Quad(%d)\tENUM %c\n", nline, enum_name);
     }
 }
 
 void print_end_enum(char enum_name)
 {
     if (show_quadruples) {
-        printf("Quads(%d)\tENDENUM %c\n", nline, enum_name);
+        printf("Quad(%d)\tENDENUM %c\n", nline, enum_name);
     }
 }
 
