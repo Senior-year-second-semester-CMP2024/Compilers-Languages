@@ -1,0 +1,19 @@
+	PUSH "enums"
+Value: "enums"
+	ENUM E
+	PUSH 1
+	POP a
+	PUSH 2
+	POP b
+	PUSH 3
+	POP c
+	PUSH 4
+	POP d
+	ENDENUM E
+	PUSH c
+	POP x
+Value: 2
+Semantic error (12): Unused variable 'E'
+Semantic error (12): Unused variable 'a'
+Semantic error (12): Unused variable 'b'
+Semantic error (12): Unused variable 'd'

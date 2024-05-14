@@ -247,7 +247,8 @@
 // ----- Return Types (NON TERMINALS) -----
 %type <VOID_TYPE> program statement_list control_statement statement
 %type <VOID_TYPE> if_condition while_loop for_loop repeat_until_loop switch_Case case_list case
-%type <VOID_TYPE> code_block function_arguments function_parameters
+%type <VOID_TYPE> code_block 
+%type <NODE_TYPE> function_arguments function_parameters
 
 %type <DATA_MODIFIER> data_modifier
 %type <NODE_TYPE> literal expression assignment data_type declaration 
@@ -509,13 +510,6 @@ repeat_until_loop        :  REPEAT '{' {enter_scope();} code_block '}'
 
 
 /* -----------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-function_parameters : literal                   {   check_type_3($1->type, symbol_table[++function_pointer].symbol_type); /* Compares two types specified as strings */
-                                                    counter_parameters--; };
-
-                    | literal                   {   check_type_3($1->type, symbol_table[++function_pointer].symbol_type); 
-                                                    counter_parameters--; } ',' function_parameters
-                    ;
-
 function_arguments : data_type IDENTIFIER       {   print_pop_identifier($2);} 
                                                 {   check_same_scope_redeclaration($2); 
                                                     add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); 
@@ -526,7 +520,19 @@ function_arguments : data_type IDENTIFIER       {   print_pop_identifier($2);}
                                                     add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); } ',' function_arguments
                    ;
 
+<<<<<<< HEAD
+function_parameters : literal                   {   check_type_3($1->type, symbol_table[++function_pointer].symbol_type); /* Compares two types specified as strings */
+                                                    counter_parameters--; };
+
+                    | literal                   {   check_type_3($1->type, symbol_table[++function_pointer].symbol_type); 
+                                                    counter_parameters--; } ',' function_parameters
+                    ;
+
+
+function_definition : data_type IDENTIFIER      {   print_function_start($2);} 
+=======
 function_definition : data_type IDENTIFIER      { print_function_start($2);   } 
+>>>>>>> 7cc06db588b65a250b712cacae5f6c79e25ed319
                                                 {   check_same_scope_redeclaration($2); 
                                                     add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); 
                                                     counter_arguments = symbol_table_index;} 

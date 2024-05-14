@@ -1,2 +1,0 @@
-Symbol Table:
-Name:x,Type:int,Value:1,Declared:1,Initialized:1,Used:1,Constant:0,Scope:0
