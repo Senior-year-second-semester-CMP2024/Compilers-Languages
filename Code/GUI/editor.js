@@ -4,11 +4,12 @@ function duplicateLine(cm) {
   cm.replaceRange(line + "\n", { line: cursor.line, ch: 0 });
   cm.setCursor({ line: cursor.line + 1, ch: cursor.ch });
 }
-
+var dark = false;
 var editor = CodeMirror.fromTextArea(document.getElementById("code-input"), {
   lineNumbers: true,
   mode: "text/x-csrc",
   autoCloseBrackets: true,
+  theme: dark ? "dracula" : "defauls",
   autoCloseTags: true,
   matchBrackets: true,
   matchBrackets: true,
@@ -36,7 +37,7 @@ var editor = CodeMirror.fromTextArea(document.getElementById("code-input"), {
 
       // Check if cursor is inside or next to a word
       if (token.type === "keyword" && token.string === "for") {
-        rep = "for (int i = 0; i < N; i++) {}";
+        rep = "for (i = 0; i < N; i++) {}";
         cm.replaceRange(
           rep,
           { line: cursor.line, ch: token.start },
@@ -106,3 +107,16 @@ var editor = CodeMirror.fromTextArea(document.getElementById("code-input"), {
     },
   },
 });
+function toggleTheme() {
+  var themeToggle = document.getElementById("theme-toggle");
+  if (dark) {
+    editor.setOption("theme", "default");
+    themeToggle.innerHTML = '<i class="fas fa-moon icon"></i> Dark Theme';
+    themeToggle.style.backgroundColor = "#343a40";
+  } else {
+    editor.setOption("theme", "dracula");
+    themeToggle.innerHTML = '<i class="fas fa-sun icon"></i> Light Theme';
+    themeToggle.style.backgroundColor = "#007bff";
+  }
+  dark = !dark;
+}

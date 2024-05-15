@@ -1,0 +1,2 @@
+Symbol Table:
+Name:N,Type:int,Value:0,Declared:1,Initialized:1,Used:0,Constant:0,Scope:0

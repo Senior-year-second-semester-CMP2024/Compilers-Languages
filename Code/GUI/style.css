@@ -124,3 +124,29 @@ body {
   display: inline-block;
   vertical-align: middle;
 }
+
+/*toggle theme button*/
+#theme-toggle {
+  background-color: #343a40;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-left: 20px;
+}
+
+#theme-toggle:hover {
+  background-color: #343a40;
+}
+
+#theme-toggle:focus {
+  outline: none;
+}
+#theme-toggle .icon {
+  margin-right: 10px;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+}

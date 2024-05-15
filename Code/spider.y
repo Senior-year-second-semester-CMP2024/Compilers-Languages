@@ -592,6 +592,15 @@ enum_declaration : IDENTIFIER IDENTIFIER                    {   check_out_of_sco
                                                                 modify_symbol_value($2, $4); 
                                                                 print_pop_identifier($2); }
                  ;
+
+                 // example :
+                 /* enum Color {
+                        RED,
+                        GREEN,
+                        BLUE
+                    };
+                    Color myColor = RED;
+                    } */
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 %%

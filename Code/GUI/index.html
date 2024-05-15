@@ -8,6 +8,13 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css"
     />
+    <!-- Light Theme -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/xq-light.min.css"
+      id="theme-style"
+    />
+    <!-- Dark Theme -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css"
@@ -24,16 +31,15 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/dialog/dialog.min.css"
     />
-    <!-- Optional theme xq-light -->
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/xq-light.min.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
     />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/hint/show-hint.min.css"
     />
-    <!-- Optional theme -->
+    <link rel="stylesheet" href="style.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/selection/active-line.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/clike/clike.min.js"></script>
@@ -53,13 +59,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/search/jump-to-line.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/dialog/dialog.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-    <title>Spider Compiler</title>
-    <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <div id="code-section">
-      <h2 style="margin-left: 30px">Source Code</h2>
+      <h2 style="display: inline-block">Source Code</h2>
+      <button id="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-moon icon"></i>
+        Dark Theme
+      </button>
       <textarea id="code-input" placeholder="Enter your code here"></textarea>
       <button id="compile-button" type="button">
         <span class="spinner" style="display: none"></span>

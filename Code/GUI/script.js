@@ -17,11 +17,9 @@ $(document).ready(function () {
       success: function (response) {
         // Handle successful response
         // sleep for 1 second
-        setTimeout(() => {
-          console.log("Compilation successful:", response);
-          // output = response.json();
-          writeToHTML(response);
-        }, 10000);
+        console.log("Compilation successful:", response);
+        // output = response.json();
+        writeToHTML(response);
       },
       error: function (xhr, status, error) {
         // Handle error
