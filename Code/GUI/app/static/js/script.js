@@ -17,7 +17,7 @@ $(document).ready(function () {
       success: function (response) {
         // Handle successful response
         // sleep for 1 second
-        console.log("Compilation successful:", response);
+        console.log("Compilation successful");
         // output = response.json();
         writeToHTML(response);
       },

@@ -1,6 +1,7 @@
 from app import app
 from flask import request, jsonify, render_template
 from app.utils import parse_output_file, parse_symbol_table, execute_compilation
+import os
 
 
 @app.route("/")

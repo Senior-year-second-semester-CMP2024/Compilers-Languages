@@ -4,14 +4,14 @@ function duplicateLine(cm) {
   cm.replaceRange(line + "\n", { line: cursor.line, ch: 0 });
   cm.setCursor({ line: cursor.line + 1, ch: cursor.ch });
 }
+
 var dark = false;
 var editor = CodeMirror.fromTextArea(document.getElementById("code-input"), {
   lineNumbers: true,
   mode: "text/x-csrc",
   autoCloseBrackets: true,
-  theme: dark ? "dracula" : "defauls",
+  theme: dark ? "dracula" : "default",
   autoCloseTags: true,
-  matchBrackets: true,
   matchBrackets: true,
   matchTags: { bothTags: true },
   styleActiveLine: true,
@@ -30,73 +30,24 @@ var editor = CodeMirror.fromTextArea(document.getElementById("code-input"), {
       duplicateLine(cm);
     },
     Tab: function (cm) {
-      // Custom handling for Tab key
       var cursor = cm.getCursor();
-      var line = cm.getLine(cursor.line);
       var token = cm.getTokenAt(cursor);
 
-      // Check if cursor is inside or next to a word
-      if (token.type === "keyword" && token.string === "for") {
-        rep = "for (i = 0; i < N; i++) {}";
-        cm.replaceRange(
-          rep,
-          { line: cursor.line, ch: token.start },
-          { line: cursor.line, ch: token.end }
-        );
-        cm.setCursor({
-          line: cursor.line,
-          ch: token.start + rep.length - 1,
-        });
-      } else if (token.type === "keyword" && token.string === "while") {
-        rep = "while (condition) {}";
-        cm.replaceRange(
-          rep,
-          { line: cursor.line, ch: token.start },
-          { line: cursor.line, ch: token.end }
-        );
-        cm.setCursor({ line: cursor.line, ch: token.start + rep.length - 1 });
-      } else if (token.type === "keyword" && token.string === "if") {
-        rep = "if (condition) {}";
-        cm.replaceRange(
-          rep,
-          { line: cursor.line, ch: token.start },
-          { line: cursor.line, ch: token.end }
-        );
-        cm.setCursor({ line: cursor.line, ch: token.start + rep.length - 1 });
-      } else if (token.type === "keyword" && token.string === "else") {
-        rep = "else {}";
-        cm.replaceRange(
-          rep,
-          { line: cursor.line, ch: token.start },
-          { line: cursor.line, ch: token.end }
-        );
-        cm.setCursor({ line: cursor.line, ch: token.start + rep.length - 1 });
-      } else if (token.type === "keyword" && token.string === "else if") {
-        rep = "else if (condition) {}";
-        cm.replaceRange(
-          rep,
-          { line: cursor.line, ch: token.start },
-          { line: cursor.line, ch: token.end }
-        );
-        cm.setCursor({ line: cursor.line, ch: token.start + rep.length - 1 });
-      } else if (token.type === "keyword" && token.string === "switch") {
-        rep = "switch (expression) {}";
-        cm.replaceRange(
-          rep,
-          { line: cursor.line, ch: token.start },
-          { line: cursor.line, ch: token.end }
-        );
-        cm.setCursor({ line: cursor.line, ch: token.start + rep.length - 1 });
-      } else if (token.type === "keyword" && token.string === "case") {
-        rep = "case value: break;";
-        cm.replaceRange(
-          rep,
-          { line: cursor.line, ch: token.start },
-          { line: cursor.line, ch: token.end }
-        );
-        cm.setCursor({ line: cursor.line, ch: token.start + rep.length - 1 });
-      } else if (token.type === "keyword" && token.string === "default") {
-        rep = "default: break;";
+      var templates = {
+        for: "for (i = 0; i < N; i = i + 1) {}",
+        while: "while (condition) {}",
+        if: "if (condition) {}",
+        else: "else {}",
+        "else if": "else if (condition) {}",
+        switch: "switch (expression) {}",
+        case: "case value: break;",
+        default: "default: break;",
+        repeat: "repeat {} until (condition);",
+        enum: "enum E{a,b,c};",
+      };
+
+      if (token.type === "keyword" && templates[token.string]) {
+        var rep = templates[token.string];
         cm.replaceRange(
           rep,
           { line: cursor.line, ch: token.start },
@@ -107,16 +58,34 @@ var editor = CodeMirror.fromTextArea(document.getElementById("code-input"), {
     },
   },
 });
+
 function toggleTheme() {
   var themeToggle = document.getElementById("theme-toggle");
+  var titles = $("h2");
+  var body = $("body");
+  var sym_items = $("td");
   if (dark) {
     editor.setOption("theme", "default");
     themeToggle.innerHTML = '<i class="fas fa-moon icon"></i> Dark Theme';
     themeToggle.style.backgroundColor = "#343a40";
+    titles.each(function () {
+      this.style.color = "#000";
+    });
+    sym_items.each(function () {
+      this.style.color = "#000";
+    });
+    body.css("background-color", "#f8f9fa");
   } else {
     editor.setOption("theme", "dracula");
     themeToggle.innerHTML = '<i class="fas fa-sun icon"></i> Light Theme';
     themeToggle.style.backgroundColor = "#007bff";
+    titles.each(function () {
+      this.style.color = "#FFF";
+    });
+    sym_items.each(function () {
+      this.style.color = "#FFF";
+    });
+    body.css("background-color", "#282a30");
   }
   dark = !dark;
 }

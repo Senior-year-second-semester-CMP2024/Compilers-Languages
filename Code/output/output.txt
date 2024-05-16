@@ -1,15 +1,33 @@
-Quad(2)	PUSH 0
-Quad(2)	POP x
+Quad(1)	ENUM E
+Quad(2)	PUSH 1
+Quad(2)	POP a
+Quad(3)	PUSH 2
+Quad(3)	POP b
 Quad(5)	PUSH 3
-Quad(5)	POP x
-Value: 3
+Quad(5)	POP c
+Quad(5)	ENDENUM E
+Quad(6)	PUSH 0
+Quad(6)	POP i
+Quad(7)	PUSH 10000
+Quad(7)	POP N
+Quad(8)	PUSH 0
+Quad(8)	POP i
+Quad(8) StartLabel_1:
+Quad(8)	PUSH i
+Quad(8)	PUSH N
+Quad(8)	LT
+Quad(8)	JF Label_1
+Quad(8)	PUSH i
 Quad(8)	PUSH 1
-Quad(8)	POP y
-Quad(12)	PUSH 0
-Quad(12)	POP a
-Quad(14)	PUSH 1
-Quad(14)	POP b
-Semantic error (16): Unused variable 'x'
-Semantic error (16): Unused variable 'y'
-Semantic error (16): Unused variable 'a'
-Semantic error (16): Unused variable 'b'
+Quad(8)	Addition
+Quad(8)	POP i
+Quad(9)	PUSH "mark"
+Value: "mark"
+Quad(10)	PUSH 0
+Quad(10)	POP x
+Quad(11)	JMP StartLabel_1
+Quad(11) Label_1:
+Semantic error (12): Unused variable 'E'
+Semantic error (12): Unused variable 'a'
+Semantic error (12): Unused variable 'b'
+Semantic error (12): Unused variable 'c'
