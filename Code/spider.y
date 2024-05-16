@@ -337,25 +337,25 @@ assignment : IDENTIFIER '=' expression              {   check_out_of_scope_decla
 expression : literal                                            {$$ = $1;}
            | function_call                                      {$$->isConstant=0;}
            
-           | '-' literal                                        {   print_instruction("Negative or Negation"); 
+           | '-' literal                                        {   print_instruction("Negative"); 
                                                                     if($2->type == "int") {$$ = create_int_node(); $$->value_node.integer_value_node = -$2->value_node.integer_value_node;} 
                                                                     else if ( $2->type == "float" ) {$$ = create_float_node(); $$->value_node.float_value_node = -$2->value_node.float_value_node;} 
                                                                     else exit(EXIT_FAILURE); $$->isConstant = $2->isConstant; }
 
-           | NOT literal                                        {   print_instruction("Negation or NOT"); 
+           | NOT literal                                        {   print_instruction("NOT"); 
                                                                     if($2->type == "bool") {$$ = create_bool_node(); $$->value_node.bool_value_node = !$2->value_node.bool_value_node;} 
                                                                     else { if ($2->value_node.integer_value_node) {$$ = create_bool_node(); $$->value_node.bool_value_node = 0;} 
                                                                     else {$$ = create_bool_node(); $$->value_node.bool_value_node = 1;}} $$->isConstant = $2->isConstant;}
            
-           | expression '|' expression                          {   print_instruction("Bitwise OR"); 
+           | expression '|' expression                          {   print_instruction("Bitwise_OR"); 
                                                                     $$ = perform_bitwise_operation($1, $3, '|'); 
                                                                     $$->isConstant = (($1->isConstant) && ($3->isConstant));}
 
-           | expression '&' expression                          {   print_instruction("Bitwise AND"); 
+           | expression '&' expression                          {   print_instruction("Bitwise_AND"); 
                                                                     $$ = perform_bitwise_operation($1, $3, '&'); 
                                                                     $$->isConstant = (($1->isConstant) && ($3->isConstant));}
 
-           | expression '^' expression                          {   print_instruction("Bitwise XOR"); 
+           | expression '^' expression                          {   print_instruction("Bitwise_XOR"); 
                                                                     $$ = perform_bitwise_operation($1, $3, '^'); 
                                                                     $$->isConstant = (($1->isConstant) && ($3->isConstant));}
            
@@ -379,19 +379,19 @@ expression : literal                                            {$$ = $1;}
                                                                     $$ = perform_arithmetic($1, $3, '%'); 
                                                                     $$->isConstant = (($1->isConstant) && ($3->isConstant));}
            
-           | expression AND expression                          {   print_instruction("Logical AND"); 
+           | expression AND expression                          {   print_instruction("Logical_AND"); 
                                                                     $$ = perform_logical_operation($1, $3, '&'); 
                                                                     $$->isConstant = (($1->isConstant) && ($3->isConstant));}
 
-           | expression OR expression                           {   print_instruction("Logical OR"); 
+           | expression OR expression                           {   print_instruction("Logical_OR"); 
                                                                     $$ = perform_logical_operation($1, $3, '|'); 
                                                                     $$->isConstant = (($1->isConstant) && ($3->isConstant));}
 
-           | expression SHIFT_LEFT expression                   {   print_instruction("Shift Left"); 
+           | expression SHIFT_LEFT expression                   {   print_instruction("Shift_Left"); 
                                                                     $$ = perform_bitwise_operation($1, $3, '<'); 
                                                                     $$->isConstant = (($1->isConstant) && ($3->isConstant));}
 
-           | expression SHIFT_RIGHT expression                  {   print_instruction("Shift Right"); 
+           | expression SHIFT_RIGHT expression                  {   print_instruction("Shift_Right"); 
                                                                     $$ = perform_bitwise_operation($1, $3, '>'); 
                                                                     $$->isConstant = (($1->isConstant) && ($3->isConstant));}
 
@@ -419,7 +419,7 @@ expression : literal                                            {$$ = $1;}
                                                                     $$ = perform_comparison($1, $3, "<=");  
                                                                     $$->isConstant = (($1->isConstant) && ($3->isConstant));}
            
-           | '(' data_type ')' literal                          {   print_instruction("Casting or Conversion"); 
+           | '(' data_type ')' literal                          {   print_instruction("Conversion"); 
                                                                     $$ = perform_conversion($4, $2->type); 
                                                                     $$->isConstant = $4->isConstant;}
            ;

@@ -1,0 +1,4 @@
+Quad(2)	PUSH 0
+Quad(2)	POP x
+Quad(5)	PUSH 3
+Semantic error (5): Variable 'x' out of scope
