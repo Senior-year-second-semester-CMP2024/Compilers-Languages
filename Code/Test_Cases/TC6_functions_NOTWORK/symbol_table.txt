@@ -1,4 +1,3 @@
-Symbol Table:
 Name:f,Type:int,Value:1,Declared:1,Initialized:0,Used:0,Constant:0,Scope:0
 Name:a,Type:int,Value:3,Declared:1,Initialized:1,Used:1,Constant:0,Scope:1
 Name:x,Type:int,Value:2,Declared:1,Initialized:1,Used:1,Constant:0,Scope:0

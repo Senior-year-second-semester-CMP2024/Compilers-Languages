@@ -1,18 +1,16 @@
-print("functions");
-
-int x(int a, int b)
-{
-    print("add");
+int f(){
+    int a;
+    a=2;
+    print("while loop");
+    while (a<20)
+    {
+	print(a);
+	a=a+1;
+    }
+    print(a);
     return 0;
 }
-x(1, 2);
 
-print("x");
-int y()
-{
-    print("y");
-    return 1;
-}
-
-print("y done");
-exit;
+int x=0;
+x=2;
+int t = f();
