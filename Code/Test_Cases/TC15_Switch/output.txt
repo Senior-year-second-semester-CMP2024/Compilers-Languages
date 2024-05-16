@@ -1,180 +1,27 @@
-Lex(1) Data Type: int
-Lex(1) Identifier: a
-Lex(1) Punctuators: =
-Lex(1) Integer Value: 8
-	PUSH 8
-Lex(1) End Of Statement: ; 
-
+	PUSH 3
 	POP a
-Lex(2) Command: print
-Lex(2) Punctuators: (
-Lex(2) String Value: "switch case loops"
 	PUSH "switch case loops"
-Lex(2) Punctuators: )
 Value: "switch case loops"
-Lex(2) End Of Statement: ; 
-
-Lex(3) Control Flow: switch
-Lex(3) Punctuators: (
-Lex(3) Identifier: a
-Lex(3) Punctuators: )
-Lex(4) Punctuators: {
-Lex(5) Control Flow: default
-Lex(5) Punctuators: :
-Lex(6) Command: print
-Lex(6) Punctuators: (
-Lex(6) String Value: "default"
-	PUSH "default"
-Lex(6) Punctuators: )
-Value: "default"
-Lex(6) End Of Statement: ; 
-
-Lex(7) Control Flow: break
-	JMP EndLabel_1
-Lex(7) End Of Statement: ; 
-
-Lex(8) Punctuators: }
-EndLabel_1:
-Lex(9) Control Flow: switch
-Lex(9) Punctuators: (
-Lex(9) Identifier: a
-Lex(9) Punctuators: )
-Lex(10) Punctuators: {
-Lex(11) Control Flow: case
-Lex(11) Integer Value: 1
 	PUSH 1
-Lex(11) Punctuators: :
 	PUSH a
 	JF Label_1
-Lex(12) Command: print
-Lex(12) Punctuators: (
-Lex(12) String Value: "1"
-	PUSH "1"
-Lex(12) Punctuators: )
-Value: "1"
-Lex(12) End Of Statement: ; 
-
-Lex(13) Control Flow: break
-	JMP EndLabel_2
-Lex(13) End Of Statement: ; 
-
-Lex(15) Control Flow: case
-Label_1:
-Lex(15) Integer Value: 2
+	PUSH 5
+	POP a
+	JMP EndLabel_1
+ Label_1:
 	PUSH 2
-Lex(15) Punctuators: :
 	PUSH a
 	JF Label_2
-Lex(16) Command: print
-Lex(16) Punctuators: (
-Lex(16) String Value: "2"
-	PUSH "2"
-Lex(16) Punctuators: )
-Value: "2"
-Lex(16) End Of Statement: ; 
-
-Lex(17) Control Flow: break
-	JMP EndLabel_2
-Lex(17) End Of Statement: ; 
-
-Lex(19) Control Flow: case
-Label_2:
-Lex(19) Integer Value: 3
+	PUSH 7
+	POP a
+	JMP EndLabel_1
+ Label_2:
 	PUSH 3
-Lex(19) Punctuators: :
 	PUSH a
 	JF Label_3
-Lex(20) Command: print
-Lex(20) Punctuators: (
-Lex(20) String Value: "3"
-	PUSH "3"
-Lex(20) Punctuators: )
-Value: "3"
-Lex(20) End Of Statement: ; 
-
-Lex(21) Control Flow: break
-	JMP EndLabel_2
-Lex(21) End Of Statement: ; 
-
-Lex(22) Punctuators: }
-Label_3:
-EndLabel_2:
-Lex(24) Control Flow: switch
-Lex(24) Punctuators: (
-Lex(24) Identifier: a
-Lex(24) Punctuators: )
-Lex(25) Punctuators: {
-Lex(26) Control Flow: case
-Lex(26) Integer Value: 1
-	PUSH 1
-Lex(26) Punctuators: :
-	PUSH a
-	JF Label_4
-Lex(27) Command: print
-Lex(27) Punctuators: (
-Lex(27) String Value: "1"
-	PUSH "1"
-Lex(27) Punctuators: )
-Value: "1"
-Lex(27) End Of Statement: ; 
-
-Lex(28) Control Flow: break
-	JMP EndLabel_3
-Lex(28) End Of Statement: ; 
-
-Lex(30) Control Flow: case
-Label_4:
-Lex(30) Integer Value: 2
-	PUSH 2
-Lex(30) Punctuators: :
-	PUSH a
-	JF Label_5
-Lex(31) Command: print
-Lex(31) Punctuators: (
-Lex(31) String Value: "2"
-	PUSH "2"
-Lex(31) Punctuators: )
-Value: "2"
-Lex(31) End Of Statement: ; 
-
-Lex(32) Control Flow: break
-	JMP EndLabel_3
-Lex(32) End Of Statement: ; 
-
-Lex(34) Control Flow: case
-Label_5:
-Lex(34) Integer Value: 3
-	PUSH 3
-Lex(34) Punctuators: :
-	PUSH a
-	JF Label_6
-Lex(35) Command: print
-Lex(35) Punctuators: (
-Lex(35) String Value: "3"
-	PUSH "3"
-Lex(35) Punctuators: )
-Value: "3"
-Lex(35) End Of Statement: ; 
-
-Lex(36) Control Flow: break
-	JMP EndLabel_3
-Lex(36) End Of Statement: ; 
-
-Lex(38) Control Flow: default
-Label_6:
-Lex(38) Punctuators: :
-Lex(39) Command: print
-Lex(39) Punctuators: (
-Lex(39) String Value: "default"
-	PUSH "default"
-Lex(39) Punctuators: )
-Value: "default"
-Lex(39) End Of Statement: ; 
-
-Lex(40) Control Flow: break
-	JMP EndLabel_3
-Lex(40) End Of Statement: ; 
-
-Lex(41) Punctuators: }
-EndLabel_3:
-Semantic error (41): Unused variable 'a'
+	PUSH 8
+	POP a
+	JMP EndLabel_1
+ Label_3:
+ EndLabel_1:
+Value: 8

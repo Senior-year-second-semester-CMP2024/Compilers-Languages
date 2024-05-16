@@ -29,5 +29,5 @@ else{
 }
 print("Third if statement start");
 if (a == 11){
-    a = 11;
+    a = 5;
 }

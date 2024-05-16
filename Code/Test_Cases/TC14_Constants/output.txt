@@ -1,16 +1,8 @@
-Lex(1) Data Modifier: const
-Lex(1) Data Type: int
-Lex(1) Identifier: a
-Lex(1) Punctuators: =
-Lex(1) Integer Value: 10
 	PUSH 10
-Lex(1) End Of Statement: ; 
-
 	POP a
-Lex(2) Command: print
-Lex(2) Punctuators: (
-Lex(2) Identifier: a
-Lex(2) Punctuators: )
 Value: 10
-Lex(2) End Of Statement: ; 
-
+	PUSH a
+	PUSH 2
+	Addition
+	POP x
+Value: 12

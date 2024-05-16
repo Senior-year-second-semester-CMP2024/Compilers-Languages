@@ -1,4 +1,3 @@
-	PUSH 5
-	POP b
+Quad(1)	PUSH 5
+Quad(2)	POP b
 Syntax error (2) Near line 2: syntax error
-Semantic error (2): Unused variable 'b'

@@ -1,4 +1,4 @@
-Name:a, Type:int, Value:90, Declared:1, Initialized:1, Used:1, Constant:0, Scope:0
+Name:a,Type:int,Value:90,Declared:1,Initialized:1,Used:1,Constant:0,Scope:0
 Name:b,Type:float,Value:100.900002,Declared:1,Initialized:1,Used:1,Const:0,Scope:0
 Name:x,Type:bool,Value:1,Declared:1,Initialized:1,Used:1,Const:0,Scope:0
 Name:y,Type:string,Value:"Karim",Declared:1,Initialized:1,Used:1,Const:0,Scope:0

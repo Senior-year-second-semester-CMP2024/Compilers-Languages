@@ -1,1 +1,1 @@
-Name:a, Type:int, Value:8, Declared:1, Initialized:1, Used:1, Constant:0, Scope:0
+Name:a,Type:int,Value:5,Declared:1,Initialized:1,Used:1,Constant:0,Scope:0

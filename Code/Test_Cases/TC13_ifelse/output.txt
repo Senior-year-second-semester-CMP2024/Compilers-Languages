@@ -1,229 +1,79 @@
-Lex(1) Command: print
-Lex(1) Punctuators: (
-Lex(1) String Value: "conditions"
 	PUSH "conditions"
-Lex(1) Punctuators: )
 Value: "conditions"
-Lex(1) End Of Statement: ; 
-
-Lex(2) Data Type: int
-Lex(2) Identifier: a
-Lex(2) Punctuators: =
-Lex(2) Integer Value: 10
 	PUSH 10
-Lex(2) End Of Statement: ; 
-
 	POP a
-Lex(3) Command: print
-Lex(3) Punctuators: (
-Lex(3) String Value: "First if statement start"
 	PUSH "First if statement start"
-Lex(3) Punctuators: )
 Value: "First if statement start"
-Lex(3) End Of Statement: ; 
-
-Lex(4) Control Flow: if
-Lex(4) Punctuators: (
-Lex(4) Identifier: a
-Lex(4) Comparison Operator: ==
 	PUSH a
-Lex(4) Integer Value: 11
 	PUSH 11
-Lex(4) Punctuators: )
 	EQ
 	JF Label_1
-Lex(4) Punctuators: {
-Lex(5) Identifier: a
-Lex(5) Punctuators: =
-Lex(5) Integer Value: 11
 	PUSH 11
-Lex(5) End Of Statement: ; 
-
 	POP a
-Lex(6) Punctuators: }
 	JMP EndLabel_1
-Label_1:
-Lex(7) Command: print
-EndLabel_1:
-Lex(7) Punctuators: (
-Lex(7) String Value: "second if statement start"
+ Label_1:
+ EndLabel_1:
 	PUSH "second if statement start"
-Lex(7) Punctuators: )
 Value: "second if statement start"
-Lex(7) End Of Statement: ; 
-
-Lex(8) Control Flow: if
-Lex(8) Punctuators: (
-Lex(8) Identifier: a
-Lex(8) Comparison Operator: ==
 	PUSH a
-Lex(8) Integer Value: 100
 	PUSH 100
-Lex(8) Punctuators: )
 	EQ
 	JF Label_2
-Lex(8) Punctuators: {
-Lex(9) Identifier: a
-Lex(9) Punctuators: =
-Lex(9) Integer Value: 100
 	PUSH 100
-Lex(9) End Of Statement: ; 
-
 	POP a
-Lex(10) Punctuators: }
 	JMP EndLabel_2
-Label_2:
-Lex(11) Control Flow: else
-Lex(11) Control Flow: if
-Lex(11) Punctuators: (
-Lex(11) Identifier: a
-Lex(11) Comparison Operator: ==
+ Label_2:
 	PUSH a
-Lex(11) Integer Value: 12
 	PUSH 12
-Lex(11) Punctuators: )
 	EQ
 	JF Label_3
-Lex(11) Punctuators: {
-Lex(12) Control Flow: if
-Lex(12) Punctuators: (
-Lex(12) Identifier: a
-Lex(12) Comparison Operator: ==
 	PUSH a
-Lex(12) Integer Value: 14
 	PUSH 14
-Lex(12) Punctuators: )
 	EQ
 	JF Label_4
-Lex(12) Punctuators: {
-Lex(13) Identifier: a
-Lex(13) Punctuators: =
-Lex(13) Integer Value: 14
 	PUSH 14
-Lex(13) End Of Statement: ; 
-
 	POP a
-Lex(14) Punctuators: }
 	JMP EndLabel_3
-Label_4:
-Lex(15) Control Flow: else
-Lex(15) Punctuators: {
-Lex(16) Identifier: a
-Lex(16) Punctuators: =
-Lex(16) Integer Value: 13
+ Label_4:
 	PUSH 13
-Lex(16) End Of Statement: ; 
-
 	POP a
-Lex(17) Punctuators: }
-EndLabel_3:
-Lex(18) Punctuators: }
+ EndLabel_3:
 	JMP EndLabel_2
-Label_3:
-Lex(19) Control Flow: else
-Lex(19) Control Flow: if
-Lex(19) Punctuators: (
-Lex(19) Identifier: a
-Lex(19) Comparison Operator: ==
+ Label_3:
 	PUSH a
-Lex(19) Integer Value: 13
 	PUSH 13
-Lex(19) Punctuators: )
 	EQ
 	JF Label_5
-Lex(19) Punctuators: {
-Lex(20) Control Flow: if
-Lex(20) Punctuators: (
-Lex(20) Identifier: a
-Lex(20) Comparison Operator: ==
 	PUSH a
-Lex(20) Integer Value: 15
 	PUSH 15
-Lex(20) Punctuators: )
 	EQ
 	JF Label_6
-Lex(20) Punctuators: {
-Lex(21) Identifier: a
-Lex(21) Punctuators: =
-Lex(21) Integer Value: 15
 	PUSH 15
-Lex(21) End Of Statement: ; 
-
 	POP a
-Lex(22) Punctuators: }
 	JMP EndLabel_4
-Label_6:
-Lex(23) Control Flow: else
-Lex(23) Control Flow: if
-Lex(23) Punctuators: (
-Lex(23) Identifier: a
-Lex(23) Comparison Operator: ==
+ Label_6:
 	PUSH a
-Lex(23) Integer Value: 11
 	PUSH 11
-Lex(23) Punctuators: )
 	EQ
 	JF Label_7
-Lex(23) Punctuators: {
-Lex(24) Identifier: a
-Lex(24) Punctuators: =
-Lex(24) Integer Value: 11
 	PUSH 11
-Lex(24) End Of Statement: ; 
-
 	POP a
-Lex(25) Punctuators: }
 	JMP EndLabel_4
-Label_7:
-Lex(26) Punctuators: }
-EndLabel_4:
+ Label_7:
+ EndLabel_4:
 	JMP EndLabel_2
-Label_5:
-Lex(27) Control Flow: else
-Lex(27) Punctuators: {
-Lex(28) Identifier: a
-Lex(28) Punctuators: =
-Lex(28) Integer Value: 14
+ Label_5:
 	PUSH 14
-Lex(28) End Of Statement: ; 
-
 	POP a
-Lex(29) Punctuators: }
-EndLabel_2:
-Lex(30) Command: print
-Lex(30) Punctuators: (
-Lex(30) String Value: "Third if statement start"
+ EndLabel_2:
 	PUSH "Third if statement start"
-Lex(30) Punctuators: )
 Value: "Third if statement start"
-Lex(30) End Of Statement: ; 
-
-Lex(31) Control Flow: if
-Lex(31) Punctuators: (
-Lex(31) Identifier: a
-Lex(31) Comparison Operator: ==
 	PUSH a
-Lex(31) Integer Value: 11
 	PUSH 11
-Lex(31) Punctuators: )
 	EQ
 	JF Label_8
-Lex(31) Punctuators: {
-Lex(32) Identifier: a
-Lex(32) Punctuators: =
-Lex(32) Integer Value: 11
-	PUSH 11
-Lex(32) End Of Statement: ; 
-
+	PUSH 5
 	POP a
-Lex(33) Punctuators: }
 	JMP EndLabel_5
-Label_8:
-Lex(36) Identifier: a
-EndLabel_5:
-Lex(36) Punctuators: =
-Lex(36) Integer Value: 8
-	PUSH 8
-Lex(36) End Of Statement: ; 
-
-	POP a
+ Label_8:
+ EndLabel_5:

@@ -1,0 +1,1 @@
+Syntax error (1) Near line 1: syntax error

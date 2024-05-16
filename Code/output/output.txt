@@ -1,3 +1,15 @@
-Quad(1)	PUSH 0
-Quad(1)	POP N
-Syntax error (2) Near line 2: syntax error
+Quad(2)	PUSH 0
+Quad(2)	POP x
+Quad(5)	PUSH 3
+Quad(5)	POP x
+Value: 3
+Quad(8)	PUSH 1
+Quad(8)	POP y
+Quad(12)	PUSH 0
+Quad(12)	POP a
+Quad(14)	PUSH 1
+Quad(14)	POP b
+Semantic error (16): Unused variable 'x'
+Semantic error (16): Unused variable 'y'
+Semantic error (16): Unused variable 'a'
+Semantic error (16): Unused variable 'b'

@@ -27,23 +27,14 @@
         if ( SHOW_SEMANTIC_ERROR_MESSAGES ) {
             
             switch( error_code ) {
-                case SEMANTIC_ERROR_TYPE_MISMATCH:
-                    printf("Semantic error (%d): Type mismatch error\n", error_line);
-                    break;
                 case SEMANTIC_ERROR_UNDECLARED:
                     printf("Semantic error (%d): Undeclared variable '%c'\n", error_line, variable);
-                    break;
-                case SEMANTIC_ERROR_UNINITIALIZED:
-                    printf("Semantic error (%d): Uninitialized variable '%c'\n", error_line, variable);
                     break;
                 case SEMANTIC_ERROR_UNUSED:
                     printf("Semantic error (%d): Unused variable '%c'\n", error_line, variable);
                     break;
-                case SEMANTIC_ERROR_REDECLARED:
-                    printf("Semantic error (%d): Redeclared variable '%c'\n", error_line, variable);
-                    break;
-                case SEMANTIC_ERROR_CONSTANT:
-                    printf("Semantic error (%d): Constant variable '%c'\n", error_line, variable);
+                case SEMANTIC_ERROR_TYPE_MISMATCH:
+                    printf("Semantic error (%d): Type mismatch error\n", error_line);
                     break;
                 case SEMANTIC_ERROR_OUT_OF_SCOPE:
                     printf("Semantic error (%d): Variable '%c' out of scope\n", error_line, variable);
@@ -51,6 +42,15 @@
                     break;
                 case SEMANTIC_WARNING_CONSTANT_IF:
                     printf("Semantic warning (%d): If statement is always %s\n", error_line, (variable ? "True" : "False"));
+                    break;
+                case SEMANTIC_ERROR_REDECLARED:
+                    printf("Semantic error (%d): Redeclared variable '%c'\n", error_line, variable);
+                    break;
+                case SEMANTIC_ERROR_CONSTANT:
+                    printf("Semantic error (%d): Constant variable '%c'\n", error_line, variable);
+                    break;
+                case SEMANTIC_ERROR_UNINITIALIZED:
+                    printf("Semantic error (%d): Uninitialized variable '%c'\n", error_line, variable);
                     break;
                 default:
                     printf("Semantic error (%d): Unknown error\n", error_line);
@@ -83,6 +83,7 @@
                 char* string_value_symbol;
                 int bool_value_symbol;
         }value_symbol;
+        // The flags are used to check if the variable is declared, initialized, used, and constant
         int declared_flag, constant_flag, initialized_flag, used_flag, scope;
     };
 
@@ -90,8 +91,8 @@
     void display_node_value(struct NodeType* node);
 
     /* ------------------------- Scope Functions -----------------------------*/
-    void enter_scope();
-    void exit_scope();
+    void starting_scope();
+    void end_scope();
 
     /* ------------------------- Semantic Functions -----------------------------*/
     void check_using_variables();
@@ -102,13 +103,13 @@
     struct NodeType* create_enum_node();
     void check_initialization(char variable_name);
     int check_variable_declaration(char variable_name);
-    void check_type_3(char* first_type, char* second_type);
     void check_same_scope_redeclaration(char variable_name);
     void check_out_of_scope_declaration(char variable_name);
     void check_reassignment_constant_variable(char variable_name);
     void check_constant_expression_if_statement(struct NodeType* expression);
     int check_variable_declaration_as_constant_same_scope(char variable_name);
-    void check_type(struct NodeType* first_type, struct NodeType* second_type);
+    void compare_types_two_nodes(struct NodeType* first_type, struct NodeType* second_type);
+    void compare_two_string_types(char* first_type, char* second_type);
 
     /* ------------------------- Symbol Table Functions -----------------------------*/
     struct symbol symbol_table [100];
@@ -191,13 +192,13 @@
 
 %}
 
-/* --------------- Yacc definitions ---------------*/
+/* ------------------------------ Yacc definitions ------------------------------*/
 
 /* --------------- Starting Symbol ---------------*/
 %start program
 
-// %union is used to define the types of the tokens that can be returned
-// Here, we define the types where the 2nd term is associated with the type of the 1st term.
+// %union is used to define the types of the tokens that can be returned 
+// ==> Here, we define the types where the 2nd term is associated with the type of the 1st term.
 %union {
     int INTEGER_TYPE;
     float FLOAT_TYPE;
@@ -210,7 +211,7 @@
     struct NodeType* NODE_TYPE;
 }
 
-// -----Tokens-----
+// ---------- Tokens ---------- 
 %token PRINT  
 %token EXIT
 %token IF ELSE 
@@ -218,7 +219,7 @@
 %token SWITCH CASE DEFAULT CONTINUE BREAK RETURN 
 %token ENUM
 
-// -----Operators-----
+// ---------- Operators ----------
 %right '=' 
 %left AND OR
 %left  '|'
@@ -231,26 +232,25 @@
 %right NOT
 %left '*' '/' '%'
 
-// ----- Declarations -----
-%token <DATA_MODIFIER> CONSTANT
+// ---------- Declarations ----------
 %token <DATA_TYPE> INTEGER_DATA_TYPE FLOAT_DATA_TYPE BOOL_DATA_TYPE STRING_DATA_TYPE VOID_DATA_TYPE
-%token <NODE_TYPE> IDENTIFIER // this is a token IDENTIFIER returned by the lexical analyzer with as NODE_TYPE
+%token <DATA_MODIFIER> CONSTANT
+%token <NODE_TYPE> IDENTIFIER // ==>this is a token IDENTIFIER returned by the lexical analyzer with as NODE_TYPE
 
 
-// ----- Data Types -----
-%token <INTEGER_TYPE> INTEGER
-%token <FLOAT_TYPE> FLOAT
-%token <STRING_TYPE> STRING
+// ---------- Data Types ----------
 %token <BOOL_TYPE> TRUE_VALUE 
 %token <BOOL_TYPE> FALSE_VALUE
+%token <STRING_TYPE> STRING
+%token <INTEGER_TYPE> INTEGER
+%token <FLOAT_TYPE> FLOAT
 
-// ----- Return Types (NON TERMINALS) -----
+// ---------- Return Types (NON TERMINALS) ----------
 %type <VOID_TYPE> program statement_list control_statement statement
 %type <VOID_TYPE> if_condition while_loop for_loop repeat_until_loop switch_Case case_list case
 %type <VOID_TYPE> code_block 
 %type <NODE_TYPE> function_arguments function_parameters
 
-%type <DATA_MODIFIER> data_modifier
 %type <NODE_TYPE> literal expression assignment data_type declaration 
 %type <NODE_TYPE> function_call
 
@@ -264,9 +264,9 @@ program : statement_list                            {;}
         ;
 /* -----------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 statement_list  : statement ';'                                                         {;}
-                | '{' {enter_scope();} code_block '}' {exit_scope();}
+                | '{' {starting_scope();} code_block '}' {end_scope();}
                 | control_statement                                                     {;}
-                | statement_list '{' {enter_scope();} code_block '}' {exit_scope();}    {;}        
+                | statement_list '{' {starting_scope();} code_block '}' {end_scope();}    {;}        
                 | statement_list statement ';'                                          {;} 
                 | statement_list control_statement                                      {;}
                 ;
@@ -276,26 +276,24 @@ code_block      : statement_list                         {;}
 /* -----------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 control_statement   :  { print_push_end_label(++end_label_number);}     if_condition        {print_pop_end_label();}
                     |  { print_push_end_label(++end_label_number);}     switch_Case         {print_pop_end_label();}
+                    
+                    
+                    |  for_loop {print_pop_start_label();}
                     |  { print_push_start_label(++start_label_number);} while_loop          {print_pop_start_label();}
                     |  { print_push_start_label(++start_label_number);} repeat_until_loop   {print_pop_start_label();}
-                    |  for_loop {print_pop_start_label();}
                     ;   
 /* -----------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 statement : assignment                   {;}
           | expression                   {;}
           | declaration                  {;}
-          | EXIT                         {print_instruction("Exit"); exit(EXIT_SUCCESS);}
-          | BREAK                        {print_jump_end_label();}
-          | CONTINUE                     {;}
-          | RETURN                       {print_function_return();}
-          | RETURN expression            {print_function_return();}
           | PRINT '(' IDENTIFIER ')'     {display_node_value(get_symbol_value($3)); mark_variable_used_in_symbol_table($3);}
           | PRINT '(' expression ')'     {display_node_value($3);}
+          | RETURN                       {print_function_return();}
+          | RETURN expression            {print_function_return();}
+          | EXIT                         {print_instruction("Exit"); exit(EXIT_SUCCESS);}
+          | CONTINUE                     {;}
+          | BREAK                        {print_jump_end_label();}
           ;
-
-/* -----------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-data_modifier : CONSTANT        {;}
-              ;
 
 /* -----------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 data_type : BOOL_DATA_TYPE              {$$ = create_bool_node();}
@@ -306,9 +304,9 @@ data_type : BOOL_DATA_TYPE              {$$ = create_bool_node();}
           ;
 
 /* -----------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-declaration : data_modifier data_type IDENTIFIER    {   check_same_scope_redeclaration($3);} 
+declaration : CONSTANT data_type IDENTIFIER    {   check_same_scope_redeclaration($3);} 
                                                         '=' expression 
-                                                    {   check_type($2, $6); add_symbol($3, $2->type, 1, 0, 0, scopes[scope_index-1]); modify_symbol_value($3, $6); 
+                                                    {   compare_types_two_nodes($2, $6); add_symbol($3, $2->type, 1, 0, 0, scopes[scope_index-1]); modify_symbol_value($3, $6); 
                                                         set_variable_initialized_in_symbol_table($3); print_pop_identifier($3);} 
 
             | data_type IDENTIFIER                  {   check_same_scope_redeclaration($2); 
@@ -317,14 +315,14 @@ declaration : data_modifier data_type IDENTIFIER    {   check_same_scope_redecla
 
             | data_type IDENTIFIER                  {   check_same_scope_redeclaration($2);} 
                                                         '=' expression 
-                                                    {   check_type($1, $5); add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); modify_symbol_value($2,$5); 
+                                                    {   compare_types_two_nodes($1, $5); add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); modify_symbol_value($2,$5); 
                                                         set_variable_initialized_in_symbol_table($2); print_pop_identifier($2);}
             ;
             
 /* -----------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 assignment : IDENTIFIER '=' expression              {   check_out_of_scope_declaration($1); 
                                                         check_reassignment_constant_variable($1); 
-                                                        check_type_2($1,$3); /* Checks the type of a symbol against a given node type */
+                                                        check_symbol_against_node_type($1,$3); /* Checks the type of a symbol against a given node type */
                                                         mark_variable_used_in_symbol_table($1); 
                                                         modify_symbol_value($1, $3); 
                                                         $$ = $3; 
@@ -463,15 +461,15 @@ literal : INTEGER               {   print_push_integer($1);
 
 /* -----------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 if_condition             :  IF '(' expression { check_constant_expression_if_statement($3); print_jump_false_label(++label_number); } ')' 
-                            '{' {enter_scope();} code_block '}' 
-                            {print_jump_end_label(); exit_scope(); print_pop_label();} 
+                            '{' {starting_scope();} code_block '}' 
+                            {print_jump_end_label(); end_scope(); print_pop_label();} 
                             else_condition {;}
                          ;
 
 else_condition          :                       {;}
                         |   ELSE {;} if_condition {;}
                         |   ELSE {;} 
-                            '{' {enter_scope();} code_block '}' {exit_scope();} 
+                            '{' {starting_scope();} code_block '}' {end_scope();} 
                         ;
 
 case                    :   CASE expression {print_peak_last_identifier_stack(); print_jump_false_label(++label_number); } 
@@ -486,30 +484,37 @@ case_list               :   case_list case            {;}
 
 switch_Case          :  SWITCH '(' IDENTIFIER ')' 
                         {print_push_last_identifier_stack($3); set_variable_initialized_in_symbol_table($3);} 
-                        '{' {enter_scope();} case_list '}' 
-                        {print_pop_last_identifier_stack(); exit_scope();}
+                        '{' {starting_scope();} case_list '}' 
+                        {print_pop_last_identifier_stack(); end_scope();}
                      ;
 
 /* -----------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 while_loop               :  WHILE '(' expression ')'  
                             {print_jump_false_label(++label_number);} 
-                            '{' {enter_scope();} code_block '}' 
-                            {exit_scope(); print_jump_start_label(); print_pop_label();} {;}
+                            '{' {starting_scope();} code_block '}' 
+                            {end_scope(); print_jump_start_label(); print_pop_label();} {;}
                         ;
 
 for_loop                 :  FOR '(' assignment ';' 
                             {print_push_start_label(++start_label_number);} expression ';' {print_jump_false_label(++label_number);} assignment ')' 
-                            '{' {enter_scope();} code_block '}' 
-                            {print_jump_start_label(); print_pop_label(); exit_scope();}
+                            '{' {starting_scope();} code_block '}' 
+                            {print_jump_start_label(); print_pop_label(); end_scope();}
                         ;
 
-repeat_until_loop        :  REPEAT '{' {enter_scope();} code_block '}' 
-                            {exit_scope();} UNTIL '(' expression ')' ';' 
+repeat_until_loop        :  REPEAT '{' {starting_scope();} code_block '}' 
+                            {end_scope();} UNTIL '(' expression ')' ';' 
                             {print_jump_false_label(++label_number); print_jump_start_label(); print_pop_label();}
                         ;
 
 
 /* -----------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+function_parameters : literal                   {   compare_two_string_types($1->type, symbol_table[++function_pointer].symbol_type); /* Compares two types specified as strings */
+                                                    counter_parameters--; };
+
+                    | literal                   {   compare_two_string_types($1->type, symbol_table[++function_pointer].symbol_type); 
+                                                    counter_parameters--; } ',' function_parameters
+                    ;
+
 function_arguments : data_type IDENTIFIER       {   print_pop_identifier($2);} 
                                                 {   check_same_scope_redeclaration($2); 
                                                     add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); 
@@ -524,9 +529,9 @@ function_definition : data_type IDENTIFIER      { print_function_start($2);   }
                                                 {   check_same_scope_redeclaration($2); 
                                                     add_symbol($2, $1->type, 0, 0, 0, scopes[scope_index-1]); 
                                                     counter_arguments = symbol_table_index;} 
-                                                {enter_scope();} 
+                                                {starting_scope();} 
                                                 function_definition_res '{' code_block '}' 
-                                                {exit_scope(); print_function_end($2); modify_symbol_parameter($2, counter_arguments);}
+                                                {end_scope(); print_function_end($2); modify_symbol_parameter($2, counter_arguments);}
                     ;
 
 function_definition_res : '(' function_arguments ')' 
@@ -558,7 +563,7 @@ enum_body : IDENTIFIER                                      {   check_same_scope
                                                                 print_pop_identifier($1); }
 
           | IDENTIFIER '=' expression                       {   check_same_scope_redeclaration($1); 
-                                                                check_type(fill_enum_values, $3); 
+                                                                compare_types_two_nodes(fill_enum_values, $3); 
                                                                 add_symbol($1, "int", 1, 1, 0, scopes[scope_index-1]); 
                                                                 fill_enum_values->value_node.integer_value_node = $3->value_node.integer_value_node; 
                                                                 modify_symbol_value($1, fill_enum_values); 
@@ -572,7 +577,7 @@ enum_body : IDENTIFIER                                      {   check_same_scope
                                                                 print_pop_identifier($3); }
 
           | enum_body ',' IDENTIFIER  '=' expression        {   check_same_scope_redeclaration($3); 
-                                                                check_type(fill_enum_values, $5); 
+                                                                compare_types_two_nodes(fill_enum_values, $5); 
                                                                 add_symbol($3, "int", 1, 1, 0, scopes[scope_index-1]); 
                                                                 fill_enum_values->value_node.integer_value_node = $5->value_node.integer_value_node; 
                                                                 modify_symbol_value($3, fill_enum_values); 
@@ -580,27 +585,27 @@ enum_body : IDENTIFIER                                      {   check_same_scope
           ;
 
 enum_declaration : IDENTIFIER IDENTIFIER                    {   check_out_of_scope_declaration($1); 
-                                                                check_type_2($1, create_enum_node());   /* Checks the type of a symbol against a given node type */
+                                                                check_symbol_against_node_type($1, create_enum_node());   /* Checks the type of a symbol against a given node type */
                                                                 check_same_scope_redeclaration($2); 
                                                                 add_symbol($2, "int", 0, 0, 0, scopes[scope_index-1]); }
 
                  | IDENTIFIER IDENTIFIER '=' expression     {   check_out_of_scope_declaration($1); 
-                                                                check_type_2($1, create_enum_node()); 
+                                                                check_symbol_against_node_type($1, create_enum_node()); 
                                                                 check_same_scope_redeclaration($2); 
                                                                 add_symbol($2, "int", 0, 1, 0, scopes[scope_index-1]); 
-                                                                check_type($4, create_int_node()); 
+                                                                compare_types_two_nodes($4, create_int_node()); 
                                                                 modify_symbol_value($2, $4); 
                                                                 print_pop_identifier($2); }
                  ;
 
-                 // example :
-                 /* enum Color {
-                        RED,
-                        GREEN,
-                        BLUE
-                    };
-                    Color myColor = RED;
-                    } */
+    // example for enum:
+    /* enum Color {
+        RED,
+        GREEN,
+        BLUE
+    };
+    Color myColor = RED;
+    } */
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 %%
@@ -793,19 +798,27 @@ void write_symbol_table_to_file(){
         {
             case 'i':
                 fprintf(filePointer, "Name:%c,Type:%s,Value:%d,Declared:%d,Initialized:%d,Used:%d,Constant:%d,Scope:%d\n", 
-                        symbol_table[i].name, symbol_table[i].symbol_type, symbol_table[i].value_symbol.integer_value_symbol, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
+                        symbol_table[i].name, symbol_table[i].symbol_type, symbol_table[i].value_symbol.integer_value_symbol, 
+                        symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, 
+                        symbol_table[i].constant_flag, symbol_table[i].scope);
                 break;
             case 'f':
                 fprintf(filePointer, "Name:%c,Type:%s,Value:%f,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
-                        symbol_table[i].name, symbol_table[i].symbol_type, symbol_table[i].value_symbol.float_value_symbol, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
+                        symbol_table[i].name, symbol_table[i].symbol_type, symbol_table[i].value_symbol.float_value_symbol, 
+                        symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag,
+                        symbol_table[i].constant_flag, symbol_table[i].scope);
                 break;
             case 'b':
                 fprintf(filePointer, "Name:%c,Type:%s,Value:%d,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
-                        symbol_table[i].name, symbol_table[i].symbol_type, symbol_table[i].value_symbol.bool_value_symbol, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
+                        symbol_table[i].name, symbol_table[i].symbol_type, symbol_table[i].value_symbol.bool_value_symbol, 
+                        symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag,
+                        symbol_table[i].constant_flag, symbol_table[i].scope);
                 break;
             case 's':
                 fprintf(filePointer, "Name:%c,Type:%s,Value:%s,Declared:%d,Initialized:%d,Used:%d,Const:%d,Scope:%d\n", 
-                        symbol_table[i].name, symbol_table[i].symbol_type, symbol_table[i].value_symbol.string_value_symbol, symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, symbol_table[i].constant_flag, symbol_table[i].scope);
+                        symbol_table[i].name, symbol_table[i].symbol_type, symbol_table[i].value_symbol.string_value_symbol,
+                        symbol_table[i].declared_flag, symbol_table[i].initialized_flag, symbol_table[i].used_flag, 
+                        symbol_table[i].constant_flag, symbol_table[i].scope);
                 break;
             default:
                 fprintf(filePointer, "Error: Invalid type\n");
@@ -1192,7 +1205,7 @@ struct NodeType* create_enum_node() {
 
 
 /* ------------------------- Compares the types of two node -----------------------------*/
-void check_type(struct NodeType* first_type, struct NodeType* second_type) {
+void compare_types_two_nodes(struct NodeType* first_type, struct NodeType* second_type) {
     if( strcmp(first_type->type, second_type->type) != 0 ) {
         log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, second_type->type); 
     }
@@ -1200,7 +1213,7 @@ void check_type(struct NodeType* first_type, struct NodeType* second_type) {
 }
 
 /* ------------------------- Checks the type of a symbol against a given node type -----------------------------*/
-void check_type_2(char symbol, struct NodeType* second_type) {
+void check_symbol_against_node_type(char symbol, struct NodeType* second_type) {
     for( int i=symbol_table_index-1 ; i>=0 ; i-- ) 
     {
         if( symbol_table[i].name == symbol ) 
@@ -1223,13 +1236,7 @@ void check_type_2(char symbol, struct NodeType* second_type) {
     return;
 }
 
-/* ------------------------- Compares two types specified as strings -----------------------------*/
-void check_type_3(char* first_type, char* second_type){
-    if( strcmp(first_type, second_type) != 0 ) {
-        log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, second_type);
-    }
-    return;
-}
+
 
 /* ------------------------- General Checking Functions -----------------------------*/
 /* -------------------------
@@ -1372,6 +1379,14 @@ int check_variable_declaration_as_constant_same_scope(char variable_name) {
     return 0;
 }
 
+/* ------------------------- Compares two types specified as strings -----------------------------*/
+void compare_two_string_types(char* first_type, char* second_type){
+    if( strcmp(first_type, second_type) != 0 ) {
+        log_semantic_error(SEMANTIC_ERROR_TYPE_MISMATCH, second_type);
+    }
+    return;
+}
+
 /* --------------------------------- Setter functions ---------------------------------------*/
 
 /* -------------------------
@@ -1434,7 +1449,7 @@ void mark_variable_declared_in_symbol_table(char variable_name) {
 /* -------------------------
 Enters a new scope by updating the scope array and index
 ------------------------- */
-void enter_scope() {
+void starting_scope() {
     scopes[scope_index] = scope_count;
     scope_index++;
     scope_count++;
@@ -1443,7 +1458,7 @@ void enter_scope() {
 /* -------------------------
 Exits the current scope by decrementing the scope index
 ------------------------- */
-void exit_scope() {
+void end_scope() {
     scope_index--;
 }
 

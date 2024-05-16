@@ -1,0 +1,3 @@
+int b = 5
+string x = "Karim";
+print(x);

@@ -8,3 +8,6 @@ print(b);
 
 bool x = true;
 print(x);
+
+string y = "Karim";
+print(y);

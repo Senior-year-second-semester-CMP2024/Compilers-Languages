@@ -1,4 +1,0 @@
-	PUSH 5
-	POP b
-Syntax error (2) Near line 2: syntax error
-Semantic error (2): Unused variable 'b'
