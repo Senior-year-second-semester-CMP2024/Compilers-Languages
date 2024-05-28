@@ -55,7 +55,7 @@ function writeToHTML(output) {
   // Update symbol table
   var symbolTable = output.symbol_table;
   var symbolTableHTML =
-    "<table><tr><th>Name</th><th>Type</th><th>Value</th><th>Declared</th><th>Initialized</th><th>Used</th><th>Scope</th></tr>";
+    "<table><tr><th>Name</th><th>Type</th><th>Value</th><th>Declared</th><th>Initialized</th><th>Used</th><th>Scope</th><th>Constant</th></tr>";
   for (var key in symbolTable) {
     if (symbolTable.hasOwnProperty(key)) {
       var symbol = symbolTable[key];
@@ -67,6 +67,7 @@ function writeToHTML(output) {
       symbolTableHTML += "<td>" + symbol.Initialized + "</td>";
       symbolTableHTML += "<td>" + symbol.Used + "</td>";
       symbolTableHTML += "<td>" + symbol.Scope + "</td>";
+      symbolTableHTML += "<td>" + symbol.Constant + "</td>";
       symbolTableHTML += "</tr>";
     }
   }
